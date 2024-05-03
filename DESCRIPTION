@@ -1,17 +1,18 @@
-Package: jaspModule
+Package: jaspesci
 Type: Package
-Title: A module for JASP
+Title: esci for JASP
 Version: 0.1.0
-Date: 2020-10-15
-Author: JASP Team
-Website: jasp-stats.org
-Maintainer: JASP Team <info@jasp-stats.org>
+Date: 2024-05-02
+Author: Robert Calin-Jageman
+Website: thenewstatistics.com
+Maintainer: Robert Calin-Jageman <rcalinjageman@dom.edu>
 Description: This module offers analyses.
 License: GPL (>= 2)
 Encoding: UTF-8
 Imports:
   jaspBase,
-  jaspGraphs
+  jaspGraphs,
+  esci
 Suggests:
   testthat
 Remotes:

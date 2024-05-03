@@ -3,12 +3,25 @@ import JASP.Module	1.0
 
 Description
 {
-	name		: "jaspModule"
-	title		: qsTr("Jasp Module")
-	description	: qsTr("This module offers analyses.")
+	name		: "jaspesci"
+	title		: qsTr("esci")
+	description	: qsTr("esci in JASP")
 	version		: "0.1"
-	author		: "JASP Team"
-	maintainer	: "JASP Team <info@jasp-stats.org>"
-	website		: "https://jasp-stats.org"
+	author		: "Robert Calin-Jageman"
+	maintainer	: "Robert Calin-Jageman <rcalinjageman@dom.edu>"
+	website		: "https://thenewstatistics.com/"
+	icon		: "esci_logo.svg"
 	license		: "GPL (>= 2)"
+
+	GroupTitle
+	{
+		title:	qsTr("Means and Medians")
+	}
+
+	Analysis
+	{
+		title:	qsTr("Single Group")
+		func:	"jasp_estimate_mdiff_one"
+	}
+
 }
