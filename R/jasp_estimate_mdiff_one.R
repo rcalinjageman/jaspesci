@@ -1,14 +1,14 @@
 jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
 
-  ready <- (length(options$variables) > 0)
+  ready <- (length(options$outcome_variable) > 0)
 
   if (ready) {
     # read dataset
     dataset <- jasp_estimate_mdiff_one_read_data(dataset, options)
 
     # check for errors
-    for (variable in options$variables) {
+    for (variable in options$outcome_variable) {
       .hasErrors(
         dataset = dataset,
         type = "observations",
@@ -21,21 +21,23 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
 
     # Run the analysis
+    my_reference_mean <- 0
+    if (options$hypothesis_evaluation) my_reference_mean <- options$reference_mean
+
     estimate <- esci::estimate_mdiff_one(
       data = dataset,
-      outcome_variable = encodeColNames(options$variables),
-      reference_mean = if (options$hypothesisEvaluation) options$nullValue else 0,
-      conf_level = options$ciLevel,
+      outcome_variable = encodeColNames(options$outcome_variable),
+      reference_mean = my_reference_mean,
+      conf_level = options$conf_level,
       save_raw_data = FALSE
     )
 
    # Some results tweaks
-    alpha <- 1 - as.numeric(options$ciLevel)
+    alpha <- 1 - as.numeric(options$conf_level)
     estimate$overview$t_multiplier <- stats::qt(1-alpha/2, estimate$overview$df)
     estimate$overview$s_component <- estimate$overview$sd
     estimate$overview$n_component <- 1/sqrt(estimate$overview$n)
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
-
 
 
     # Define and fill tables
@@ -45,44 +47,47 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
     }
 
-    if (options$hypothesisEvaluation) {
+    if (options$hypothesis_evaluation) {
       # SMD
-      estimate$es_smd$reference_value <- options$nullValue
-      estimate$es_smd$mean <- estimate$es_smd$numerator + options$nullValue
+      estimate$es_smd$reference_value <- options$reference_mean
+      estimate$es_smd$mean <- estimate$es_smd$numerator + options$reference_mean
 
-      if (options$effectSize == "Mean" & is.null(jaspResults[["smdTable"]]) ) {
+      if (options$effect_size == "mean" & is.null(jaspResults[["smdTable"]]) ) {
         jasp_smd_prep(jaspResults, dataset, options, ready)
         jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd)
-      } else {
-        jaspResults[["smdTable"]] <- NULL
-      }
+      } # else {
+        # jaspResults[["smdTable"]] <- NULL
+      # }
 
 
       # Hypothesis evaluation
-      myrope <- c(-1 * options$nullROPE, options$nullROPE)
-      myeffectsize <- if (options$effectSize == "Mean") "mean" else "median"
+      my_rope <- c(-1 * options$rope, options$rope)
 
       test_results <- esci::test_mdiff(
         estimate,
-        effect_size = myeffectsize,
-        rope = myrope,
+        effect_size = options$effect_size,
+        rope = my_rope,
         rope_units = "raw",
         output_html = TRUE
       )
 
       if (is.null(jaspResults[["heTable"]]) ) {
-        if (options$nullROPE == 0) {
+        if (options$rope == 0) {
           jasp_he_point_prep(jaspResults, dataset, options, ready)
         } else {
           jasp_he_interval_prep(jaspResults, dataset, options, ready)
         }
-        jasp_table_fill(jaspResults[["heTable"]], if (options$nullROPE == 0) test_results$point_null else test_results$interval_null)
+
+        to_fill <- test_results$point_null
+        if (options$rope >0) to_fill <- test_results$interval_null
+
+        jasp_table_fill(jaspResults[["heTable"]], to_fill)
       }
 
-    } else {
-      jaspResults[["smdTable"]] <- NULL
-      jaspResults[["heTable"]] <- NULL
-    }
+    } # else {
+      # jaspResults[["smdTable"]] <- NULL
+      # jaspResults[["heTable"]] <- NULL
+    # }
 
   }  # end of ready
 
@@ -95,14 +100,14 @@ jasp_estimate_mdiff_one_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
   else
-    return(.readDataSetToEnd(columns.as.numeric = options$variables))
+    return(.readDataSetToEnd(columns.as.numeric = options$outcome_variable))
 }
 
 
 jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable <- createJaspTable(title = "Overview")
 
-  overviewTable$dependOn(c("variables", "ciLevel", "extraDetails", "effectSize", "calculationComponents"))
+  overviewTable$dependOn(c("outcome_variable", "conf_level", "extraDetails", "effect_size", "calculationComponents"))
 
 
   overviewTable$addColumnInfo(
@@ -113,7 +118,7 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
   )
 
 
-  if (options$effectSize == "Mean") {
+  if (options$effect_size == "mean") {
     overviewTable$addColumnInfo(
       name = "mean",
       title = "<i>M</i>",
@@ -125,13 +130,13 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
       name = "mean_LL",
       title = "LL",
       type = "number",
-      overtitle = paste0(100 * options$ciLevel, "% CI")
+      overtitle = paste0(100 * options$conf_level, "% CI")
     )
     overviewTable$addColumnInfo(
       name = "mean_UL",
       title = "UL",
       type = "number",
-      overtitle = paste0(100 * options$ciLevel, "% CI")
+      overtitle = paste0(100 * options$conf_level, "% CI")
     )
 
     if (options$extraDetails) {
@@ -159,7 +164,7 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
   }
 
 
-  if (options$effectSize == "Median") {
+  if (options$effect_size == "median") {
     overviewTable$addColumnInfo(
       name = "median",
       title = "<i>Mdn</i>",
@@ -170,13 +175,13 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
       name = "median_LL",
       title = "LL",
       type = "number",
-      overtitle = paste0(100 * options$ciLevel, "% CI")
+      overtitle = paste0(100 * options$conf_level, "% CI")
     )
     overviewTable$addColumnInfo(
       name = "median_UL",
       title = "UL",
       type = "number",
-      overtitle = paste0(100 * options$ciLevel, "% CI")
+      overtitle = paste0(100 * options$conf_level, "% CI")
     )
 
 
@@ -244,7 +249,7 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
   )
 
 
-  if (options$calculationComponents & options$effectSize == "Mean") {
+  if (options$calculationComponents & options$effect_size == "mean") {
     overviewTable$addColumnInfo(
       name = "df",
       title = "<i>df</i>",
@@ -278,7 +283,7 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(length(options$variables))
+    overviewTable$setExpectedSize(length(options$outcome_variable))
 
   jaspResults[["overviewTable"]] <- overviewTable
 
@@ -292,7 +297,7 @@ jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
 jasp_smd_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable <- createJaspTable(title = "Standardized Mean Difference")
 
-  overviewTable$dependOn(c("variables", "ciLevel", "effectSize", "extraDetails", "nullValue", "hypothesisEvaluation"))
+  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "extraDetails", "reference_mean", "hypothesis_evaluation"))
 
 
   overviewTable$addColumnInfo(
@@ -338,14 +343,14 @@ jasp_smd_prep <- function(jaspResults, dataset, options, ready) {
       name = "LL",
       title = "LL",
       type = "number",
-      overtitle = paste0(100 * options$ciLevel, "% CI")
+      overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
   overviewTable$addColumnInfo(
     name = "UL",
     title = "UL",
     type = "number",
-    overtitle = paste0(100 * options$ciLevel, "% CI")
+    overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
   overviewTable$addColumnInfo(
@@ -374,7 +379,7 @@ jasp_smd_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(length(options$variables))
+    overviewTable$setExpectedSize(length(options$outcome_variable))
 
   jaspResults[["smdTable"]] <- overviewTable
 
@@ -386,7 +391,7 @@ jasp_smd_prep <- function(jaspResults, dataset, options, ready) {
 jasp_he_point_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
 
-  overviewTable$dependOn(c("variables", "ciLevel", "effectSize", "nullValue", "nullROPE", "hypothesisEvaluation"))
+  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "hypothesis_evaluation"))
 
 
   overviewTable$addColumnInfo(
@@ -414,7 +419,7 @@ jasp_he_point_prep <- function(jaspResults, dataset, options, ready) {
     type = "string"
   )
 
-  if (options$effectSize == "Mean") {
+  if (options$effect_size == "mean") {
     overviewTable$addColumnInfo(
       name = "t",
       title = "<i>t</i>",
@@ -458,7 +463,7 @@ jasp_he_point_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(length(options$variables))
+    overviewTable$setExpectedSize(length(options$outcome_variable))
 
   jaspResults[["heTable"]] <- overviewTable
 
@@ -470,7 +475,7 @@ jasp_he_point_prep <- function(jaspResults, dataset, options, ready) {
 jasp_he_interval_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
 
-  overviewTable$dependOn(c("variables", "ciLevel", "effectSize", "nullValue", "nullROPE", "hypothesisEvaluation"))
+  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "hypothesis_evaluation"))
 
 
   overviewTable$addColumnInfo(
@@ -515,7 +520,7 @@ jasp_he_interval_prep <- function(jaspResults, dataset, options, ready) {
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(length(options$variables))
+    overviewTable$setExpectedSize(length(options$outcome_variable))
 
   jaspResults[["heTable"]] <- overviewTable
 

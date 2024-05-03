@@ -26,72 +26,87 @@ Form
 	id: form
 	property int framework:	Common.Type.Framework.Classical
 
-	Formula { rhs: "variables" }
-
 	VariablesForm
 	{
 		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
 		AvailableVariablesList { name: "allVariablesList" }
-		AssignedVariablesList { name: "variables"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
+		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
 	}
+
 
 	Group
 	{
-		title: qsTr(qsTr("<b>Analysis options</b>"))
+		title: qsTr("<b>Analysis options</b>")
 		CIField
 		  {
-		    name: "ciLevel"
+		    name: "conf_level"
 		    label: qsTr("Confidence level")
-		    id: ciValue
+		    id: conf_level
+		    min: 75
 		  }
 		DropDown
       {
-        name: "effectSize"
+        name: "effect_size"
         label: qsTr("Effect size of interest")
-        values: ["Mean", "Median"]
-        id: effectSizeChoice
+        values:
+          [
+            { label: "Mean", value: "mean"},
+            { label: "Median", value: "median"}
+          ]
+        id: effect_size
       }
 	}
 
 	Group
 	{
-	  title: qsTr(qsTr("<b>Results options</b>"))
-	  CheckBox { name: "extraDetails";	label: qsTr("Extra details") }
-	  CheckBox { name: "calculationComponents";	label: qsTr("Calculation components"); enabled: effectSizeChoice.currentValue == "Mean" }
+	  title: qsTr("<b>Results options</b>")
+	  CheckBox
+	  {
+	    name: "extraDetails";
+	    label: qsTr("Extra details")
+	   }
+	  CheckBox
+	  {
+	    name: "calculationComponents";
+	    label: qsTr("Calculation components");
+	    enabled: effect_size.currentValue == "mean"
+	   }
 	}
 
 
 	Section
   {
-  title: qsTr("Hypothesis evaluation")
+    title: qsTr("Hypothesis evaluation")
 
-  CheckBox
-  {
-  name: "hypothesisEvaluation"
-  label: qsTr("Hypothesis evaluation")
-  id: hypEval
-  }
+    CheckBox
+    {
+    name: "hypothesis_evaluation"
+    label: qsTr("Hypothesis evaluation")
+    id: hypothesis_evaluation
+    }
 
-  Group
-  {
-    DoubleField
+    Group
     {
-      name: "nullValue"
-      label: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
-      defaultValue: 0
-      enabled: hypEval.checked
-      visible: hypEval.checked
+      DoubleField
+      {
+        name: "reference_mean"
+        label: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
+        defaultValue: 0
+        enabled: hypothesis_evaluation.checked
+        visible: hypothesis_evaluation.checked
+      }
+
+      DoubleField
+      {
+        name: "rope"
+        label: qsTr("+/- ")
+        defaultValue: 0
+        negativeValues: false
+        enabled: hypothesis_evaluation.checked
+        visible: hypothesis_evaluation.checked
+        afterLabel: "alpha: " + conf_level.currentValue
+      }
     }
-    DoubleField
-    {
-      name: "nullROPE"
-      label: qsTr("+/- ")
-      defaultValue: 0
-      enabled: hypEval.checked
-      visible: hypEval.checked
-      afterLabel: "alpha: " + (1 - ciValue)
-    }
-  }
 }
 
 }
