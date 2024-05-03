@@ -12,7 +12,9 @@ Encoding: UTF-8
 Imports:
   jaspBase,
   jaspGraphs,
-  esci
+  esci,
+  ggdist,
+  dplyr
 Suggests:
   testthat
 Remotes:
