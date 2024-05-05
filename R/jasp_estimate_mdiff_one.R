@@ -29,7 +29,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       outcome_variable = encodeColNames(options$outcome_variable),
       reference_mean = my_reference_mean,
       conf_level = options$conf_level,
-      save_raw_data = FALSE
+      save_raw_data = TRUE
     )
 
    # Some results tweaks
@@ -47,7 +47,11 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
     }
 
-    if (options$hypothesis_evaluation) {
+    hypothesis_evaluation <- options$hypothesis_evaluation
+    interval_null <- options$rope > 0
+
+
+    if (hypothesis_evaluation) {
       # SMD
       estimate$es_smd$reference_value <- options$reference_mean
       estimate$es_smd$mean <- estimate$es_smd$numerator + options$reference_mean
@@ -88,6 +92,38 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       # jaspResults[["smdTable"]] <- NULL
       # jaspResults[["heTable"]] <- NULL
     # }
+
+
+    if (is.null(jaspResults[["mdiffPlot"]])) {
+      jasp_plot_magnitude_prep(jaspResults, options)
+
+      args <- list()
+      args$estimate <- estimate
+      args$effect_size <- options$effect_size
+      args$data_layout <- options$data_layout
+      args$data_spread <- options$data_spread
+      args$error_layout <- options$error_layout
+      args$error_scale <- options$error_scale
+      args$error_nudge <- options$error_nudge
+      if (hypothesis_evaluation) {
+        args$rope <- c(
+          options$reference_mean - options$rope,
+          options$reference_mean + options$rope
+        )
+      }
+
+      myplot <- do.call(
+        what = esci::plot_magnitude,
+        args = args
+      )
+
+      myplot <- jasp_plot_magnitude_decorate(myplot, options)
+
+      jaspResults[["mdiffPlot"]]$plotObject <- myplot
+
+
+    }
+
 
   }  # end of ready
 
@@ -528,6 +564,107 @@ jasp_he_interval_prep <- function(jaspResults, dataset, options, ready) {
 
 }
 
+
+
+jasp_plot_magnitude_prep <- function(jaspResults, options) {
+  mdiffPlot <- createJaspPlot(
+    title = "Estimation Figure",
+    width = options$width,
+    height = options$height
+  )
+
+  mdiffPlot$dependOn(
+    c(
+      "outcome_variable",
+      "conf_level",
+      "effect_size",
+      "reference_mean",
+      "rope",
+      "hypothesis_evaluation",
+      "width",
+      "height",
+      "data_layout",
+      "data_spread",
+      "error_layout",
+      "error_scale",
+      "error_nudge",
+      "ylab",
+      "xlab",
+      "axis.text.y",
+      "axis.title.y",
+      "axis.text.x",
+      "axis.title.x",
+      "ymin",
+      "ymax",
+      "shape_summary",
+      "size_summary"
+    )
+  )
+
+  jaspResults[["mdiffPlot"]] <- mdiffPlot
+
+  return()
+
+}
+
+
+
+jasp_plot_magnitude_decorate <- function(myplot, options) {
+
+  divider <- 1
+  if (options$effect_size == "median") divider <- 4
+
+
+  myplot <- myplot + ggplot2::theme(
+    axis.text.y = ggtext::element_markdown(size = options$axis.text.y),
+    axis.title.y = ggtext::element_markdown(size = options$axis.title.y),
+    axis.text.x = ggtext::element_markdown(size = options$axis.text.x),
+    axis.title.x = ggtext::element_markdown(size = options$axis.title.x)
+  )
+
+  if (!(options$ylab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::ylab(options$ylab)
+  }
+
+  if (!(options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::xlab(options$xlab)
+  }
+
+  limits <- c(NA, NA)
+
+  if (!(options$ymin %in% c("auto", "Auto", "AUTO", ""))) {
+    try(limits[[1]] <- as.numeric(options$ymin))
+  }
+
+  if (!(options$ymax %in% c("auto", "Auto", "AUTO", ""))) {
+    try(limits[[2]] <- as.numeric(options$ymax))
+  }
+
+  myplot <- myplot + ggplot2::scale_y_continuous(
+    limits = limits
+  )
+
+
+  myplot <- myplot + ggplot2::scale_shape_manual(
+    values = c(
+      "raw" = options$shape_summary,
+      "summary" = options$shape_summary
+    )
+  )
+
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    c("size", "point_size"),
+    "point_size_d",
+    function(n) return(c(
+      "raw" = as.numeric(options$size_summary),
+      "summary" = as.numeric(options$size_summary)/divider
+    ))
+  )
+
+
+  return(myplot)
+}
 
 
 jasp_table_fill <- function(overviewTable, overview) {

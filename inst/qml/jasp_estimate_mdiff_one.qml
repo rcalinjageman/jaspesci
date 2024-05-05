@@ -18,6 +18,7 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import JASP
 import JASP.Controls
 
@@ -73,6 +74,245 @@ Form
 	   }
 	}
 
+  Section
+  {
+    title: qsTr("Figure Options")
+
+    Group
+    {
+    title: qsTr("Dimensions")
+    IntegerField
+      {
+        name: "width"
+        label: qsTr("Width")
+        defaultValue: 300
+        min: 100
+        max: 3000
+      }
+
+    IntegerField
+      {
+        name: "height"
+        label: qsTr("Height")
+        defaultValue: 400
+        min: 100
+        max: 3000
+      }
+
+    }
+
+
+    Group
+    {
+    title: qsTr("<i>Y</i> axis")
+    TextField
+      {
+        name: "ylab"
+        label: qsTr("Label")
+        placeholderText: "auto"
+      }
+
+    IntegerField
+      {
+        name: "axis.text.y"
+        label: qsTr("Tick Font Size")
+        defaultValue: 14
+        min: 2
+        max: 80
+      }
+
+    IntegerField
+      {
+        name: "axis.title.y"
+        label: qsTr("Label Font Size")
+        defaultValue: 15
+        min: 2
+        max: 80
+      }
+
+    TextField
+      {
+        name: "ymin"
+        label: qsTr("Min")
+        placeholderText: "auto"
+      }
+
+    TextField
+      {
+        name: "ymax"
+        label: qsTr("Max")
+        placeholderText: "auto"
+      }
+
+    TextField
+      {
+        name: "y.breaks"
+        label: qsTr("Num. tick marks")
+        placeholderText: "auto"
+      }
+    }
+
+    Group
+    {
+    title: qsTr("<i>X</i> axis")
+    TextField
+      {
+        name: "xlab"
+        label: qsTr("Label")
+        placeholderText: "auto"
+      }
+
+    IntegerField
+      {
+        name: "axis.text.x"
+        label: qsTr("Tick Font Size")
+        defaultValue: 14
+        min: 2
+        max: 80
+      }
+
+    IntegerField
+      {
+        name: "axis.title.x"
+        label: qsTr("Label Font Size")
+        defaultValue: 15
+        min: 2
+        max: 80
+      }
+    }
+
+    Group
+    {
+    title: qsTr("Distributions")
+    DoubleField
+      {
+        name: "error_scale"
+        label: qsTr("Label")
+        defaultValue: 0.20
+        min: 0
+        max: 5
+      }
+
+
+    DropDown
+      {
+        name: "error_layout"
+        label: qsTr("Style")
+        values:
+          [
+            { label: "Plausibility curve", value: "halfeye"},
+            { label: "Cat's eye", value: "eye"},
+            { label: "None", value: "none"}
+          ]
+        id: error_layout
+      }
+
+    }
+
+    Group
+    {
+    title: qsTr("Data")
+
+    DropDown
+      {
+        name: "data_layout"
+        label: qsTr("Layout")
+        values:
+          [
+            { label: "Random", value: "random"},
+            { label: "Swarm", value: "swarm"},
+            { label: "None", value: "none"}
+          ]
+        id: data_layout
+      }
+
+
+    DoubleField
+      {
+        name: "data_spread"
+        label: qsTr("Layout")
+        defaultValue: 0.25
+        min: 0
+        max: 5
+      }
+
+    DoubleField
+      {
+        name: "error_nudge"
+        label: qsTr("Offset from CI")
+        defaultValue: 0.3
+        min: 0
+        max: 5
+      }
+
+
+    }
+
+
+  Section
+  {
+    title: qsTr("Aesthetics")
+
+    Group
+    {
+    title: qsTr("Summary")
+
+      DropDown
+      {
+        name: "shape_summary"
+        label: qsTr("Shape")
+        values:
+          [
+            { label: "Circle", value: "circle filled"},
+            { label: "Square", value: "square filled"},
+            { label: "Diamond", value: "diamond filled"},
+            { label: "Triangle", value: "triangle filled"}
+          ]
+        id: summary_shape
+      }
+
+      IntegerField
+      {
+        name: "size_summary"
+        label: qsTr("Size")
+        defaultValue: 4
+        min: 1
+        max: 6
+      }
+
+
+
+      Rectangle {
+        id: color_summary
+        color: "steelblue"
+        width: 40; height: 40
+
+        MouseArea {
+          anchors.fill: parent
+          onClicked: { colorDialog.open() }
+        }
+
+        ColorDialog {
+          id: colorDialog
+          selectedColor: color_summary.color
+          onAccepted: color_summary.color = selectedColor
+        }
+
+
+      }
+
+
+
+
+
+
+
+
+    }
+  }
+
+
+  }
 
 	Section
   {
@@ -106,7 +346,9 @@ Form
         visible: hypothesis_evaluation.checked
         afterLabel: "alpha: " + conf_level.currentValue
       }
+
+
     }
-}
+  }
 
 }
