@@ -21,6 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import JASP
 import JASP.Controls
+import "./esci" as Esci
 
 Form
 {
@@ -38,6 +39,8 @@ Form
 	Group
 	{
 		title: qsTr("<b>Analysis options</b>")
+		columns: 2
+		Layout.columnSpan: 2
 		CIField
 		  {
 		    name: "conf_level"
@@ -61,6 +64,8 @@ Form
 	Group
 	{
 	  title: qsTr("<b>Results options</b>")
+		columns: 2
+		Layout.columnSpan: 2
 	  CheckBox
 	  {
 	    name: "extraDetails";
@@ -77,10 +82,11 @@ Form
   Section
   {
     title: qsTr("Figure Options")
-
     Group
     {
     title: qsTr("Dimensions")
+    columns: 2
+    Layout.columnSpan: 2
     IntegerField
       {
         name: "width"
@@ -105,12 +111,20 @@ Form
     Group
     {
     title: qsTr("<i>Y</i> axis")
-    TextField
+    columns: 2
+    Layout.columnSpan: 2
+
+    Group
+    {
+      Layout.columnSpan: 2
+      TextField
       {
         name: "ylab"
         label: qsTr("Label")
         placeholderText: "auto"
       }
+    }
+
 
     IntegerField
       {
@@ -146,7 +160,7 @@ Form
 
     TextField
       {
-        name: "y.breaks"
+        name: "n.breaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
       }
@@ -155,12 +169,19 @@ Form
     Group
     {
     title: qsTr("<i>X</i> axis")
-    TextField
+    columns: 2
+    Layout.columnSpan: 2
+
+    Group {
+      Layout.columnSpan: 2
+
+      TextField
       {
         name: "xlab"
         label: qsTr("Label")
         placeholderText: "auto"
       }
+    }
 
     IntegerField
       {
@@ -184,6 +205,9 @@ Form
     Group
     {
     title: qsTr("Distributions")
+    columns: 2
+    Layout.columnSpan: 2
+
     DoubleField
       {
         name: "error_scale"
@@ -194,16 +218,9 @@ Form
       }
 
 
-    DropDown
+    Esci.ErrorLayout
       {
         name: "error_layout"
-        label: qsTr("Style")
-        values:
-          [
-            { label: "Plausibility curve", value: "halfeye"},
-            { label: "Cat's eye", value: "eye"},
-            { label: "None", value: "none"}
-          ]
         id: error_layout
       }
 
@@ -212,17 +229,12 @@ Form
     Group
     {
     title: qsTr("Data")
+    columns: 2
+    Layout.columnSpan: 2
 
-    DropDown
+    Esci.DataLayout
       {
         name: "data_layout"
-        label: qsTr("Layout")
-        values:
-          [
-            { label: "Random", value: "random"},
-            { label: "Swarm", value: "swarm"},
-            { label: "None", value: "none"}
-          ]
         id: data_layout
       }
 
@@ -256,77 +268,181 @@ Form
     Group
     {
     title: qsTr("Summary")
+    columns: 2
+    Layout.columnSpan: 2
 
-      DropDown
+      Esci.ShapeSelect
       {
         name: "shape_summary"
-        label: qsTr("Shape")
-        values:
-          [
-            { label: "Circle", value: "circle filled"},
-            { label: "Square", value: "square filled"},
-            { label: "Diamond", value: "diamond filled"},
-            { label: "Triangle", value: "triangle filled"}
-          ]
-        id: summary_shape
+        id: shape_summary
+      }
+
+      Esci.SizeSelect
+      {
+        name: "size_summary"
+      }
+
+      Esci.ColorSelect
+      {
+        name: "color_summary"
+        label: qsTr("Outline")
+        startValue: '#008DF9'
+        id: color_summary
+      }
+
+
+      Esci.ColorSelect
+      {
+        name: "fill_summary"
+        label: qsTr("Fill")
+        startValue: '#008DF9'
+        id: fill_summary
+      }
+
+
+      Esci.AlphaSelect
+      {
+        name: "alpha_summary"
+      }
+
+
+    }
+
+
+
+    Group
+    {
+    title: qsTr("CI")
+    columns: 2
+    Layout.columnSpan: 2
+
+      Esci.LineTypeSelect
+      {
+        name: "linetype_summary"
+        id: linetype_summary
       }
 
       IntegerField
       {
-        name: "size_summary"
-        label: qsTr("Size")
-        defaultValue: 4
+        name: "size_interval"
+        label: qsTr("Thickness")
+        defaultValue: 3
         min: 1
-        max: 6
+        max: 10
       }
 
-
-
-      Rectangle {
-        id: color_summary
-        color: "steelblue"
-        width: 40; height: 40
-
-        MouseArea {
-          anchors.fill: parent
-          onClicked: { colorDialog.open() }
-        }
-
-        ColorDialog {
-          id: colorDialog
-          selectedColor: color_summary.color
-          onAccepted: color_summary.color = selectedColor
-        }
-
-
+      Esci.ColorSelect
+      {
+        name: "color_interval"
+        label: qsTr("Color")
+        startValue: 'black'
+        id: color_interval
       }
 
-
-
-
-
-
+      Esci.AlphaSelect
+      {
+        name: "alpha_interval"
+      }
 
 
     }
-  }
+
+
+    Group
+    {
+    title: qsTr("Error distribution")
+    columns: 2
+    Layout.columnSpan: 2
+
+      Esci.ColorSelect
+      {
+        name: "fill_error"
+        label: qsTr("Fill")
+        startValue: 'gray75'
+        id: fill_error
+      }
+
+      Esci.AlphaSelect
+      {
+        name: "alpha_error"
+      }
+
+
+    }
+
+
+    Group
+    {
+    title: qsTr("The raw data")
+    columns: 2
+    Layout.columnSpan: 2
+
+      Esci.ShapeSelect
+      {
+        name: "shape_raw"
+        id: shape_raw
+      }
+
+      Esci.SizeSelect
+      {
+        name: "size_raw"
+        defaultValue: 2
+      }
+
+      Esci.ColorSelect
+      {
+        name: "color_raw"
+        label: qsTr("Outline")
+        startValue: '#008DF9'
+        id: color_raw
+      }
+
+      Esci.ColorSelect
+      {
+        name: "fill_raw"
+        label: qsTr("Fill")
+        startValue: 'NA'
+        id: fill_raw
+      }
+
+      Esci.AlphaSelect
+      {
+        name: "alpha_raw"
+      }
+
+
+    }
 
 
   }
+
+  }
+
+
 
 	Section
   {
     title: qsTr("Hypothesis evaluation")
 
-    CheckBox
+    Group
     {
-    name: "hypothesis_evaluation"
-    label: qsTr("Hypothesis evaluation")
-    id: hypothesis_evaluation
+      columns: 2
+      Layout.columnSpan: 2
+
+      CheckBox
+      {
+      name: "hypothesis_evaluation"
+      label: qsTr("Hypothesis evaluation")
+      id: hypothesis_evaluation
+      }
+
     }
 
     Group
     {
+      columns: 2
+      Layout.columnSpan: 2
+
       DoubleField
       {
         name: "reference_mean"
@@ -349,6 +465,18 @@ Form
 
 
     }
+
+
+      Esci.ColorSelect
+      {
+        name: "null_color"
+        label: qsTr("Color for null hypothesis")
+        startValue: '#A40122'
+        enabled: hypothesis_evaluation.checked
+        visible: hypothesis_evaluation.checked
+        id: null_color
+      }
+
   }
 
 }

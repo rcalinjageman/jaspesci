@@ -596,8 +596,24 @@ jasp_plot_magnitude_prep <- function(jaspResults, options) {
       "axis.title.x",
       "ymin",
       "ymax",
+      "n.breaks",
       "shape_summary",
-      "size_summary"
+      "size_summary",
+      "color_summary",
+      "fill_summary",
+      "alpha_summary",
+      "linetype_summary",
+      "size_interval",
+      "color_interval",
+      "alpha_interval",
+      "fill_error",
+      "alpha_error",
+      "shape_raw",
+      "size_raw",
+      "color_raw",
+      "fill_raw",
+      "alpha_raw",
+      "null_color"
     )
   )
 
@@ -640,27 +656,127 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     try(limits[[2]] <- as.numeric(options$ymax))
   }
 
+  n.breaks <- NULL
+  if (!(options$n.breaks %in% c("auto", "Auto", "AUTO", ""))) {
+    try(n.breaks <- as.numeric(options$n.breaks))
+    if (is.na(n.breaks)) n.breaks <- NULL
+  }
+
+
   myplot <- myplot + ggplot2::scale_y_continuous(
-    limits = limits
+    limits = limits,
+    n.breaks = n.breaks
   )
 
 
   myplot <- myplot + ggplot2::scale_shape_manual(
     values = c(
-      "raw" = options$shape_summary,
+      "raw" = options$shape_raw,
       "summary" = options$shape_summary
     )
   )
 
+  myplot <- myplot + ggplot2::scale_color_manual(
+    values = c(
+      "raw" = options$color_raw,
+      "summary" = options$color_summary
+    ),
+    aesthetics = c("color", "point_color")
+  )
+
+  myplot <- myplot + ggplot2::scale_fill_manual(
+    values = c(
+      "raw" = options$fill_raw,
+      "summary" = options$fill_summary
+    ),
+    aesthetics = c("fill", "point_fill")
+  )
 
   myplot <- myplot + ggplot2::discrete_scale(
     c("size", "point_size"),
     "point_size_d",
     function(n) return(c(
-      "raw" = as.numeric(options$size_summary),
+      "raw" = as.numeric(options$size_raw),
       "summary" = as.numeric(options$size_summary)/divider
     ))
   )
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    c("alpha", "point_alpha"),
+    "point_alpha_d",
+    function(n) return(c(
+      "raw" = 1 - options$alpha_raw,
+      "summary" = 1 - options$alpha_summary
+    ))
+  )
+
+
+  myplot <- myplot + ggplot2::scale_linetype_manual(
+    values = c(
+      "summary" = options$linetype_summary
+    )
+  )
+
+  myplot <- myplot + ggplot2::scale_color_manual(
+    values = c(
+      "summary" = options$color_interval
+    ),
+    aesthetics = "interval_color"
+  )
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    "interval_alpha",
+    "interval_alpha_d",
+    function(n) return(c(
+      "summary" = 1 - options$alpha_interval
+    ))
+  )
+  myplot <- myplot + ggplot2::discrete_scale(
+    "interval_size",
+    "interval_size_d",
+    function(n) return(c(
+      "summary" = as.numeric(options$size_interval)/divider
+    ))
+  )
+
+  # Slab
+  myplot <- myplot + ggplot2::scale_fill_manual(
+    values = c(
+      "summary" = options$fill_error
+    ),
+    aesthetics = "slab_fill"
+  )
+  myplot <- myplot + ggplot2::discrete_scale(
+    "slab_alpha",
+    "slab_alpha_d",
+    function(n) return(c(
+      "summary" = 1 - options$alpha_error
+    ))
+  )
+
+
+  hypothesis_evaluation <- options$hypothesis_evaluation
+  interval_null <- options$rope > 0
+
+  if (hypothesis_evaluation ) {
+    myplot$layers[["null_line"]]$aes_params$colour <- options$null_color
+    if (interval_null) {
+      try(myplot$layers[["null_interval"]]$aes_params$fill <- options$null_color)
+      try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(options$size_interval)/divider+1)
+      try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(options$alpha_interval))
+      try(myplot$layers[["ta_CI"]]$aes_params$colour <- options$color_interval)
+      try(myplot$layers[["ta_CI"]]$aes_params$linetype <- options$linetype_summary)
+
+      if (options$effect_size == "median") {
+        try(myplot$layers[["ta_CI"]]$aes_params$colour <- options$color_summary)
+        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(options$size_summary)/divider*2)
+        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(options$alpha_summary))
+        try(myplot$layers[["ta_CI"]]$aes_params$linetype <- options$linetype_summary)
+      }
+
+    }
+  }
+
 
 
   return(myplot)
