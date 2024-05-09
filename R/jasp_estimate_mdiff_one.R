@@ -7,6 +7,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     # read dataset
     dataset <- jasp_estimate_mdiff_one_read_data(dataset, options)
 
+
     # check for errors
     for (variable in options$outcome_variable) {
       .hasErrors(
@@ -18,7 +19,6 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       )
 
     }
-
 
     # Run the analysis
     my_reference_mean <- 0
@@ -32,7 +32,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       save_raw_data = TRUE
     )
 
-   # Some results tweaks
+    # Some results tweaks - future updates to esci will do these calcs within esci rather than here
     alpha <- 1 - as.numeric(options$conf_level)
     estimate$overview$t_multiplier <- stats::qt(1-alpha/2, estimate$overview$df)
     estimate$overview$s_component <- estimate$overview$sd
@@ -40,31 +40,30 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
 
 
-    # Define and fill tables
+    # Define and fill the overview table
     if (is.null(jaspResults[["overviewTable"]])) {
-      jasp_overview_prep(jaspResults, dataset, options, ready)
+      jasp_overview_prep(jaspResults, options, ready)
       jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview)
-
     }
 
+
+    # Hypothesis evaluation
     hypothesis_evaluation <- options$hypothesis_evaluation
     interval_null <- options$rope > 0
 
-
     if (hypothesis_evaluation) {
-      # SMD
+      # Define and fill the smd table
+      # Two additional calculation tweaks that esci will soon handle on its own
       estimate$es_smd$reference_value <- options$reference_mean
       estimate$es_smd$mean <- estimate$es_smd$numerator + options$reference_mean
 
       if (options$effect_size == "mean" & is.null(jaspResults[["smdTable"]]) ) {
-        jasp_smd_prep(jaspResults, dataset, options, ready)
+        jasp_smd_prep(jaspResults, options, ready)
         jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd)
-      } # else {
-        # jaspResults[["smdTable"]] <- NULL
-      # }
+      } else {
+        jaspResults[["smdTable"]] <- NULL
+      }
 
-
-      # Hypothesis evaluation
       my_rope <- c(-1 * options$rope, options$rope)
 
       test_results <- esci::test_mdiff(
@@ -75,11 +74,12 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
         output_html = TRUE
       )
 
+      # Define and fill the hypothesis evaluation table
       if (is.null(jaspResults[["heTable"]]) ) {
         if (options$rope == 0) {
-          jasp_he_point_prep(jaspResults, dataset, options, ready)
+          jasp_he_point_prep(jaspResults, options, ready)
         } else {
-          jasp_he_interval_prep(jaspResults, dataset, options, ready)
+          jasp_he_interval_prep(jaspResults, options, ready)
         }
 
         to_fill <- test_results$point_null
@@ -87,13 +87,16 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
         jasp_table_fill(jaspResults[["heTable"]], to_fill)
       }
+    } else {
 
-    } # else {
-      # jaspResults[["smdTable"]] <- NULL
-      # jaspResults[["heTable"]] <- NULL
-    # }
+      # No Hypothesis eval, clear tables
+      jaspResults[["smdTable"]] <- NULL
+      jaspResults[["heTable"]] <- NULL
+
+    } # end of hypothesis evalu
 
 
+    # Now prep and fill the plot
     if (is.null(jaspResults[["mdiffPlot"]])) {
       jasp_plot_magnitude_prep(jaspResults, options)
 
@@ -140,433 +143,9 @@ jasp_estimate_mdiff_one_read_data <- function(dataset, options) {
 }
 
 
-jasp_overview_prep <- function(jaspResults, dataset, options, ready) {
-  overviewTable <- createJaspTable(title = "Overview")
-
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "extraDetails", "effect_size", "calculationComponents"))
-
-
-  overviewTable$addColumnInfo(
-    name = "outcome_variable_name",
-    title = "Outcome variable",
-    type = "string",
-    combine = TRUE
-  )
-
-
-  if (options$effect_size == "mean") {
-    overviewTable$addColumnInfo(
-      name = "mean",
-      title = "<i>M</i>",
-      type = "number"
-    )
-
-
-    overviewTable$addColumnInfo(
-      name = "mean_LL",
-      title = "LL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-    )
-    overviewTable$addColumnInfo(
-      name = "mean_UL",
-      title = "UL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-    )
-
-    if (options$extraDetails) {
-
-      overviewTable$addColumnInfo(
-        name = "moe",
-        title = "<i>MoE</i>",
-        type = "number"
-      )
-
-      overviewTable$addColumnInfo(
-        name = "mean_SE",
-        title = "<i>SE</i><sub>Mean</sub>",
-        type = "number"
-      )
-
-    }
-
-    overviewTable$addColumnInfo(
-      name = "median",
-      title = "<i>Mdn</i>",
-      type = "number"
-    )
-
-  }
-
-
-  if (options$effect_size == "median") {
-    overviewTable$addColumnInfo(
-      name = "median",
-      title = "<i>Mdn</i>",
-      type = "number"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "median_LL",
-      title = "LL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-    )
-    overviewTable$addColumnInfo(
-      name = "median_UL",
-      title = "UL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-    )
-
-
-    if (options$extraDetails) {
-      overviewTable$addColumnInfo(
-        name = "median_SE",
-        title = "<i>SE</i><sub>Median</sub>",
-        type = "number"
-      )
-    }
-
-    overviewTable$addColumnInfo(
-      name = "mean",
-      title = "<i>M</i>",
-      type = "number"
-    )
-  }
-
-  overviewTable$addColumnInfo(
-    name = "sd",
-    title = "<i>s</i>",
-    type = "number"
-  )
-
-  if (options$extraDetails) {
-    overviewTable$addColumnInfo(
-      name = "min",
-      title = "Minimum",
-      type = "number"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "max",
-      title = "Maximum",
-      type = "number"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "q1",
-      title = "25th",
-      type = "number",
-      overtitle = "Percentile"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "q3",
-      title = "75th",
-      type = "number",
-      overtitle = "Percentile"
-    )
-
-  }
-
-
-  overviewTable$addColumnInfo(
-    name = "n",
-    title = "<i>N</i>",
-    type = "integer"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "missing",
-    title = "Missing",
-    type = "integer"
-  )
-
-
-  if (options$calculationComponents & options$effect_size == "mean") {
-    overviewTable$addColumnInfo(
-      name = "df",
-      title = "<i>df</i>",
-      type = "integer"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "t_multiplier",
-      title = "<i>t</i>",
-      type = "number",
-      overtitle = "Calculation component"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "s_component",
-      title = "Variability",
-      type = "number",
-      overtitle = "Calculation component"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "n_component",
-      title = "Sample size",
-      type = "number",
-      overtitle = "Calculation component"
-    )
-
-  }
-
-
-  overviewTable$showSpecifiedColumnsOnly <- TRUE
-
-  if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable))
-
-  jaspResults[["overviewTable"]] <- overviewTable
-
-
-  return()
-
-}
-
-
-
-jasp_smd_prep <- function(jaspResults, dataset, options, ready) {
-  overviewTable <- createJaspTable(title = "Standardized Mean Difference")
-
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "extraDetails", "reference_mean", "hypothesis_evaluation"))
-
-
-  overviewTable$addColumnInfo(
-    name = "effect",
-    title = "Effect",
-    type = "string",
-    combine = TRUE
-  )
-
-  overviewTable$addColumnInfo(
-    name = "mean",
-    title = "<i>M</i>",
-    type = "number"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "reference_value",
-    title = "Reference value",
-    type = "number"
-  )
-
-  overviewTable$addColumnInfo(
-      name = "numerator",
-      title = "<i>M</i> - Reference",
-      type = "number",
-      overtitle = "Numerator"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "denominator",
-    title = "<i>s</i>",
-    type = "number",
-    overtitle = "Standardizer"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "effect_size",
-    title = "<i>d</i><sub>1</i>",
-    type = "number"
-  )
-
-  overviewTable$addColumnInfo(
-      name = "LL",
-      title = "LL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-  )
-
-  overviewTable$addColumnInfo(
-    name = "UL",
-    title = "UL",
-    type = "number",
-    overtitle = paste0(100 * options$conf_level, "% CI")
-  )
-
-  overviewTable$addColumnInfo(
-    name = "d_biased",
-    title = "<i>d</i><sub>1.biased</i>",
-    type = "number"
-  )
-
-  if (options$extraDetails) {
-
-      overviewTable$addColumnInfo(
-        name = "SE",
-        title = "<i>SE</i>",
-        type = "number"
-      )
-
-      overviewTable$addColumnInfo(
-        name = "df",
-        title = "<i>df</i>",
-        type = "integer"
-      )
-
-  }
-
-
-  overviewTable$showSpecifiedColumnsOnly <- TRUE
-
-  if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable))
-
-  jaspResults[["smdTable"]] <- overviewTable
-
-  return()
-
-}
-
-
-jasp_he_point_prep <- function(jaspResults, dataset, options, ready) {
-  overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
-
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "hypothesis_evaluation"))
-
-
-  overviewTable$addColumnInfo(
-    name = "effect",
-    title = "Effect",
-    type = "string",
-    combine = TRUE
-  )
-
-  overviewTable$addColumnInfo(
-    name = "null_words",
-    title = "<i>H</i><sub>0</sub>",
-    type = "number"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "CI",
-    title = "CI",
-    type = "string"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "CI_compare",
-    title = "Compare CI with <i>H</i><sub>0</sub>",
-    type = "string"
-  )
-
-  if (options$effect_size == "mean") {
-    overviewTable$addColumnInfo(
-      name = "t",
-      title = "<i>t</i>",
-      type = "number"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "df",
-      title = "<i>df</i>",
-      type = "number"
-    )
-
-    overviewTable$addColumnInfo(
-      name = "p",
-      title = "<i>p</i>, two tailed",
-      type = "pvalue"
-    )
-
-  } else {
-    overviewTable$addColumnInfo(
-      name = "p_result",
-      title = "<i>p</i>, two tailed",
-      type = "pvalue"
-    )
-  }
-
-  overviewTable$addColumnInfo(
-    name = "null_decision",
-    title = "<i>H</i><sub>0</sub> decision",
-    type = "string"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "conclusion",
-    title = "Conclusion",
-    type = "string"
-  )
-
-
-
-  overviewTable$showSpecifiedColumnsOnly <- TRUE
-
-  if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable))
-
-  jaspResults[["heTable"]] <- overviewTable
-
-  return()
-
-}
-
-
-jasp_he_interval_prep <- function(jaspResults, dataset, options, ready) {
-  overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
-
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "hypothesis_evaluation"))
-
-
-  overviewTable$addColumnInfo(
-    name = "effect",
-    title = "Effect",
-    type = "string",
-    combine = TRUE
-  )
-
-  overviewTable$addColumnInfo(
-    name = "rope",
-    title = "<i>H</i><sub>0</sub>",
-    type = "number"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "CI",
-    title = "CI",
-    type = "string"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "rope_compare",
-    title = "Compare CI with <i>H</i><sub>0</sub>",
-    type = "string"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "p_result",
-    title = "<i>p</i>, two tailed",
-    type = "pvalue"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "conclusion",
-    title = "Conclusion",
-    type = "string"
-  )
-
-
-
-  overviewTable$showSpecifiedColumnsOnly <- TRUE
-
-  if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable))
-
-  jaspResults[["heTable"]] <- overviewTable
-
-  return()
-
-}
-
-
-
+# Prep a magnitude plot
 jasp_plot_magnitude_prep <- function(jaspResults, options) {
+
   mdiffPlot <- createJaspPlot(
     title = "Estimation Figure",
     width = options$width,
@@ -624,13 +203,14 @@ jasp_plot_magnitude_prep <- function(jaspResults, options) {
 }
 
 
-
+# Apply all plot customizations
 jasp_plot_magnitude_decorate <- function(myplot, options) {
 
+  # Divider used for CI linewidth
   divider <- 1
   if (options$effect_size == "median") divider <- 4
 
-
+  # Font sizes
   myplot <- myplot + ggplot2::theme(
     axis.text.y = ggtext::element_markdown(size = options$axis.text.y),
     axis.title.y = ggtext::element_markdown(size = options$axis.title.y),
@@ -638,6 +218,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     axis.title.x = ggtext::element_markdown(size = options$axis.title.x)
   )
 
+  # Axis options
   if (!(options$ylab %in% c("auto", "Auto", "AUTO", ""))) {
     myplot <- myplot + ggplot2::ylab(options$ylab)
   }
@@ -669,6 +250,9 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
   )
 
 
+  # Aesthetics -------------------
+
+  # Raw and summary marker - Shape
   myplot <- myplot + ggplot2::scale_shape_manual(
     values = c(
       "raw" = options$shape_raw,
@@ -676,6 +260,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     )
   )
 
+  # Raw and summary marker - Outline
   myplot <- myplot + ggplot2::scale_color_manual(
     values = c(
       "raw" = options$color_raw,
@@ -684,6 +269,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     aesthetics = c("color", "point_color")
   )
 
+  # Raw and summary marker - Fill
   myplot <- myplot + ggplot2::scale_fill_manual(
     values = c(
       "raw" = options$fill_raw,
@@ -692,6 +278,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     aesthetics = c("fill", "point_fill")
   )
 
+  # Raw and summary marker - Size
   myplot <- myplot + ggplot2::discrete_scale(
     c("size", "point_size"),
     "point_size_d",
@@ -701,6 +288,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     ))
   )
 
+  # Raw and summary marker - Alpha
   myplot <- myplot + ggplot2::discrete_scale(
     c("alpha", "point_alpha"),
     "point_alpha_d",
@@ -710,13 +298,14 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     ))
   )
 
-
+  # CI - linetype
   myplot <- myplot + ggplot2::scale_linetype_manual(
     values = c(
       "summary" = options$linetype_summary
     )
   )
 
+  # CI - color
   myplot <- myplot + ggplot2::scale_color_manual(
     values = c(
       "summary" = options$color_interval
@@ -724,6 +313,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     aesthetics = "interval_color"
   )
 
+  # CI - alpha
   myplot <- myplot + ggplot2::discrete_scale(
     "interval_alpha",
     "interval_alpha_d",
@@ -731,6 +321,8 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
       "summary" = 1 - options$alpha_interval
     ))
   )
+
+  # CI - line thickness
   myplot <- myplot + ggplot2::discrete_scale(
     "interval_size",
     "interval_size_d",
@@ -739,13 +331,15 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     ))
   )
 
-  # Slab
+  # Error distribution fill
   myplot <- myplot + ggplot2::scale_fill_manual(
     values = c(
       "summary" = options$fill_error
     ),
     aesthetics = "slab_fill"
   )
+
+  # Error distribution alpha
   myplot <- myplot + ggplot2::discrete_scale(
     "slab_alpha",
     "slab_alpha_d",
@@ -754,12 +348,14 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     ))
   )
 
-
+  # Hypothesis evaluation aesthetics
   hypothesis_evaluation <- options$hypothesis_evaluation
   interval_null <- options$rope > 0
 
   if (hypothesis_evaluation ) {
+    # Null line color
     myplot$layers[["null_line"]]$aes_params$colour <- options$null_color
+
     if (interval_null) {
       try(myplot$layers[["null_interval"]]$aes_params$fill <- options$null_color)
       try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(options$size_interval)/divider+1)
@@ -782,16 +378,4 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
   return(myplot)
 }
 
-
-jasp_table_fill <- function(overviewTable, overview) {
-
-
-  for (x in 1:nrow(overview)) {
-      overviewTable$addRows(
-        as.list(overview[x, ])
-      )
-  }
-
-  return()
-}
 

@@ -211,7 +211,7 @@ Form
     DoubleField
       {
         name: "error_scale"
-        label: qsTr("Label")
+        label: qsTr("Width")
         defaultValue: 0.20
         min: 0
         max: 5
