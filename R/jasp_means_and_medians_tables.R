@@ -189,7 +189,7 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
 
 
 # Prep a Cohen's d table
-jasp_smd_prep <- function(jaspResults, options, ready) {
+jasp_smd_prep <- function(jaspResults, options, ready, properties) {
   overviewTable <- createJaspTable(title = "Standardized Mean Difference")
 
   overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "extraDetails", "reference_mean", "hypothesis_evaluation"))
@@ -223,14 +223,14 @@ jasp_smd_prep <- function(jaspResults, options, ready) {
 
   overviewTable$addColumnInfo(
     name = "denominator",
-    title = "<i>s</i>",
+    title = properties$denominator_name_html,
     type = "number",
     overtitle = "Standardizer"
   )
 
   overviewTable$addColumnInfo(
     name = "effect_size",
-    title = "<i>d</i><sub>1</i>",
+    title = properties$effect_size_name_html,
     type = "number"
   )
 
@@ -248,9 +248,17 @@ jasp_smd_prep <- function(jaspResults, options, ready) {
     overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
+  to_replace <- '<sub>.biased</sub>'
+  if (grepl("biased", properties$effect_size_name_html))
+    to_replace <- ""
+
   overviewTable$addColumnInfo(
     name = "d_biased",
-    title = "<i>d</i><sub>1.biased</i>",
+    title = paste(
+      properties$effect_size_name_html,
+      to_replace,
+      sep = ""
+    ),
     type = "number"
   )
 
@@ -300,7 +308,7 @@ jasp_he_point_prep <- function(jaspResults, options, ready) {
   overviewTable$addColumnInfo(
     name = "null_words",
     title = "<i>H</i><sub>0</sub>",
-    type = "number"
+    type = "string"
   )
 
   overviewTable$addColumnInfo(

@@ -33,8 +33,13 @@ Form
 		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
 		AvailableVariablesList { name: "allVariablesList" }
 		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
+		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
 	}
 
+	CheckBox {
+	  name: "switch_comparison_order";
+	  label: qsTr("Switch comparison order")
+  }
 
 	Group
 	{
@@ -52,11 +57,16 @@ Form
         label: qsTr("Effect size of interest")
         values:
           [
-            { label: "Mean", value: "mean"},
-            { label: "Median", value: "median"}
+            { label: "Mean diiference", value: "mean_difference"},
+            { label: "Median difference", value: "median_difference"}
           ]
         id: effect_size
       }
+    CheckBox {
+	    name: "assume_equal_variance";
+	    label: qsTr("Assume equal variance")
+    }
+
 	}
 
 	Group
@@ -75,6 +85,10 @@ Form
 	    label: qsTr("Calculation components");
 	    enabled: effect_size.currentValue == "mean"
 	   }
+	  CheckBox {
+	    name: "show_ratio";
+	    label: qsTr("Ration between groups (appropriate only for true ration scales")
+    }
 	}
 
   Section

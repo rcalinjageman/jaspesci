@@ -24,4 +24,11 @@ Description
 		func:	"jasp_estimate_mdiff_one"
 	}
 
+		Analysis
+	{
+		title:	qsTr("Two Groups")
+		func:	"jasp_estimate_mdiff_two"
+	}
+
+
 }
