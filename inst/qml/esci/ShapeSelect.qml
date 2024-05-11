@@ -5,7 +5,6 @@ import "./" as Esci
 
       DropDown
       {
-        label: qsTr("Shape")
         startValue: 'circle filled'
         values:
           [

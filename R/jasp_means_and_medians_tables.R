@@ -1,8 +1,20 @@
 # Prep an overview table
-jasp_overview_prep <- function(jaspResults, options, ready) {
+jasp_overview_prep <- function(jaspResults, options, ready, levels = 1) {
   overviewTable <- createJaspTable(title = "Overview")
 
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "extraDetails", "effect_size", "calculationComponents"))
+  overviewTable$dependOn(
+    c(
+      "outcome_variable",
+      "grouping_variable",
+      "switch_comparison_order",
+      "conf_level",
+      "assume_equal_variance",
+      "effect_size",
+      "switch_comparison_order",
+      "show_details",
+      "show_calculations"
+    )
+  )
 
 
   overviewTable$addColumnInfo(
@@ -12,8 +24,19 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
     combine = TRUE
   )
 
+  if (levels > 1) {
+    overviewTable$addColumnInfo(
+      name = "grouping_variable_level",
+      title = options$grouping_variable,
+      type = "string",
+      combine = TRUE
+    )
 
-  if (options$effect_size == "mean") {
+
+  }
+
+
+  if (options$effect_size %in% c("mean", "mean_difference")) {
     overviewTable$addColumnInfo(
       name = "mean",
       title = "<i>M</i>",
@@ -34,7 +57,7 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
       overtitle = paste0(100 * options$conf_level, "% CI")
     )
 
-    if (options$extraDetails) {
+    if (options$show_details) {
 
       overviewTable$addColumnInfo(
         name = "moe",
@@ -59,7 +82,7 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
   }
 
 
-  if (options$effect_size == "median") {
+  if (options$effect_size %in% c("median", "median_difference")) {
     overviewTable$addColumnInfo(
       name = "median",
       title = "<i>Mdn</i>",
@@ -80,7 +103,7 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
     )
 
 
-    if (options$extraDetails) {
+    if (options$show_details) {
       overviewTable$addColumnInfo(
         name = "median_SE",
         title = "<i>SE</i><sub>Median</sub>",
@@ -101,7 +124,7 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
     type = "number"
   )
 
-  if (options$extraDetails) {
+  if (options$show_details) {
     overviewTable$addColumnInfo(
       name = "min",
       title = "Minimum",
@@ -143,8 +166,22 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
     type = "integer"
   )
 
+  if (options$show_details & options$effect_size == "mean_difference") {
+    overviewTable$addColumnInfo(
+      name = "df",
+      title = "<i>df</i>",
+      type = if (options$assume_equal_variance) "integer" else "number"
+    )
 
-  if (options$calculationComponents & options$effect_size == "mean") {
+    overviewTable$addColumnInfo(
+      name = "s_pooled",
+      title = "<i>s</i><sub>p</sub>",
+      type = "number"
+    )
+  }
+
+
+  if (options$show_calculations & options$effect_size == "mean") {
     overviewTable$addColumnInfo(
       name = "df",
       title = "<i>df</i>",
@@ -178,7 +215,7 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable))
+    overviewTable$setExpectedSize(length(options$outcome_variable)) * levels
 
   jaspResults[["overviewTable"]] <- overviewTable
 
@@ -189,34 +226,60 @@ jasp_overview_prep <- function(jaspResults, options, ready) {
 
 
 # Prep a Cohen's d table
-jasp_smd_prep <- function(jaspResults, options, ready, properties) {
+jasp_smd_prep <- function(jaspResults, options, ready, properties, one_group = TRUE) {
   overviewTable <- createJaspTable(title = "Standardized Mean Difference")
 
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "extraDetails", "reference_mean", "hypothesis_evaluation"))
+  overviewTable$dependOn(
+    c(
+      "outcome_variable",
+      "grouping_variable",
+      "conf_level",
+      "assume_equal_variance",
+      "effect_size",
+      "switch_comparison_order",
+      "show_details",
+      "reference_mean",
+      "evaluate_hypotheses"
+    )
+  )
 
+  if (!one_group) {
+    overviewTable$addColumnInfo(
+      name = "outcome_variable_name",
+      title = "Outcome variable",
+      type = "string",
+      combine = TRUE
+    )
+
+  }
+
+  if (one_group) effect_title <- "Effect" else effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
 
   overviewTable$addColumnInfo(
     name = "effect",
-    title = "Effect",
-    type = "string",
-    combine = TRUE
+    title = effect_title,
+    type = "string"
   )
 
-  overviewTable$addColumnInfo(
-    name = "mean",
-    title = "<i>M</i>",
-    type = "number"
-  )
+  if (one_group) {
+    overviewTable$addColumnInfo(
+      name = "mean",
+      title = "<i>M</i>",
+      type = "number"
+    )
 
-  overviewTable$addColumnInfo(
-    name = "reference_value",
-    title = "Reference value",
-    type = "number"
-  )
+    overviewTable$addColumnInfo(
+      name = "reference_value",
+      title = "Reference value",
+      type = "number"
+    )
+  }
+
+  if (one_group) numerator_title <- "<i>M</i> - Reference" else numerator_title <- "<i>M</i><sub>diff</sub>"
 
   overviewTable$addColumnInfo(
     name = "numerator",
-    title = "<i>M</i> - Reference",
+    title = numerator_title,
     type = "number",
     overtitle = "Numerator"
   )
@@ -248,21 +311,8 @@ jasp_smd_prep <- function(jaspResults, options, ready, properties) {
     overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
-  to_replace <- '<sub>.biased</sub>'
-  if (grepl("biased", properties$effect_size_name_html))
-    to_replace <- ""
 
-  overviewTable$addColumnInfo(
-    name = "d_biased",
-    title = paste(
-      properties$effect_size_name_html,
-      to_replace,
-      sep = ""
-    ),
-    type = "number"
-  )
-
-  if (options$extraDetails) {
+  if (options$show_details) {
 
     overviewTable$addColumnInfo(
       name = "SE",
@@ -274,6 +324,20 @@ jasp_smd_prep <- function(jaspResults, options, ready, properties) {
       name = "df",
       title = "<i>df</i>",
       type = "integer"
+    )
+
+    to_replace <- '<sub>.biased</sub>'
+    if (grepl("biased", properties$effect_size_name_html))
+      to_replace <- ""
+
+    overviewTable$addColumnInfo(
+      name = "d_biased",
+      title = paste(
+        properties$effect_size_name_html,
+        to_replace,
+        sep = ""
+      ),
+      type = "number"
     )
 
   }
@@ -295,7 +359,7 @@ jasp_smd_prep <- function(jaspResults, options, ready, properties) {
 jasp_he_point_prep <- function(jaspResults, options, ready) {
   overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
 
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "hypothesis_evaluation"))
+  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "evaluate_hypotheses"))
 
 
   overviewTable$addColumnInfo(
@@ -380,7 +444,7 @@ jasp_he_point_prep <- function(jaspResults, options, ready) {
 jasp_he_interval_prep <- function(jaspResults, options, ready) {
   overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
 
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "hypothesis_evaluation"))
+  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "evaluate_hypotheses"))
 
 
   overviewTable$addColumnInfo(
@@ -432,3 +496,196 @@ jasp_he_interval_prep <- function(jaspResults, options, ready) {
   return()
 
 }
+
+
+
+
+
+# Prep a mean difference table
+jasp_es_mean_difference_prep <- function(jaspResults, options, ready, properties) {
+  overviewTable <- createJaspTable(title = "Mean Difference")
+
+  overviewTable$dependOn(
+    c(
+      "outcome_variable",
+      "grouping_variable",
+      "conf_level",
+      "assume_equal_variance",
+      "effect_size",
+      "switch_comparison_order",
+      "show_details",
+      "reference_mean",
+      "evaluate_hypotheses"
+    )
+  )
+
+  overviewTable$addColumnInfo(
+    name = "outcome_variable_name",
+    title = "Outcome variable",
+    type = "string",
+    combine = TRUE
+  )
+
+
+  effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+
+  overviewTable$addColumnInfo(
+    name = "effect",
+    title = effect_title,
+    type = "string"
+  )
+
+  overviewTable$addColumnInfo(
+    name = "effect_size",
+    title = "<i>M</i>",
+    type = "number"
+  )
+
+  overviewTable$addColumnInfo(
+    name = "LL",
+    title = "LL",
+    type = "number",
+    overtitle = paste0(100 * options$conf_level, "% CI")
+  )
+
+  overviewTable$addColumnInfo(
+    name = "UL",
+    title = "UL",
+    type = "number",
+    overtitle = paste0(100 * options$conf_level, "% CI")
+  )
+
+
+  if (options$show_details) {
+    overviewTable$addColumnInfo(
+      name = "moe",
+      title = "<i>MoE</i>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "SE",
+      title = "<i>SE</i>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "df",
+      title = "<i>df</i>",
+      type = if (options$assume_equal_variance) "integer" else "number"
+    )
+
+  }
+
+
+  if (options$show_calculations & options$effect_size == "mean_difference") {
+        overviewTable$addColumnInfo(
+      name = "t_multiplier",
+      title = "<i>t</i>",
+      type = "number",
+      overtitle = "Calculation component"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "s_component",
+      title = "Variability",
+      type = "number",
+      overtitle = "Calculation component"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "n_component",
+      title = "Sample size",
+      type = "number",
+      overtitle = "Calculation component"
+    )
+
+  }
+
+  overviewTable$showSpecifiedColumnsOnly <- TRUE
+
+  if (ready)
+    overviewTable$setExpectedSize(length(options$outcome_variable) * 3)
+
+  jaspResults[["es_mean_differenceTable"]] <- overviewTable
+
+  return()
+
+}
+
+
+
+# Prep a median difference table
+jasp_es_median_difference_prep <- function(jaspResults, options, ready, properties) {
+  overviewTable <- createJaspTable(title = "Median Difference")
+
+  overviewTable$dependOn(
+    c(
+      "outcome_variable",
+      "grouping_variable",
+      "conf_level",
+      "assume_equal_variance",
+      "effect_size",
+      "switch_comparison_order",
+      "show_details",
+      "reference_mean",
+      "evaluate_hypotheses"
+    )
+  )
+
+  overviewTable$addColumnInfo(
+    name = "outcome_variable_name",
+    title = "Outcome variable",
+    type = "string",
+    combine = TRUE
+  )
+
+
+  effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+
+  overviewTable$addColumnInfo(
+    name = "effect",
+    title = effect_title,
+    type = "string"
+  )
+
+  overviewTable$addColumnInfo(
+    name = "effect_size",
+    title = "<i>Mdn</i>",
+    type = "number"
+  )
+
+  overviewTable$addColumnInfo(
+    name = "LL",
+    title = "LL",
+    type = "number",
+    overtitle = paste0(100 * options$conf_level, "% CI")
+  )
+
+  overviewTable$addColumnInfo(
+    name = "UL",
+    title = "UL",
+    type = "number",
+    overtitle = paste0(100 * options$conf_level, "% CI")
+  )
+
+  if (options$show_details) {
+    overviewTable$addColumnInfo(
+      name = "SE",
+      title = "<i>SE</i>",
+      type = "number"
+    )
+  }
+
+
+  overviewTable$showSpecifiedColumnsOnly <- TRUE
+
+  if (ready)
+    overviewTable$setExpectedSize(length(options$outcome_variable) * 3)
+
+  jaspResults[["es_median_differenceTable"]] <- overviewTable
+
+  return()
+
+}
+

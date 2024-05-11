@@ -6,6 +6,5 @@ import "./" as Esci
 
       PercentField
       {
-        label: qsTr("Transparency")
         defaultValue: 0
       }

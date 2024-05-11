@@ -1,11 +1,17 @@
-jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
+jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
 
-  ready <- (length(options$outcome_variable) > 0)
+  ready <- (length(options$outcome_variable) > 0 & length(options$grouping_variable > 0))
 
   if (ready) {
     # read dataset
-    dataset <- jasp_estimate_mdiff_one_read_data(dataset, options)
+    dataset <- jasp_estimate_mdiff_two_read_data(dataset, options)
+
+    # mytext <- createJaspHtml(
+    #   paste(dataset)
+    # )
+    #
+    # jaspResults[["debugText"]] <- mytext
 
 
     # check for errors
@@ -21,112 +27,156 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     }
 
     # Run the analysis
-    my_reference_mean <- 0
-    if (options$hypothesis_evaluation) my_reference_mean <- options$reference_mean
+    args <- list()
+    self <- list()
+    self$options <- options
 
-    estimate <- esci::estimate_mdiff_one(
-      data = dataset,
-      outcome_variable = encodeColNames(options$outcome_variable),
-      reference_mean = my_reference_mean,
-      conf_level = options$conf_level,
-      save_raw_data = TRUE
-    )
+    args$data <- dataset
+    call <- esci::estimate_mdiff_two
+    args$conf_level <- self$options$conf_level
+    args$assume_equal_variance <- self$options$assume_equal_variance
+    args$outcome_variable <- unname(self$options$outcome_variable)
+    args$grouping_variable <- unname(self$options$grouping_variable)
+    args$grouping_variable_name <- unname(self$options$grouping_variable)
+    args$switch_comparison_order <- self$options$switch_comparison_order
+    args$save_raw_data <- TRUE
+
+    estimate <- try(do.call(what = call, args = args))
+
+    if(is.null(estimate)) return()
+    if(is(estimate, "try-error")) return()
+
+
+    # mytext <- createJaspHtml(
+    #   paste(estimate)
+    # )
+    #
+    # jaspResults[["estimateText"]] <- mytext
 
     # Some results tweaks - future updates to esci will do these calcs within esci rather than here
-    alpha <- 1 - as.numeric(options$conf_level)
-    estimate$overview$t_multiplier <- stats::qt(1-alpha/2, estimate$overview$df)
-    estimate$overview$s_component <- estimate$overview$sd
-    estimate$overview$n_component <- 1/sqrt(estimate$overview$n)
+    # Add in MoE
+    estimate$es_mean_difference$moe <- (estimate$es_mean_difference$UL - estimate$es_mean_difference$LL)/2
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
+
+    # Add calculation details
+    alpha <- 1 - self$options$conf_level
+    estimate$es_mean_difference$t_multiplier <- stats::qt(1-alpha/2, estimate$es_mean_difference$df)
+
+    for (x in 1:nrow(estimate$es_smd)) {
+      estimate$overview[estimate$overview$outcome_variable_name == estimate$es_smd$outcome_variable_name[[x]], "s_pooled"] <- estimate$es_smd$denominator[[x]]
+      estimate$es_mean_difference$s_component[c(x*3-2, x*3-1, x*3-0)] <- estimate$es_smd$denominator[[x]]
+    }
+    estimate$es_mean_difference$n_component <- estimate$es_mean_difference$SE / estimate$es_mean_difference$s_component
 
 
     # Define and fill the overview table
     if (is.null(jaspResults[["overviewTable"]])) {
-      jasp_overview_prep(jaspResults, options, ready)
+      jasp_overview_prep(jaspResults, options, ready, 2)
       jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview, NULL)
     }
 
-
-    # Hypothesis evaluation
-    hypothesis_evaluation <- options$hypothesis_evaluation
-    interval_null <- options$rope > 0
-
-    if (hypothesis_evaluation) {
-      # Define and fill the smd table
-      # Two additional calculation tweaks that esci will soon handle on its own
-      estimate$es_smd$reference_value <- options$reference_mean
-      estimate$es_smd$mean <- estimate$es_smd$numerator + options$reference_mean
-
-      if (options$effect_size == "mean" & is.null(jaspResults[["smdTable"]]) ) {
-        jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties)
-        jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
-      } else {
-        # jaspResults[["smdTable"]] <- NULL
-      }
-
-      my_rope <- c(0, 0)
-      if (options$rope > 0 ) my_rope <- c(-1 * options$rope, options$rope)
-
-      test_results <- esci::test_mdiff(
-        estimate,
-        effect_size = options$effect_size,
-        rope = my_rope,
-        rope_units = "raw",
-        output_html = FALSE
-      )
-      #
-      # # Define and fill the hypothesis evaluation table
-      if (is.null(jaspResults[["heTable"]]) ) {
-        if (options$rope > 0) {
-          jasp_he_interval_prep(jaspResults, options, ready)
-        } else {
-          jasp_he_point_prep(jaspResults, options, ready)
-        }
-
-        to_fill <- test_results$point_null
-        if (options$rope > 0) to_fill <- test_results$interval_null
-
-        jasp_table_fill(jaspResults[["heTable"]], to_fill)
-      }
-    } else {
-
-      # No Hypothesis eval, clear tables
-      #jaspResults[["smdTable"]] <- NULL
-      #jaspResults[["heTable"]] <- NULL
-
-    } # end of hypothesis evaluation
-
-
-    # Now prep and fill the plot
-    if (is.null(jaspResults[["mdiffPlot"]])) {
-      jasp_plot_magnitude_prep(jaspResults, options)
-
-      args <- list()
-      args$estimate <- estimate
-      args$effect_size <- options$effect_size
-      args$data_layout <- options$data_layout
-      args$data_spread <- options$data_spread
-      args$error_layout <- options$error_layout
-      args$error_scale <- options$error_scale
-      args$error_nudge <- options$error_nudge
-      if (hypothesis_evaluation) {
-        args$rope <- c(
-          options$reference_mean - options$rope,
-          options$reference_mean + options$rope
-        )
-      }
-
-      myplot <- do.call(
-        what = esci::plot_magnitude,
-        args = args
-      )
-
-      myplot <- jasp_plot_magnitude_decorate(myplot, options)
-
-      jaspResults[["mdiffPlot"]]$plotObject <- myplot
-
-
+    # Define and fill the mean difference table
+    if (options$effect_size == "mean_difference" & is.null(jaspResults[["es_mean_differenceTable"]]) ) {
+      jasp_es_mean_difference_prep(jaspResults, options, ready, estimate$es_mean_difference_properties)
+      jasp_table_fill(jaspResults[["es_mean_differenceTable"]], estimate$es_mean_difference)
     }
+
+    # Define and fill the median difference table
+    if (options$effect_size == "median_difference" & is.null(jaspResults[["es_median_differenceTable"]]) ) {
+      jasp_es_median_difference_prep(jaspResults, options, ready, estimate$es_median_difference_properties)
+      jasp_table_fill(jaspResults[["es_median_differenceTable"]], estimate$es_median_difference)
+    }
+
+
+    # Define and fill the smd table
+    if (options$effect_size == "mean_difference" & is.null(jaspResults[["smdTable"]]) ) {
+      jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties, one_group = FALSE)
+      jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
+    }
+
+
+
+#
+#     # Hypothesis evaluation
+#     hypothesis_evaluation <- options$hypothesis_evaluation
+#     interval_null <- options$rope > 0
+#
+#     if (hypothesis_evaluation) {
+#       # Define and fill the smd table
+#       # Two additional calculation tweaks that esci will soon handle on its own
+#       estimate$es_smd$reference_value <- options$reference_mean
+#       estimate$es_smd$mean <- estimate$es_smd$numerator + options$reference_mean
+#
+#       if (options$effect_size == "mean" & is.null(jaspResults[["smdTable"]]) ) {
+#         jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties)
+#         jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
+#       } else {
+#         # jaspResults[["smdTable"]] <- NULL
+#       }
+#
+#       my_rope <- c(0, 0)
+#       if (options$rope > 0 ) my_rope <- c(-1 * options$rope, options$rope)
+#
+#       test_results <- esci::test_mdiff(
+#         estimate,
+#         effect_size = options$effect_size,
+#         rope = my_rope,
+#         rope_units = "raw",
+#         output_html = FALSE
+#       )
+#       #
+#       # # Define and fill the hypothesis evaluation table
+#       if (is.null(jaspResults[["heTable"]]) ) {
+#         if (options$rope > 0) {
+#           jasp_he_interval_prep(jaspResults, options, ready)
+#         } else {
+#           jasp_he_point_prep(jaspResults, options, ready)
+#         }
+#
+#         to_fill <- test_results$point_null
+#         if (options$rope > 0) to_fill <- test_results$interval_null
+#
+#         jasp_table_fill(jaspResults[["heTable"]], to_fill)
+#       }
+#     } else {
+#
+#       # No Hypothesis eval, clear tables
+#       #jaspResults[["smdTable"]] <- NULL
+#       #jaspResults[["heTable"]] <- NULL
+#
+#     } # end of hypothesis evaluation
+#
+#
+#     # Now prep and fill the plot
+#     if (is.null(jaspResults[["mdiffPlot"]])) {
+#       jasp_plot_magnitude_prep(jaspResults, options)
+#
+#       args <- list()
+#       args$estimate <- estimate
+#       args$effect_size <- options$effect_size
+#       args$data_layout <- options$data_layout
+#       args$data_spread <- options$data_spread
+#       args$error_layout <- options$error_layout
+#       args$error_scale <- options$error_scale
+#       args$error_nudge <- options$error_nudge
+#       if (hypothesis_evaluation) {
+#         args$rope <- c(
+#           options$reference_mean - options$rope,
+#           options$reference_mean + options$rope
+#         )
+#       }
+#
+#       myplot <- do.call(
+#         what = esci::plot_magnitude,
+#         args = args
+#       )
+#
+#       myplot <- jasp_plot_magnitude_decorate(myplot, options)
+#
+#       jaspResults[["mdiffPlot"]]$plotObject <- myplot
+#
+#
+#     }
 
 
   }  # end of ready
@@ -136,11 +186,16 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
 
 
-jasp_estimate_mdiff_one_read_data <- function(dataset, options) {
+jasp_estimate_mdiff_two_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
   else
-    return(.readDataSetToEnd(columns.as.numeric = options$outcome_variable))
+    return(
+      .readDataSetToEnd(
+        columns.as.numeric = options$outcome_variable,
+        columns.as.factor = options$grouping_variable
+      )
+    )
 }
 
 

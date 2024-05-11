@@ -5,7 +5,6 @@ import "./" as Esci
 
       DropDown
       {
-        label: qsTr("Style")
         startValue: 'solid'
         values:
           [

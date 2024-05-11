@@ -66,12 +66,12 @@ Form
 		Layout.columnSpan: 2
 	  CheckBox
 	  {
-	    name: "extraDetails";
+	    name: "show_details";
 	    label: qsTr("Extra details")
 	   }
 	  CheckBox
 	  {
-	    name: "calculationComponents";
+	    name: "show_calculations";
 	    label: qsTr("Calculation components");
 	    enabled: effect_size.currentValue == "mean"
 	   }
@@ -271,12 +271,14 @@ Form
 
       Esci.ShapeSelect
       {
+        label: qsTr("Shape")
         name: "shape_summary"
         id: shape_summary
       }
 
       Esci.SizeSelect
       {
+        label: qsTr("Size")
         name: "size_summary"
       }
 
@@ -300,6 +302,7 @@ Form
 
       Esci.AlphaSelect
       {
+        label: qsTr("Transparency")
         name: "alpha_summary"
       }
 
@@ -316,6 +319,7 @@ Form
 
       Esci.LineTypeSelect
       {
+        label: qsTr("Style")
         name: "linetype_summary"
         id: linetype_summary
       }
@@ -377,12 +381,14 @@ Form
 
       Esci.ShapeSelect
       {
+        label: qsTr("Shape")
         name: "shape_raw"
         id: shape_raw
       }
 
       Esci.SizeSelect
       {
+        label: qsTr("Size")
         name: "size_raw"
         defaultValue: 2
       }
@@ -429,9 +435,9 @@ Form
 
       CheckBox
       {
-      name: "hypothesis_evaluation"
+      name: "evaluate_hypotheses"
       label: qsTr("Hypothesis evaluation")
-      id: hypothesis_evaluation
+      id: evaluate_hypotheses
       }
 
     }
@@ -447,8 +453,8 @@ Form
         label: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
         defaultValue: 0
         negativeValues: true
-        enabled: hypothesis_evaluation.checked
-        visible: hypothesis_evaluation.checked
+        enabled: evaluate_hypotheses.checked
+        visible: evaluate_hypotheses.checked
       }
 
       DoubleField
@@ -457,8 +463,8 @@ Form
         label: qsTr("+/- ")
         defaultValue: 0
         negativeValues: false
-        enabled: hypothesis_evaluation.checked
-        visible: hypothesis_evaluation.checked
+        enabled: evaluate_hypotheses.checked
+        visible: evaluate_hypotheses.checked
         afterLabel: "alpha: " + conf_level.currentValue
       }
 
@@ -471,8 +477,8 @@ Form
         name: "null_color"
         label: qsTr("Color for null hypothesis")
         startValue: '#A40122'
-        enabled: hypothesis_evaluation.checked
-        visible: hypothesis_evaluation.checked
+        enabled: evaluate_hypotheses.checked
+        visible: evaluate_hypotheses.checked
         id: null_color
       }
 

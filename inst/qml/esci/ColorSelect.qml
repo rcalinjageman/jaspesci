@@ -6,7 +6,6 @@ import "./" as Esci
 
       DropDown
       {
-        label: qsTr("Color")
         startValue: '#008DF9'
         values:
           [

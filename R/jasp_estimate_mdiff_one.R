@@ -22,7 +22,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
     # Run the analysis
     my_reference_mean <- 0
-    if (options$hypothesis_evaluation) my_reference_mean <- options$reference_mean
+    if (options$evaluate_hypotheses) my_reference_mean <- options$reference_mean
 
     estimate <- esci::estimate_mdiff_one(
       data = dataset,
@@ -48,7 +48,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
 
     # Hypothesis evaluation
-    hypothesis_evaluation <- options$hypothesis_evaluation
+    hypothesis_evaluation <- options$evaluate_hypotheses
     interval_null <- options$rope > 0
 
     if (hypothesis_evaluation) {
@@ -350,7 +350,7 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
   )
 
   # Hypothesis evaluation aesthetics
-  hypothesis_evaluation <- options$hypothesis_evaluation
+  hypothesis_evaluation <- options$evaluate_hypotheses
   interval_null <- options$rope > 0
 
   if (hypothesis_evaluation ) {
