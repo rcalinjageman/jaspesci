@@ -1,100 +1,122 @@
 jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
-
-  ready <- (length(options$outcome_variable) > 0 & length(options$grouping_variable > 0))
-
-  if (ready) {
-    # read dataset
-    dataset <- jasp_estimate_mdiff_two_read_data(dataset, options)
-
-    # mytext <- createJaspHtml(
-    #   paste(dataset)
-    # )
-    #
-    # jaspResults[["debugText"]] <- mytext
+  # Check if ready
+  ready <- (length(options$outcome_variable) > 0) & (length(options$grouping_variable > 0))
+  if (!ready) return()
 
 
-    # check for errors
-    for (variable in options$outcome_variable) {
-      .hasErrors(
-        dataset = dataset,
-        type = "observations",
-        observations.target = variable,
-        observations.amount  = "< 3",
-        exitAnalysisIfErrors = TRUE
-      )
-
-    }
-
-    # Run the analysis
-    args <- list()
-    self <- list()
-    self$options <- options
-
-    args$data <- dataset
-    call <- esci::estimate_mdiff_two
-    args$conf_level <- self$options$conf_level
-    args$assume_equal_variance <- self$options$assume_equal_variance
-    args$outcome_variable <- unname(self$options$outcome_variable)
-    args$grouping_variable <- unname(self$options$grouping_variable)
-    args$grouping_variable_name <- unname(self$options$grouping_variable)
-    args$switch_comparison_order <- self$options$switch_comparison_order
-    args$save_raw_data <- TRUE
-
-    estimate <- try(do.call(what = call, args = args))
-
-    if(is.null(estimate)) return()
-    if(is(estimate, "try-error")) return()
+  # read dataset
+  dataset <- jasp_estimate_mdiff_two_read_data(dataset, options)
 
 
-    # mytext <- createJaspHtml(
-    #   paste(estimate)
-    # )
-    #
-    # jaspResults[["estimateText"]] <- mytext
-
-    # Some results tweaks - future updates to esci will do these calcs within esci rather than here
-    # Add in MoE
-    estimate$es_mean_difference$moe <- (estimate$es_mean_difference$UL - estimate$es_mean_difference$LL)/2
-    estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
-
-    # Add calculation details
-    alpha <- 1 - self$options$conf_level
-    estimate$es_mean_difference$t_multiplier <- stats::qt(1-alpha/2, estimate$es_mean_difference$df)
-
-    for (x in 1:nrow(estimate$es_smd)) {
-      estimate$overview[estimate$overview$outcome_variable_name == estimate$es_smd$outcome_variable_name[[x]], "s_pooled"] <- estimate$es_smd$denominator[[x]]
-      estimate$es_mean_difference$s_component[c(x*3-2, x*3-1, x*3-0)] <- estimate$es_smd$denominator[[x]]
-    }
-    estimate$es_mean_difference$n_component <- estimate$es_mean_difference$SE / estimate$es_mean_difference$s_component
+  # check for errors
+  for (variable in options$outcome_variable) {
+    .hasErrors(
+      dataset = dataset,
+      type = c("observations", "variance", "infinity"),
+      all.grouping = options$grouping_variable,
+      observations.target = variable,
+      observations.amount  = "< 3",
+      exitAnalysisIfErrors = TRUE
+    )
+  }
 
 
-    # Define and fill the overview table
-    if (is.null(jaspResults[["overviewTable"]])) {
-      jasp_overview_prep(jaspResults, options, ready, 2)
-      jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview, NULL)
-    }
+  # Run the analysis
+  args <- list()
+  self <- list()
+  self$options <- options
 
-    # Define and fill the mean difference table
-    if (options$effect_size == "mean_difference" & is.null(jaspResults[["es_mean_differenceTable"]]) ) {
-      jasp_es_mean_difference_prep(jaspResults, options, ready, estimate$es_mean_difference_properties)
-      jasp_table_fill(jaspResults[["es_mean_differenceTable"]], estimate$es_mean_difference)
-    }
+  args$data <- dataset
+  call <- esci::estimate_mdiff_two
+  args$conf_level <- self$options$conf_level
+  args$assume_equal_variance <- self$options$assume_equal_variance
+  args$outcome_variable <- unname(self$options$outcome_variable)
+  args$grouping_variable <- unname(self$options$grouping_variable)
+  args$grouping_variable_name <- unname(self$options$grouping_variable)
+  args$switch_comparison_order <- self$options$switch_comparison_order
+  args$save_raw_data <- TRUE
 
-    # Define and fill the median difference table
-    if (options$effect_size == "median_difference" & is.null(jaspResults[["es_median_differenceTable"]]) ) {
-      jasp_es_median_difference_prep(jaspResults, options, ready, estimate$es_median_difference_properties)
-      jasp_table_fill(jaspResults[["es_median_differenceTable"]], estimate$es_median_difference)
-    }
+  estimate <- try(do.call(what = call, args = args))
+
+  if(is.null(estimate)) return()
+  if(is(estimate, "try-error")) {
+    # To do: pull the error text and return it as a jasp error
+
+    return()
+
+  }
+
+  # Some handles
+  is_mean <- FALSE
+  if (options$effect_size == "mean_difference") is_mean <- TRUE
+
+  # Some results tweaks - future updates to esci will do these calcs within esci rather than here
+  # Add in MoE
+  estimate$es_mean_difference$moe <- (estimate$es_mean_difference$UL - estimate$es_mean_difference$LL)/2
+  estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
+
+  # Add calculation details
+  alpha <- 1 - self$options$conf_level
+  estimate$es_mean_difference$t_multiplier <- stats::qt(1-alpha/2, estimate$es_mean_difference$df)
+
+  # Fix sp and other calculation components
+  for (x in 1:nrow(estimate$es_smd)) {
+    estimate$overview[estimate$overview$outcome_variable_name == estimate$es_smd$outcome_variable_name[[x]], "s_pooled"] <- estimate$es_smd$denominator[[x]]
+    estimate$es_mean_difference$s_component[c(x*3-2, x*3-1, x*3-0)] <- estimate$es_smd$denominator[[x]]
+  }
+  estimate$es_mean_difference$n_component <- estimate$es_mean_difference$SE / estimate$es_mean_difference$s_component
 
 
-    # Define and fill the smd table
-    if (options$effect_size == "mean_difference" & is.null(jaspResults[["smdTable"]]) ) {
-      jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties, one_group = FALSE)
-      jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
-    }
+  # Define and fill the overview table
+  if (is.null(jaspResults[["overviewTable"]])) {
+    jasp_overview_prep(jaspResults, options, ready, 2)
+    jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview, NULL)
+  }
+
+  # Define and fill out the m_diff table (mean or median)
+  if (is.null(jaspResults[["es_m_differenceTable"]])) {
+
+    jasp_es_m_difference_prep(
+      jaspResults,
+      options,
+      ready
+    )
+
+    to_fill <- estimate$es_median_difference
+    if (is_mean) to_fill <- estimate$es_mean_difference
+
+    jasp_table_fill(
+      jaspResults[["es_m_differenceTable"]],
+      to_fill
+    )
+  }
+
+  # Define and fill the smd table
+  if (is_mean & is.null(jaspResults[["smdTable"]]) ) {
+    jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties, one_group = FALSE)
+    jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
+  }
 
 
+  # Define and fill out the m_diff table (mean or median)
+  if (options$show_ratio & is.null(jaspResults[["es_m_ratioTable"]])) {
+
+    jasp_es_m_ratio_prep(
+      jaspResults,
+      options,
+      ready,
+      levels
+    )
+
+    to_fill <- estimate$es_median_ratio
+    if (is_mean) to_fill <- estimate$es_mean_ratio
+
+    jasp_table_fill(
+      jaspResults[["es_m_ratioTable"]],
+      to_fill
+    )
+  }
 
 #
 #     # Hypothesis evaluation
@@ -178,8 +200,6 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 #
 #     }
 
-
-  }  # end of ready
 
   return()
 }

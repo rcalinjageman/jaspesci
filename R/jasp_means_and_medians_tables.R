@@ -173,11 +173,17 @@ jasp_overview_prep <- function(jaspResults, options, ready, levels = 1) {
       type = if (options$assume_equal_variance) "integer" else "number"
     )
 
-    overviewTable$addColumnInfo(
-      name = "s_pooled",
-      title = "<i>s</i><sub>p</sub>",
-      type = "number"
-    )
+  }
+
+
+  if (options$effect_size == "mean_difference") {
+    if (options$assume_equal_variance) {
+      overviewTable$addColumnInfo(
+        name = "s_pooled",
+        title = "<i>s</i><sub>p</sub>",
+        type = "number"
+      )
+    }
   }
 
 
@@ -326,21 +332,22 @@ jasp_smd_prep <- function(jaspResults, options, ready, properties, one_group = T
       type = "integer"
     )
 
-    to_replace <- '<sub>.biased</sub>'
-    if (grepl("biased", properties$effect_size_name_html))
-      to_replace <- ""
-
-    overviewTable$addColumnInfo(
-      name = "d_biased",
-      title = paste(
-        properties$effect_size_name_html,
-        to_replace,
-        sep = ""
-      ),
-      type = "number"
-    )
 
   }
+
+  to_replace <- '<sub>.biased</sub>'
+  if (grepl("biased", properties$effect_size_name_html))
+    to_replace <- ""
+
+  overviewTable$addColumnInfo(
+    name = "d_biased",
+    title = paste(
+      properties$effect_size_name_html,
+      to_replace,
+      sep = ""
+    ),
+    type = "number"
+  )
 
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
@@ -498,12 +505,16 @@ jasp_he_interval_prep <- function(jaspResults, options, ready) {
 }
 
 
+# Prep a mdiff table
+jasp_es_m_difference_prep <- function(jaspResults, options, ready) {
 
+  is_mean <- FALSE
+  if (options$effect_size == "mean_difference") is_mean <- TRUE
 
+  overviewTable <- createJaspTable(
+    title = if (is_mean) "Mean Difference" else "Median Difference"
+  )
 
-# Prep a mean difference table
-jasp_es_mean_difference_prep <- function(jaspResults, options, ready, properties) {
-  overviewTable <- createJaspTable(title = "Mean Difference")
 
   overviewTable$dependOn(
     c(
@@ -514,10 +525,10 @@ jasp_es_mean_difference_prep <- function(jaspResults, options, ready, properties
       "effect_size",
       "switch_comparison_order",
       "show_details",
-      "reference_mean",
-      "evaluate_hypotheses"
+      "show_calculations"
     )
   )
+
 
   overviewTable$addColumnInfo(
     name = "outcome_variable_name",
@@ -537,7 +548,7 @@ jasp_es_mean_difference_prep <- function(jaspResults, options, ready, properties
 
   overviewTable$addColumnInfo(
     name = "effect_size",
-    title = "<i>M</i>",
+    title = if (is_mean) "<i>M</i>" else "<i>Mdn</i>",
     type = "number"
   )
 
@@ -556,30 +567,33 @@ jasp_es_mean_difference_prep <- function(jaspResults, options, ready, properties
   )
 
 
-  if (options$show_details) {
+  if (options$show_details & is_mean) {
     overviewTable$addColumnInfo(
       name = "moe",
       title = "<i>MoE</i>",
       type = "number"
     )
+  }
 
+  if (options$show_details) {
     overviewTable$addColumnInfo(
       name = "SE",
       title = "<i>SE</i>",
       type = "number"
     )
+  }
 
+  if (options$show_details & is_mean) {
     overviewTable$addColumnInfo(
       name = "df",
       title = "<i>df</i>",
       type = if (options$assume_equal_variance) "integer" else "number"
     )
-
   }
 
 
-  if (options$show_calculations & options$effect_size == "mean_difference") {
-        overviewTable$addColumnInfo(
+  if (options$show_calculations & is_mean & options$assume_equal_variance) {
+    overviewTable$addColumnInfo(
       name = "t_multiplier",
       title = "<i>t</i>",
       type = "number",
@@ -607,31 +621,33 @@ jasp_es_mean_difference_prep <- function(jaspResults, options, ready, properties
   if (ready)
     overviewTable$setExpectedSize(length(options$outcome_variable) * 3)
 
-  jaspResults[["es_mean_differenceTable"]] <- overviewTable
+  jaspResults[["es_m_differenceTable"]] <- overviewTable
 
   return()
 
 }
 
 
+# Prep a mdiff table
+jasp_es_m_ratio_prep <- function(jaspResults, options, ready, levels = c("Comparison", "Reference")) {
 
-# Prep a median difference table
-jasp_es_median_difference_prep <- function(jaspResults, options, ready, properties) {
-  overviewTable <- createJaspTable(title = "Median Difference")
+  is_mean <- FALSE
+  if (options$effect_size == "mean_difference") is_mean <- TRUE
+
+  overviewTable <- createJaspTable(
+    title = if (is_mean) "Ratio of Means" else "Ratio of Medians"
+  )
 
   overviewTable$dependOn(
     c(
       "outcome_variable",
       "grouping_variable",
       "conf_level",
-      "assume_equal_variance",
       "effect_size",
-      "switch_comparison_order",
-      "show_details",
-      "reference_mean",
-      "evaluate_hypotheses"
+      "switch_comparison_order"
     )
   )
+
 
   overviewTable$addColumnInfo(
     name = "outcome_variable_name",
@@ -650,8 +666,20 @@ jasp_es_median_difference_prep <- function(jaspResults, options, ready, properti
   )
 
   overviewTable$addColumnInfo(
+    name = if (is_mean) "comparison_mean" else "comparison_median",
+    title = if (is_mean) "<i>M</i><sub>comparison</sub>" else "<i>Mdn</i><sub>comparison</sub>",
+    type = "number"
+  )
+
+  overviewTable$addColumnInfo(
+    name = if (is_mean) "reference_mean" else "reference_median",
+    title = if (is_mean) "<i>M</i><sub>reference</sub>" else "<i>Mdn</i><sub>reference</sub>",
+    type = "number"
+  )
+
+  overviewTable$addColumnInfo(
     name = "effect_size",
-    title = "<i>Mdn</i>",
+    title = if (is_mean) "<i>M</i>/<i>M</i>" else "<i>Mdn</i>/<i>Mdn</i>",
     type = "number"
   )
 
@@ -669,23 +697,14 @@ jasp_es_median_difference_prep <- function(jaspResults, options, ready, properti
     overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
-  if (options$show_details) {
-    overviewTable$addColumnInfo(
-      name = "SE",
-      title = "<i>SE</i>",
-      type = "number"
-    )
-  }
-
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable) * 3)
+    overviewTable$setExpectedSize(length(options$outcome_variable) * 1)
 
-  jaspResults[["es_median_differenceTable"]] <- overviewTable
+  jaspResults[["es_m_ratioTable"]] <- overviewTable
 
   return()
 
 }
-
