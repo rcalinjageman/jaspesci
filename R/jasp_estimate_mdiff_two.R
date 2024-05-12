@@ -10,17 +10,85 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
 
   # check for errors
-  for (variable in options$outcome_variable) {
-    .hasErrors(
-      dataset = dataset,
-      type = c("observations", "variance", "infinity"),
-      all.grouping = options$grouping_variable,
-      observations.target = variable,
-      observations.amount  = "< 3",
-      exitAnalysisIfErrors = TRUE
+  # At least 2 levels in grouping variable
+  .hasErrors(
+    dataset = dataset,
+    type = "factorLevels",
+    factorLevels.target  = options$grouping_variable,
+    factorLevels.amount  = "< 2",
+    exitAnalysisIfErrors = TRUE
+  )
+
+  # at least 2 observations in each level of each outcome variable
+  .hasErrors(
+    dataset = dataset,
+    type = c("observations", "variance", "infinity"),
+    all.grouping = options$grouping_variable,
+    all.target = options$grouping_variable,
+    observations.amount  = "< 3",
+    exitAnalysisIfErrors = TRUE
+  )
+
+
+  # More than 2 levels in grouping variable
+  levels <- levels(dataset[[options$grouping_variable]])
+
+  level_errors <- .hasErrors(
+    dataset = dataset,
+    type = "factorLevels",
+    factorLevels.target  = options$grouping_variable,
+    factorLevels.amount  = "> 2",
+    exitAnalysisIfErrors = FALSE
+  )
+
+  if (isa(level_errors, "list")) {
+    error_explain <- paste(
+      "The grouping variable (",
+      options$grouping_variable,
+      ") had ",
+      length(levels),
+      " levels.  Only the first 2 levels were used for effect-size calculations.",
+      sep = ""
     )
+
+    lerror_text <- createJaspHtml(
+      paste(
+        level_errors,
+        error_explain,
+        sep = "<BR>"
+      ),
+      title = "Warning!"
+    )
+    # To do: why does depenOn throw an error?
+    lerror_text$dependOn(c("outcome_variable", "grouping_variable"))
+    jaspResults[["level_errors"]] <- lerror_text
   }
 
+
+  # If show_ratio, no negative values
+  neg_errors <- NULL
+
+  if (options$show_ratio) {
+    neg_errors <- .hasErrors(
+      dataset = dataset,
+      type = c("negativeValues"),
+      all.target = options$outcome_variable,
+      exitAnalysisIfErrors = FALSE
+    )
+
+    if (isa(neg_errors, "list")) {
+      error_text <- createJaspHtml(
+        paste(
+          neg_errors,
+          "The ratio between group effect size is appropriate only for true ratio scales where values < 0 are impossible.  One or more of your outcome variables includes at least one negative value, so the requested ratio effect size is not reported.",
+          sep = "<BR>"
+        ),
+        title = "Warning!"
+      )
+      error_text$dependOn(c("outcome_variable", "grouping_variable", "show_ratio"))
+      jaspResults[["neg_errors"]] <- error_text
+    }
+  }
 
   # Run the analysis
   args <- list()
@@ -48,8 +116,8 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   }
 
   # Some handles
-  is_mean <- FALSE
-  if (options$effect_size == "mean_difference") is_mean <- TRUE
+  is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
+
 
   # Some results tweaks - future updates to esci will do these calcs within esci rather than here
   # Add in MoE
@@ -70,7 +138,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
   # Define and fill the overview table
   if (is.null(jaspResults[["overviewTable"]])) {
-    jasp_overview_prep(jaspResults, options, ready, 2)
+    jasp_overview_prep(jaspResults, options, ready, length(levels))
     jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview, NULL)
   }
 
@@ -100,7 +168,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
 
   # Define and fill out the m_diff table (mean or median)
-  if (options$show_ratio & is.null(jaspResults[["es_m_ratioTable"]])) {
+  if (options$show_ratio & is.null(jaspResults[["es_m_ratioTable"]]) & isa(neg_errors, "logical")) {
 
     jasp_es_m_ratio_prep(
       jaspResults,

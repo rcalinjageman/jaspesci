@@ -217,6 +217,19 @@ jasp_overview_prep <- function(jaspResults, options, ready, levels = 1) {
 
   }
 
+  if (options$effect_size == "mean_difference") {
+    if (options$assume_equal_variance) {
+      overviewTable$addFootnote(
+        "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
+      )
+    } else {
+      overviewTable$addFootnote(
+        "Variances are not assumed equal, and so the CI was calculated separately for each mean."
+      )
+    }
+
+  }
+
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
@@ -616,6 +629,19 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready) {
 
   }
 
+  if (options$effect_size == "mean_difference") {
+    if (options$assume_equal_variance) {
+      overviewTable$addFootnote(
+        "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
+      )
+    } else {
+      overviewTable$addFootnote(
+        "Variances are not assumed equal, and so the CI was calculated separately for each mean."
+      )
+    }
+
+  }
+
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
@@ -644,7 +670,8 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, levels = c("Compar
       "grouping_variable",
       "conf_level",
       "effect_size",
-      "switch_comparison_order"
+      "switch_comparison_order",
+      "show_ratio"
     )
   )
 
@@ -697,6 +724,11 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, levels = c("Compar
     overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
+
+
+  overviewTable$addFootnote(
+    "This effect-size measure is appropriate only for true ratio scales."
+  )
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
