@@ -21,13 +21,13 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     }
 
     # Run the analysis
-    my_reference_mean <- 0
-    if (options$evaluate_hypotheses) my_reference_mean <- options$reference_mean
+    null_value <- 0
+    if (options$evaluate_hypotheses) null_value <- options$null_value
 
     estimate <- esci::estimate_mdiff_one(
       data = dataset,
       outcome_variable = encodeColNames(options$outcome_variable),
-      reference_mean = my_reference_mean,
+      reference_mean = null_value,
       conf_level = options$conf_level,
       save_raw_data = TRUE
     )
@@ -48,58 +48,21 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
 
     # Hypothesis evaluation
-    hypothesis_evaluation <- options$evaluate_hypotheses
-    interval_null <- options$rope > 0
+    evaluate_h <- options$evaluate_hypotheses
 
-    if (hypothesis_evaluation) {
-      # Define and fill the smd table
-      # Two additional calculation tweaks that esci will soon handle on its own
-      estimate$es_smd$reference_value <- options$reference_mean
-      estimate$es_smd$mean <- estimate$es_smd$numerator + options$reference_mean
-
-      if (options$effect_size == "mean" & is.null(jaspResults[["smdTable"]]) ) {
-        jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties)
-        jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
-      } else {
-        # jaspResults[["smdTable"]] <- NULL
-      }
-
-      my_rope <- c(0, 0)
-      if (options$rope > 0 ) my_rope <- c(-1 * options$rope, options$rope)
-
-      test_results <- esci::test_mdiff(
-        estimate,
-        effect_size = options$effect_size,
-        rope = my_rope,
-        rope_units = "raw",
-        output_html = FALSE
+    if(evaluate_h & is.null(jaspResults[["heTable"]])) {
+      jasp_test_mdiff(
+        jaspResults,
+        options,
+        ready,
+        estimate
       )
-      #
-      # # Define and fill the hypothesis evaluation table
-      if (is.null(jaspResults[["heTable"]]) ) {
-        if (options$rope > 0) {
-          jasp_he_interval_prep(jaspResults, options, ready)
-        } else {
-          jasp_he_point_prep(jaspResults, options, ready)
-        }
-
-        to_fill <- test_results$point_null
-        if (options$rope > 0) to_fill <- test_results$interval_null
-
-        jasp_table_fill(jaspResults[["heTable"]], to_fill)
-      }
-    } else {
-
-      # No Hypothesis eval, clear tables
-      #jaspResults[["smdTable"]] <- NULL
-      #jaspResults[["heTable"]] <- NULL
-
-    } # end of hypothesis evaluation
+    }
 
 
     # Now prep and fill the plot
     if (is.null(jaspResults[["mdiffPlot"]])) {
-      jasp_plot_magnitude_prep(jaspResults, options)
+      jasp_plot_m_prep(jaspResults, options)
 
       args <- list()
       args$estimate <- estimate
@@ -109,10 +72,10 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       args$error_layout <- options$error_layout
       args$error_scale <- options$error_scale
       args$error_nudge <- options$error_nudge
-      if (hypothesis_evaluation) {
+      if (evaluate_h) {
         args$rope <- c(
-          options$reference_mean - options$rope,
-          options$reference_mean + options$rope
+          options$null_value - options$null_boundary,
+          options$null_value + options$null_boundary
         )
       }
 
@@ -145,63 +108,7 @@ jasp_estimate_mdiff_one_read_data <- function(dataset, options) {
 
 
 # Prep a magnitude plot
-jasp_plot_magnitude_prep <- function(jaspResults, options) {
 
-  mdiffPlot <- createJaspPlot(
-    title = "Estimation Figure",
-    width = options$width,
-    height = options$height
-  )
-
-  mdiffPlot$dependOn(
-    c(
-      "outcome_variable",
-      "conf_level",
-      "effect_size",
-      "reference_mean",
-      "rope",
-      "hypothesis_evaluation",
-      "width",
-      "height",
-      "data_layout",
-      "data_spread",
-      "error_layout",
-      "error_scale",
-      "error_nudge",
-      "ylab",
-      "xlab",
-      "axis.text.y",
-      "axis.title.y",
-      "axis.text.x",
-      "axis.title.x",
-      "ymin",
-      "ymax",
-      "n.breaks",
-      "shape_summary",
-      "size_summary",
-      "color_summary",
-      "fill_summary",
-      "alpha_summary",
-      "linetype_summary",
-      "size_interval",
-      "color_interval",
-      "alpha_interval",
-      "fill_error",
-      "alpha_error",
-      "shape_raw",
-      "size_raw",
-      "color_raw",
-      "fill_raw",
-      "alpha_raw",
-      "null_color"
-    )
-  )
-
-  jaspResults[["mdiffPlot"]] <- mdiffPlot
-
-  return()
-
-}
 
 
 # Apply all plot customizations
@@ -350,10 +257,10 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
   )
 
   # Hypothesis evaluation aesthetics
-  hypothesis_evaluation <- options$evaluate_hypotheses
-  interval_null <- options$rope > 0
+  evaluate_hypotheses <- options$evaluate_hypotheses
+  interval_null <- options$null_boundary > 0
 
-  if (hypothesis_evaluation ) {
+  if (evaluate_hypotheses ) {
     # Null line color
     myplot$layers[["null_line"]]$aes_params$colour <- options$null_color
 

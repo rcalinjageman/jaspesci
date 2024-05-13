@@ -449,7 +449,7 @@ Form
 
       DoubleField
       {
-        name: "reference_mean"
+        name: "null_value"
         label: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
         defaultValue: 0
         negativeValues: true
@@ -459,7 +459,7 @@ Form
 
       DoubleField
       {
-        name: "rope"
+        name: "null_boundary"
         label: qsTr("+/- ")
         defaultValue: 0
         negativeValues: false

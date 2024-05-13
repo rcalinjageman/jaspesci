@@ -375,25 +375,60 @@ jasp_smd_prep <- function(jaspResults, options, ready, properties, one_group = T
 }
 
 
-# Prep a point null table
-jasp_he_point_prep <- function(jaspResults, options, ready) {
+# Prep a hypothesis evaluation table
+jasp_he_prep <- function(jaspResults, options, ready) {
   overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
 
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "evaluate_hypotheses"))
+  overviewTable$dependOn(
+    c(
+      "outcome_variable",
+      "grouping_variable",
+      "conf_level",
+      "effect_size",
+      "assume_equal_variance",
+      "switch_comparison_order",
+      "show_details",
+      "show_calculations",
+      "null_value",
+      "null_boundary",
+      "rope_units",
+      "evaluate_hypotheses"
+    )
+  )
 
+  is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference")) TRUE else FALSE
+  is_mean <- if (options$effect_size %in% c("mean_difference", "mean")) TRUE else FALSE
+  is_interval <- if (options$null_boundary > 0) TRUE else FALSE
+
+  if (is_difference) {
+    overviewTable$addColumnInfo(
+      name = "outcome_variable_name",
+      title = "Outcome variable",
+      type = "string",
+      combine = FALSE
+    )
+  }
 
   overviewTable$addColumnInfo(
     name = "effect",
     title = "Effect",
     type = "string",
-    combine = TRUE
+    combine = FALSE
   )
 
-  overviewTable$addColumnInfo(
-    name = "null_words",
-    title = "<i>H</i><sub>0</sub>",
-    type = "string"
-  )
+  if (is_interval) {
+    overviewTable$addColumnInfo(
+      name = "rope",
+      title = "<i>H</i><sub>0</sub>",
+      type = "number"
+    )
+  } else {
+    overviewTable$addColumnInfo(
+      name = "null_words",
+      title = "<i>H</i><sub>0</sub>",
+      type = "string"
+    )
+  }
 
   overviewTable$addColumnInfo(
     name = "CI",
@@ -401,13 +436,22 @@ jasp_he_point_prep <- function(jaspResults, options, ready) {
     type = "string"
   )
 
-  overviewTable$addColumnInfo(
-    name = "CI_compare",
-    title = "Compare CI with <i>H</i><sub>0</sub>",
-    type = "string"
-  )
+  if (is_interval) {
+    overviewTable$addColumnInfo(
+      name = "rope_compare",
+      title = "Compare CI with <i>H</i><sub>0</sub>",
+      type = "string"
+    )
 
-  if (options$effect_size == "mean") {
+  } else {
+    overviewTable$addColumnInfo(
+      name = "CI_compare",
+      title = "Compare CI with <i>H</i><sub>0</sub>",
+      type = "string"
+    )
+  }
+
+  if (is_mean & !is_interval) {
     overviewTable$addColumnInfo(
       name = "t",
       title = "<i>t</i>",
@@ -434,76 +478,19 @@ jasp_he_point_prep <- function(jaspResults, options, ready) {
     )
   }
 
-  overviewTable$addColumnInfo(
-    name = "null_decision",
-    title = "<i>H</i><sub>0</sub> decision",
-    type = "string"
-  )
+  if (!is_interval) {
+    overviewTable$addColumnInfo(
+      name = "null_decision",
+      title = "<i>H</i><sub>0</sub> decision",
+      type = "string"
+    )
+  }
 
   overviewTable$addColumnInfo(
     name = "conclusion",
     title = "Conclusion",
     type = "string"
   )
-
-
-
-  overviewTable$showSpecifiedColumnsOnly <- TRUE
-
-  if (ready)
-    overviewTable$setExpectedSize(length(options$outcome_variable))
-
-  jaspResults[["heTable"]] <- overviewTable
-
-  return()
-
-}
-
-
-# Prep an interval null table
-jasp_he_interval_prep <- function(jaspResults, options, ready) {
-  overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
-
-  overviewTable$dependOn(c("outcome_variable", "conf_level", "effect_size", "reference_mean", "rope", "evaluate_hypotheses"))
-
-
-  overviewTable$addColumnInfo(
-    name = "effect",
-    title = "Effect",
-    type = "string",
-    combine = TRUE
-  )
-
-  overviewTable$addColumnInfo(
-    name = "rope",
-    title = "<i>H</i><sub>0</sub>",
-    type = "number"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "CI",
-    title = "CI",
-    type = "string"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "rope_compare",
-    title = "Compare CI with <i>H</i><sub>0</sub>",
-    type = "string"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "p_result",
-    title = "<i>p</i>, two tailed",
-    type = "pvalue"
-  )
-
-  overviewTable$addColumnInfo(
-    name = "conclusion",
-    title = "Conclusion",
-    type = "string"
-  )
-
 
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
