@@ -368,6 +368,10 @@ jasp_smd_prep <- function(jaspResults, options, ready, properties, one_group = T
   if (ready)
     overviewTable$setExpectedSize(length(options$outcome_variable))
 
+  overviewTable$addCitation(
+    "Bonett, D.G. (2008). Confidence intervals for standardized linear contrasts of means. Psychological Methods. 13, 99-109, https://psycnet.apa.org/doiLanding?doi=10.1037%2F1082-989X.13.2.99."
+  )
+
   jaspResults[["smdTable"]] <- overviewTable
 
   return()
@@ -721,6 +725,11 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, levels = c("Compar
 
   if (ready)
     overviewTable$setExpectedSize(length(options$outcome_variable) * 1)
+
+  overviewTable$addCitation(
+    "Bonett, D.G. & Price, R. M. (2020). Confidence intervals for ratios of means and medians. Journal of Educational and Behavioral Statistics. 45, 750-770, https://journals.sagepub.com/doi/10.3102/1076998620934125."
+  )
+
 
   jaspResults[["es_m_ratioTable"]] <- overviewTable
 

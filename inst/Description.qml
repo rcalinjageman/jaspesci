@@ -24,10 +24,21 @@ Description
 		func:	"jasp_estimate_mdiff_one"
 	}
 
-		Analysis
+	Analysis
 	{
 		title:	qsTr("Two Groups")
 		func:	"jasp_estimate_mdiff_two"
+	}
+
+	GroupTitle
+	{
+		title:	qsTr("Meta-Analysis")
+	}
+
+	Analysis
+	{
+		title:	qsTr("Means")
+		func:	"jasp_meta_mean"
 	}
 
 

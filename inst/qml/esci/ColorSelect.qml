@@ -16,7 +16,7 @@ import "./" as Esci
             { label: "Dark pink", value: "#FF5AAF"},
             { label: "Dark purplish", value: "#9F0162"},
             { label: "Dark red", value: "#A40122"},
-            { label: "Dark greenish", value: "#00FCCF"},
+            { label: "Greenish", value: "#00FCCF"},
             { label: "Orange", value: "#FF6E3A"},
             { label: "Pink", value: "#FFB2FD"},
             { label: "Purple", value: "#8400CD"},

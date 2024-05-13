@@ -32,10 +32,12 @@ jasp_test_mdiff <- function(jaspResults, options, ready, estimate) {
 
 
 
-jasp_plot_m_prep <- function(jaspResults, options) {
+jasp_plot_m_prep <- function(jaspResults, options, my_variable = "mdiffPlot", add_citation = FALSE) {
+
+  my_title <- if (my_variable == "mdiffPlot") "Estimation Figure" else paste("Estimation Figure", my_variable, sep = " - ")
 
   mdiffPlot <- createJaspPlot(
-    title = "Estimation Figure",
+    title = my_title,
     width = options$width,
     height = options$height
   )
@@ -99,7 +101,14 @@ jasp_plot_m_prep <- function(jaspResults, options) {
     )
   )
 
-  jaspResults[["mdiffPlot"]] <- mdiffPlot
+  if (add_citation) {
+    mdiffPlot$addCitation(
+      "Kay, M. (2002). ggdist: Visualizations of Distributions and Uncertainty in the Grammar of Graphics. IEEE Transactions on Visualization and Computer Graphics. 30, 414-424, https://zenodo.org/records/7933524."
+    )
+
+  }
+
+  jaspResults[[my_variable]] <- mdiffPlot
 
   return()
 

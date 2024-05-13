@@ -62,7 +62,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
     # Now prep and fill the plot
     if (is.null(jaspResults[["mdiffPlot"]])) {
-      jasp_plot_m_prep(jaspResults, options)
+      jasp_plot_m_prep(jaspResults, options, add_citation = TRUE)
 
       args <- list()
       args$estimate <- estimate

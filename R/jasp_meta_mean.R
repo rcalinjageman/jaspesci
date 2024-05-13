@@ -1,4 +1,6 @@
-jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
+jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
+
+  return()
 
   # Check if ready
   ready <- (length(options$outcome_variable) > 0) & (options$grouping_variable != "")
@@ -280,7 +282,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
 
 
-jasp_estimate_mdiff_two_read_data <- function(dataset, options) {
+jasp_meata_mean_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
   else
@@ -293,7 +295,7 @@ jasp_estimate_mdiff_two_read_data <- function(dataset, options) {
 }
 
 
-jasp_plot_mdiff_decorate <- function(myplot, options) {
+jasp_meta_decorate <- function(myplot, options) {
 
   # make compatible with jamovi code
   self <- list()
