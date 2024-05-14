@@ -28,15 +28,66 @@ Form
 	id: form
 	property int framework:	Common.Type.Framework.Classical
 
-	VariablesForm {
-		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
-		AvailableVariablesList { name: "allVariablesList" }
-		AssignedVariablesList { name: "means"; title: qsTr("Means"); suggestedColumns: ["scale"]; singleVariable: true }
-		AssignedVariablesList { name: "sds"; title: qsTr("Standard deviations"); suggestedColumns: ["scale"]; singleVariable: true }
-		AssignedVariablesList { name: "ns"; title: qsTr("Sample sizes"); suggestedColumns: ["scale"]; singleVariable: true }
-		AssignedVariablesList { name: "labels"; title: qsTr("Study labels (optional"); suggestedColumns: ["nominal"]; singleVariable: true }
-		AssignedVariablesList { name: "moderator"; title: qsTr("Moderator (optional"); suggestedColumns: ["nominal"]; singleVariable: true }
-	}
+  RadioButtonGroup {
+    columns: 2
+    Layout.columnSpan: 2
+    name: "switch"
+    id: switch_source
+    RadioButton { value: "from_raw"; label: qsTr("Analyze original units"); checked: true; id: from_raw }
+    RadioButton { value: "from_d"; label: qsTr("Analyze Cohen's <i>d</i>"); id: from_d }
+  }
+
+  Group {
+    Layout.rowSpan: 20
+
+  	VariablesForm {
+  		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
+  		AvailableVariablesList {
+  		  name: "allVariablesList"
+  		}
+  		AssignedVariablesList {
+  		  name: "means";
+  		  title: qsTr("Means");
+  		  suggestedColumns: ["scale"];
+  		  singleVariable: true
+  		  enabled: from_raw.checked
+  		}
+  		AssignedVariablesList {
+  		  name: "sds";
+  		  title: qsTr("Standard deviations");
+  		  suggestedColumns: ["scale"];
+  		  singleVariable: true
+  		  enabled: from_raw.checked
+  		}
+  		AssignedVariablesList {
+  		  name: "ds";
+  		  title: qsTr("Cohen's <i>d</i>, unbiased");
+  		  suggestedColumns: ["scale"];
+  		  singleVariable: true
+  		  enabled: from_d.checked
+  		}
+  		AssignedVariablesList {
+  		  name: "ns";
+  		  title: qsTr("Sample sizes");
+  		  suggestedColumns: ["scale"];
+  		  singleVariable: true
+  		}
+  		AssignedVariablesList {
+  		  name: "labels";
+  		  title: qsTr("Study labels (optional");
+  		  suggestedColumns: ["nominal"];
+  		  singleVariable: true
+  		}
+  		AssignedVariablesList {
+  		  name: "moderator";
+  		  title: qsTr("Moderator (optional");
+  		  suggestedColumns: ["nominal"];
+  		  singleVariable: true
+  		}
+  	}
+
+  }
+
 
 
 	Group {
@@ -62,7 +113,7 @@ Form
     }
 
 		DropDown {
-        name: "effect_size"
+        name: "reported_effect_size"
         label: qsTr("Effect size of interest")
         startValue: 'mean_difference'
         values:
@@ -94,6 +145,7 @@ Form
 
 	  CheckBox {
 	    name: "show_details";
+	    id: show_details
 	    label: qsTr("Extra details")
 	  }
 
@@ -620,150 +672,161 @@ Form
 
         }
 
+        Label {
+          text: "<b>Diamonds"
+        }
+
+        Label {
+          text: " "
+        }
+
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: "Outline"
+        }
+
+        Label {
+          text: "Fill"
+        }
+
+        Label {
+          text: "Transparency"
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: "Overall"
+        }
+
+        Esci.ColorSelect
+        {
+          name: "color_summary_overall"
+          id: color_summary_overall
+          startValue: 'black'
+        }
+
+        Esci.ColorSelect
+        {
+          name: "fill_summary_overall"
+          id: fill_summary_overall
+          startValue: 'black'
+        }
+
+        Esci.AlphaSelect
+        {
+          name: "alpha_summary_overall"
+          id: alpha_summary_overall
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: "Reference"
+        }
+
+        Esci.ColorSelect
+        {
+          name: "color_summary_reference"
+          id: color_summary_reference
+          startValue: '#008DF9'
+        }
+
+        Esci.ColorSelect
+        {
+          name: "fill_summary_reference"
+          id: fill_summary_reference
+          startValue: '#008DF9'
+        }
+
+        Esci.AlphaSelect
+        {
+          name: "alpha_summary_reference"
+          id: alpha_summary_reference
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: "Comparison"
+        }
+
+        Esci.ColorSelect
+        {
+          name: "color_summary_comparison"
+          startValue: "#009F81"
+        }
+
+        Esci.ColorSelect
+        {
+          name: "fill_summary_comparison"
+          startValue: "#009F81"
+        }
+
+        Esci.AlphaSelect
+        {
+          name: "alpha_summary_comparison"
+          id: alpha_summary_comparison
+        }
+
+        Label {
+          text: " "
+        }
+
+        Label {
+          text: "Unused"
+        }
+
+        Esci.ColorSelect
+        {
+          name: "color_summary_unused"
+          id: color_summary_unused
+          startValue: 'gray75'
+        }
+
+        Esci.ColorSelect
+        {
+          name: "fill_summary_unused"
+          id: fill_summary_unused
+          startValue: 'gray75'
+        }
+
+        Esci.AlphaSelect
+        {
+          name: "alpha_summary_unused"
+          id: alpha_summary_unused
+        }
+
+        Label {
+          text: " "
+        }
 
       }
 
 
     }
-
-        GridLayout {
-      id: grid_diamond
-      columns: 4
-
-
-
-      Label {
-        text: "<b>Diamonds"
-      }
-
-      Label {
-        text: " "
-      }
-
-
-      Label {
-        text: " "
-      }
-
-      Label {
-        text: " "
-      }
-
-      Label {
-        text: " "
-      }
-
-      Label {
-        text: "Outline"
-      }
-
-      Label {
-        text: "Fill"
-      }
-
-      Label {
-        text: "Transparency"
-      }
-
-      Label {
-        text: "Overall"
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_summary_overall"
-        id: color_summary_overall
-        startValue: 'black'
-      }
-
-      Esci.ColorSelect
-      {
-        name: "fill_summary_overall"
-        id: fill_summary_overall
-        startValue: 'black'
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_summary_overall"
-        id: alpha_summary_overall
-      }
-
-
-      Label {
-        text: "Reference"
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_summary_reference"
-        id: color_summary_reference
-        startValue: '#008DF9'
-      }
-
-      Esci.ColorSelect
-      {
-        name: "fill_summary_reference"
-        id: fill_summary_reference
-        startValue: '#008DF9'
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_summary_reference"
-        id: alpha_summary_reference
-      }
-
-      Label {
-        text: "Comparison"
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_summary_comparison"
-        startValue: "#009F81"
-      }
-
-      Esci.ColorSelect
-      {
-        name: "fill_summary_comparison"
-        startValue: "#009F81"
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_summary_comparison"
-        id: alpha_summary_comparison
-      }
-
-
-      Label {
-        text: "Unused"
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_summary_unused"
-        id: color_summary_unused
-        startValue: 'gray75'
-      }
-
-      Esci.ColorSelect
-      {
-        name: "fill_summary_unused"
-        id: fill_summary_unused
-        startValue: 'gray75'
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_summary_unused"
-        id: alpha_summary_unused
-      }
-
-  }
-
-
 
 
 

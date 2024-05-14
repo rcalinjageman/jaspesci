@@ -1,110 +1,94 @@
 jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
-  return()
+  from_raw <- options$switch == "from_raw"
 
   # Check if ready
-  ready <- (length(options$outcome_variable) > 0) & (options$grouping_variable != "")
+  if (from_raw) {
+    ready <- options$means != "" &
+      options$sds != "" &
+      options$ns != ""
+  } else {
+    ready <- options$ds != "" & options$ns != ""
+  }
+
   if (!ready) return()
 
   # read dataset
-  dataset <- jasp_estimate_mdiff_two_read_data(dataset, options)
+  dataset <- jasp_meta_mean_read_data(dataset, options)
+
+  # myds <- createJaspHtml(printmydf(dataset))
+  # jaspResults[["myds"]] <- myds
 
 
   # check for errors
-  # At least 2 levels in grouping variable
+  # ns are positive; if from_raw sds should all be positive, too
   .hasErrors(
     dataset = dataset,
-    type = "factorLevels",
-    factorLevels.target  = options$grouping_variable,
-    factorLevels.amount  = "< 2",
+    type = c("observations", "variance", "infinity", "negativeValues"),
+    all.target = if (from_raw) c(options$sds, options$ns) else c(options$ns),
+    observations.amount  = "< 2",
     exitAnalysisIfErrors = TRUE
   )
 
-  # at least 2 observations in each level of each outcome variable
-  .hasErrors(
-    dataset = dataset,
-    type = c("observations", "variance", "infinity"),
-    all.grouping = options$grouping_variable,
-    all.target = options$grouping_variable,
-    observations.amount  = "< 3",
-    exitAnalysisIfErrors = TRUE
-  )
-
-
-  # More than 2 levels in grouping variable
-  levels <- levels(dataset[[options$grouping_variable]])
-
-  level_errors <- .hasErrors(
-    dataset = dataset,
-    type = "factorLevels",
-    factorLevels.target  = options$grouping_variable,
-    factorLevels.amount  = "> 2",
-    exitAnalysisIfErrors = FALSE
-  )
-
-  if (isa(level_errors, "list")) {
-    error_explain <- paste(
-      "The grouping variable (",
-      options$grouping_variable,
-      ") had ",
-      length(levels),
-      " levels.  Only the first 2 levels were used for effect-size calculations.",
-      sep = ""
-    )
-
-    lerror_text <- createJaspHtml(
-      paste(
-        level_errors,
-        error_explain,
-        sep = "<BR>"
-      ),
-      title = "Warning!"
-    )
-    # To do: why does depenOn throw an error?
-    lerror_text$dependOn(c("outcome_variable", "grouping_variable"))
-    jaspResults[["level_errors"]] <- lerror_text
-  }
-
-
-  # If show_ratio, no negative values
-  neg_errors <- NULL
-
-  if (options$show_ratio) {
-    neg_errors <- .hasErrors(
+  if (options$moderator != "") {
+    # At least 2 levels in grouping variable
+    .hasErrors(
       dataset = dataset,
-      type = c("negativeValues"),
-      all.target = options$outcome_variable,
-      exitAnalysisIfErrors = FALSE
+      type = "factorLevels",
+      factorLevels.target  = options$moderator,
+      factorLevels.amount  = "< 3",
+      exitAnalysisIfErrors = TRUE
     )
 
-    if (isa(neg_errors, "list")) {
-      error_text <- createJaspHtml(
-        paste(
-          neg_errors,
-          "The ratio between group effect size is appropriate only for true ratio scales where values < 0 are impossible.  One or more of your outcome variables includes at least one negative value, so the requested ratio effect size is not reported.",
-          sep = "<BR>"
-        ),
-        title = "Warning!"
-      )
-      error_text$dependOn(c("outcome_variable", "grouping_variable", "show_ratio"))
-      jaspResults[["neg_errors"]] <- error_text
-    }
+    # at least 2 observations in each level of the moderator
+    .hasErrors(
+      dataset = dataset,
+      type = c("observations", "variance", "infinity"),
+      all.grouping = options$moderator,
+      all.target = c(
+        if (from_raw) c(options$means, options$sds) else options$ds,
+        options$ns
+      ),
+      observations.amount  = "< 3",
+      exitAnalysisIfErrors = TRUE
+    )
+
   }
+
 
   # Run the analysis
   args <- list()
   self <- list()
   self$options <- options
 
+  call <- if (from_raw) esci::meta_mean else esci::meta_d1()
+
   args$data <- dataset
-  call <- esci::estimate_mdiff_two
+  args$effect_label <- "My effect"
+  if (!self$options$effect_label %in% c("Auto", "auto", "AUTO", "")) args$effect_label <- self$options$label
+
   args$conf_level <- self$options$conf_level
-  args$assume_equal_variance <- self$options$assume_equal_variance
-  args$outcome_variable <- unname(self$options$outcome_variable)
-  args$grouping_variable <- unname(self$options$grouping_variable)
-  args$grouping_variable_name <- unname(self$options$grouping_variable)
-  args$switch_comparison_order <- self$options$switch_comparison_order
-  args$save_raw_data <- TRUE
+
+
+  if (from_raw) {
+    args$means <- self$options$means
+    args$sds <- self$options$sds
+    args$ns <- self$options$ns
+    args$reported_effect_size <- self$options$reported_effect_size
+  } else {
+    args$ds <- self$options$ds
+    args$ns <- self$options$dns
+  }
+
+  if (self$options$moderator != "") {
+    args$moderator <- self$options$moderator
+  }
+
+  if (self$options$labels != "") {
+    args$labels <- self$options$labels
+  }
+
+  args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
 
   estimate <- try(do.call(what = call, args = args))
 
@@ -116,32 +100,32 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
   }
 
-  # Some handles
-  is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
+
+#   myds <- createJaspHtml(printmydf(estimate$raw_data))
+#   jaspResults[["myds"]] <- myds
 
 
-  # Some results tweaks - future updates to esci will do these calcs within esci rather than here
-  # Add in MoE
-  estimate$es_mean_difference$moe <- (estimate$es_mean_difference$UL - estimate$es_mean_difference$LL)/2
-  estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
-
-  # Add calculation details
-  alpha <- 1 - self$options$conf_level
-  estimate$es_mean_difference$t_multiplier <- stats::qt(1-alpha/2, estimate$es_mean_difference$df)
-
-  # Fix sp and other calculation components
-  for (x in 1:nrow(estimate$es_smd)) {
-    estimate$overview[estimate$overview$outcome_variable_name == estimate$es_smd$outcome_variable_name[[x]], "s_pooled"] <- estimate$es_smd$denominator[[x]]
-    estimate$es_mean_difference$s_component[c(x*3-2, x*3-1, x*3-0)] <- estimate$es_smd$denominator[[x]]
+  # Define and fill the raw_data
+  if (is.null(jaspResults[["meta_raw_dataTable"]])) {
+    jasp_meta_raw_data_prep(jaspResults, options, ready, nrow(dataset))
+    jasp_table_fill(jaspResults[["meta_raw_dataTable"]], estimate$raw_data, NULL)
   }
-  estimate$es_mean_difference$n_component <- estimate$es_mean_difference$SE / estimate$es_mean_difference$s_component
 
-
-  # Define and fill the overview table
-  if (is.null(jaspResults[["overviewTable"]])) {
-    jasp_overview_prep(jaspResults, options, ready, length(levels))
-    jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview, NULL)
+  # Define and fill the es_meta
+  if (is.null(jaspResults[["es_metaTable"]])) {
+    row_expect <- if (options$moderator != "") length(levels(dataset[[options$moderator]])) else 1
+    es_note <- if (options$random_effects == "fixed_effects")
+      "Estimate is based on a fixed effect (FE) model"
+    else
+      "Estimate is based on a random effects (RE) model"
+    jasp_es_meta_data_prep(jaspResults, options, ready, row_expect)
+    jasp_table_fill(jaspResults[["es_metaTable"]], estimate$es_meta, es_note)
   }
+
+
+  return()
+
+
 
   # Define and fill out the m_diff table (mean or median)
   if (is.null(jaspResults[["es_m_differenceTable"]])) {
@@ -282,16 +266,34 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
 
 
-jasp_meata_mean_read_data <- function(dataset, options) {
+jasp_meta_mean_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
-  else
-    return(
-      .readDataSetToEnd(
-        columns.as.numeric = options$outcome_variable,
-        columns.as.factor = options$grouping_variable
+  else {
+
+    from_raw <- options$switch == "from_raw"
+
+    args <- list()
+    if (from_raw) {
+      args$columns.as.numeric = c(options$means, options$sds, options$ns)
+    } else {
+      args$columns.as.numeric = c(options$ds, options$ns)
+    }
+
+    args$columns.as.factor <- NULL
+
+    args$columns.as.factor <- c(
+      if (options$labels != "") options$labels else NULL,
+      if (options$moderator != "") options$moderator else NULL
+    )
+
+    return (
+      do.call(
+        what = .readDataSetToEnd,
+        args = args
       )
     )
+  }
 }
 
 
@@ -564,4 +566,26 @@ jasp_meta_decorate <- function(myplot, options) {
 
 
   return(myplot)
+}
+
+
+printmydf <- function(mydf) {
+
+  if (is.null(mydf)) return()
+
+  if (nrow(mydf) <1) return()
+
+  printed <- paste(colnames(mydf), collapse = ",     ")
+
+  for (x in 1:nrow(mydf)) {
+    next_row <- paste(mydf[x, ], collapse = ",    ")
+
+    printed <- paste(
+      printed,
+      next_row,
+      sep = "<BR>"
+    )
+  }
+
+  return(printed)
 }
