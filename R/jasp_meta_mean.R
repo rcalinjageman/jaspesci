@@ -65,7 +65,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
   args$data <- dataset
   args$effect_label <- "My effect"
-  if (!self$options$effect_label %in% c("Auto", "auto", "AUTO", "")) args$effect_label <- self$options$label
+  if (!self$options$effect_label %in% c("Auto", "auto", "AUTO", "")) args$effect_label <- self$options$effect_label
 
   args$conf_level <- self$options$conf_level
 
