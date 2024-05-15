@@ -152,6 +152,7 @@ Form
 	  CheckBox {
 	    name: "include_PIs";
 	    label: qsTr("Prediction intervals")
+	    enabled: random_effects.currentValue == "random_effects"
 	  }
 
 

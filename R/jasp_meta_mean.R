@@ -30,13 +30,16 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     exitAnalysisIfErrors = TRUE
   )
 
+  has_moderator <- FALSE
   if (options$moderator != "") {
+    has_moderator <- TRUE
+
     # At least 2 levels in grouping variable
     .hasErrors(
       dataset = dataset,
       type = "factorLevels",
       factorLevels.target  = options$moderator,
-      factorLevels.amount  = "< 3",
+      factorLevels.amount  = "< 2",
       exitAnalysisIfErrors = TRUE
     )
 
@@ -49,7 +52,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
         if (from_raw) c(options$means, options$sds) else options$ds,
         options$ns
       ),
-      observations.amount  = "< 3",
+      observations.amount  = "< 2",
       exitAnalysisIfErrors = TRUE
     )
 
@@ -57,11 +60,12 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
 
   # Run the analysis
-  args <- list()
   self <- list()
   self$options <- options
 
-  call <- if (from_raw) esci::meta_mean else esci::meta_d1()
+  args <- list()
+
+  call <- if (from_raw) esci::meta_mean else esci::meta_d1
 
   args$data <- dataset
   args$effect_label <- "My effect"
@@ -69,6 +73,10 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
   args$conf_level <- self$options$conf_level
 
+  if (!(options$reference_mean %in% c("auto", "Auto", "AUTO", ""))) {
+    try(args$reference_mean <- as.numeric(options$reference_mean))
+    if (is.na(args$reference_mean)) args$reference_mean <- NULL
+  }
 
   if (from_raw) {
     args$means <- self$options$means
@@ -90,6 +98,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
   args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
 
+
   estimate <- try(do.call(what = call, args = args))
 
   if(is.null(estimate)) return()
@@ -100,89 +109,92 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
   }
 
+  # properties cleanup - need to move this into esci
+  if (!is.null(args$reference_mean) & from_raw) {
+    if (options$reported_effect_size == "mean_difference") {
+      estimate$properties$effect_size_name_html <- paste(
+        estimate$properties$effect_size_name_html,
+        " - <i>M</i><sub>Reference</sub>",
+        sep = ""
+      )
+    } else {
+    }
+  }
 
-#   myds <- createJaspHtml(printmydf(estimate$raw_data))
-#   jaspResults[["myds"]] <- myds
 
+  #myds <- createJaspHtml(printmydf(estimate$es_meta))
+  # myds <- createJaspHtml(paste(levels(estimate$raw_data$label), collapse = ", "))
+  # jaspResults[["myds"]] <- myds
+
+
+  es_note <- if (options$random_effects == "fixed_effects")
+    "Estimate is based on a fixed effect (FE) model"
+  else
+    "Estimate is based on a random effects (RE) model"
 
   # Define and fill the raw_data
   if (is.null(jaspResults[["meta_raw_dataTable"]])) {
-    jasp_meta_raw_data_prep(jaspResults, options, ready, nrow(dataset))
+    jasp_meta_raw_data_prep(
+      jaspResults,
+      options = options,
+      ready = ready,
+      levels = nrow(dataset),
+      effect_size_title = estimate$properties$effect_size_name_html
+    )
     jasp_table_fill(jaspResults[["meta_raw_dataTable"]], estimate$raw_data, NULL)
   }
 
   # Define and fill the es_meta
   if (is.null(jaspResults[["es_metaTable"]])) {
     row_expect <- if (options$moderator != "") length(levels(dataset[[options$moderator]])) else 1
-    es_note <- if (options$random_effects == "fixed_effects")
-      "Estimate is based on a fixed effect (FE) model"
-    else
-      "Estimate is based on a random effects (RE) model"
-    jasp_es_meta_data_prep(jaspResults, options, ready, row_expect)
+
+    jasp_es_meta_data_prep(
+      jaspResults,
+      options = options,
+      ready = ready,
+      levels = row_expect,
+      effect_size_title = estimate$properties$effect_size_name_html
+    )
     jasp_table_fill(jaspResults[["es_metaTable"]], estimate$es_meta, es_note)
   }
 
+
+  # Define and fill the es_heterogeneityTable table
+  if (is.null(jaspResults[["es_heterogeneityTable"]])) {
+    my_levels <- if (has_moderator) length(levels(dataset[[options$moderator]])) else 0
+
+    jasp_es_heterogeneity_data_prep(
+      jaspResults,
+      options = options,
+      ready = ready,
+      levels = my_levels
+    )
+    jasp_table_fill(
+      jaspResults[["es_heterogeneityTable"]],
+      estimate$es_heterogeneity,
+      message = estimate$es_heterogeneity_properties$message_html
+    )
+  }
+
+
+  if (has_moderator & is.null(jaspResults[["es_meta_differenceTable"]])) {
+    jasp_es_meta_difference_prep(
+      jaspResults,
+      options = options,
+      ready = ready,
+      effect_size_title = estimate$properties$effect_size_name_html
+    )
+    jasp_table_fill(
+      jaspResults[["es_meta_differenceTable"]],
+      estimate$es_meta_difference,
+      message = es_note
+    )
+  }
 
   return()
 
 
 
-  # Define and fill out the m_diff table (mean or median)
-  if (is.null(jaspResults[["es_m_differenceTable"]])) {
-
-    jasp_es_m_difference_prep(
-      jaspResults,
-      options,
-      ready
-    )
-
-    to_fill <- estimate$es_median_difference
-    if (is_mean) to_fill <- estimate$es_mean_difference
-
-    jasp_table_fill(
-      jaspResults[["es_m_differenceTable"]],
-      to_fill
-    )
-  }
-
-  # Define and fill the smd table
-  if (is_mean & is.null(jaspResults[["smdTable"]]) ) {
-    jasp_smd_prep(jaspResults, options, ready, estimate$es_smd_properties, one_group = FALSE)
-    jasp_table_fill(jaspResults[["smdTable"]], estimate$es_smd, estimate$es_smd_properties$message_html)
-  }
-
-
-  # Define and fill out the m_diff table (mean or median)
-  if (options$show_ratio & is.null(jaspResults[["es_m_ratioTable"]]) & isa(neg_errors, "logical")) {
-
-    jasp_es_m_ratio_prep(
-      jaspResults,
-      options,
-      ready,
-      levels
-    )
-
-    to_fill <- estimate$es_median_ratio
-    if (is_mean) to_fill <- estimate$es_mean_ratio
-
-    jasp_table_fill(
-      jaspResults[["es_m_ratioTable"]],
-      to_fill
-    )
-  }
-
-
-  # Hypothesis evaluation
-  evaluate_h <- options$evaluate_hypotheses
-
-  if(evaluate_h & is.null(jaspResults[["heTable"]])) {
-    jasp_test_mdiff(
-      jaspResults,
-      options,
-      ready,
-      estimate
-    )
-  }
 
   # Now prep and fill the plot
   x <- 0
