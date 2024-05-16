@@ -279,8 +279,6 @@ jasp_es_meta_data_prep <- function(jaspResults, options, ready, levels = 1, effe
 }
 
 
-
-
 jasp_es_heterogeneity_data_prep <- function(jaspResults, options, ready, levels = 0) {
   overviewTable <- createJaspTable(title = "Effect Size Heterogeneity")
 
@@ -338,7 +336,11 @@ jasp_es_heterogeneity_data_prep <- function(jaspResults, options, ready, levels 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
   if (ready)
-    overviewTable$setExpectedSize(5 * (levels + 1))
+    if (options$random_effects == "fixed_effects") {
+      overviewTable$setExpectedSize(1 * levels)
+    } else {
+      overviewTable$setExpectedSize(5 * (levels + 1))
+    }
 
   jaspResults[["es_heterogeneityTable"]] <- overviewTable
 
@@ -346,8 +348,6 @@ jasp_es_heterogeneity_data_prep <- function(jaspResults, options, ready, levels 
   return()
 
 }
-
-
 
 
 jasp_es_meta_difference_prep <- function(jaspResults, options, ready, levels = 3, effect_size_title = "<i>M</i>") {

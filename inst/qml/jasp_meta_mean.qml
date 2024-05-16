@@ -80,6 +80,7 @@ Form
   		}
   		AssignedVariablesList {
   		  name: "moderator";
+  		  id: moderator;
   		  title: qsTr("Moderator (optional");
   		  suggestedColumns: ["nominal"];
   		  singleVariable: true
@@ -294,24 +295,28 @@ Form
         name: "dlab"
         label: qsTr("Label")
         placeholderText: "auto"
+        enabled: moderator.count > 0
       }
 
       TextField {
         name: "dmin"
         label: qsTr("Min")
         placeholderText: "auto"
+        enabled: moderator.count > 0
       }
 
       TextField {
         name: "dmax"
         label: qsTr("Max")
         placeholderText: "auto"
+        enabled: moderator.count > 0
       }
 
       TextField {
         name: "dbreaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
+        enabled: moderator.count > 0
       }
 
     }
@@ -406,6 +411,7 @@ Form
           name: "shape_raw_comparison"
           id: shape_raw_comparison
           startValue: 'square filled'
+          enabled: moderator.count > 0
         }
 
         Esci.ShapeSelect
@@ -413,6 +419,7 @@ Form
           name: "shape_summary_difference"
           id: shape_summary_difference
           startValue: 'triangle filled'
+          enabled: moderator.count > 0
         }
 
         Esci.ShapeSelect
@@ -420,6 +427,7 @@ Form
           name: "shape_raw_unused"
           id: shape_raw_unused
           startValue: 'square filled'
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -438,6 +446,7 @@ Form
           name: "color_raw_comparison"
           id: color_raw_comparison
           startValue: "#009F81"
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -445,6 +454,7 @@ Form
           name: "color_summary_difference"
           id: color_summary_difference
           startValue: 'black'
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -452,6 +462,7 @@ Form
           name: "color_raw_unused"
           id: color_raw_unused
           startValue: 'gray65'
+          enabled: moderator.count > 0
         }
 
 
@@ -471,6 +482,7 @@ Form
           name: "fill_raw_comparison"
           id: fill_raw_comparison
           startValue: "#009F81"
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -478,6 +490,7 @@ Form
           name: "fill_summary_difference"
           id: fill_summary_difference
           startValue: 'black'
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -485,6 +498,7 @@ Form
           name: "fill_raw_unused"
           id: fill_raw_unused
           startValue: 'gray65'
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -496,12 +510,14 @@ Form
           name: "alpha_raw_reference"
           id: alpha_raw_reference
 
+
         }
 
         Esci.AlphaSelect
         {
           name: "alpha_raw_comparison"
           id: alpha_raw_comparison
+          enabled: moderator.count > 0
 
         }
 
@@ -509,6 +525,7 @@ Form
         {
           name: "alpha_summary_difference"
           id: alpha_summary_difference
+          enabled: moderator.count > 0
 
         }
 
@@ -516,6 +533,7 @@ Form
         {
           name: "alpha_raw_unused"
           id: alpha_raw_unused
+          enabled: moderator.count > 0
 
         }
 
@@ -553,12 +571,14 @@ Form
         {
           name: "linetype_raw_comparison"
           id: linetype_raw_comparison
+          enabled: moderator.count > 0
         }
 
         Esci.LineTypeSelect
         {
           name: "linetype_summary_difference"
           id: linetype_summary_difference
+          enabled: moderator.count > 0
         }
 
 
@@ -566,6 +586,7 @@ Form
         {
           name: "linetype_raw_unused"
           id: linetype_raw_unused
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -586,6 +607,7 @@ Form
           defaultValue: 0.50
           min: .25
           max: 10
+          enabled: moderator.count > 0
         }
 
         DoubleField
@@ -594,6 +616,7 @@ Form
           defaultValue: 0.50
           min: .25
           max: 10
+          enabled: moderator.count > 0
         }
 
         DoubleField
@@ -602,6 +625,7 @@ Form
           defaultValue: 0.50
           min: .25
           max: 10
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -620,6 +644,7 @@ Form
           name: "color_interval_comparison"
           id: color_interval_comparison
           startValue: 'black'
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -627,6 +652,7 @@ Form
           name: "color_interval_difference"
           id: color_inteval_difference
           startValue: 'black'
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -634,6 +660,7 @@ Form
           name: "color_interval_unused"
           id: color_inteval_unused
           startValue: 'black'
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -651,6 +678,7 @@ Form
         {
           name: "alpha_interval_comparison"
           id: alpha_interval_comparison
+          enabled: moderator.count > 0
 
         }
 
@@ -658,6 +686,7 @@ Form
         {
           name: "alpha_interval_difference"
           id: alpha_interval_difference
+          enabled: moderator.count > 0
 
         }
 
@@ -665,6 +694,7 @@ Form
         {
           name: "alpha_interval_unused"
           id: alpha_interval_unused
+          enabled: moderator.count > 0
 
         }
 
@@ -746,6 +776,7 @@ Form
           name: "color_summary_reference"
           id: color_summary_reference
           startValue: '#008DF9'
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -753,12 +784,14 @@ Form
           name: "fill_summary_reference"
           id: fill_summary_reference
           startValue: '#008DF9'
+          enabled: moderator.count > 0
         }
 
         Esci.AlphaSelect
         {
           name: "alpha_summary_reference"
           id: alpha_summary_reference
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -773,18 +806,21 @@ Form
         {
           name: "color_summary_comparison"
           startValue: "#009F81"
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
         {
           name: "fill_summary_comparison"
           startValue: "#009F81"
+          enabled: moderator.count > 0
         }
 
         Esci.AlphaSelect
         {
           name: "alpha_summary_comparison"
           id: alpha_summary_comparison
+          enabled: moderator.count > 0
         }
 
         Label {
@@ -800,6 +836,7 @@ Form
           name: "color_summary_unused"
           id: color_summary_unused
           startValue: 'gray75'
+          enabled: moderator.count > 0
         }
 
         Esci.ColorSelect
@@ -807,12 +844,14 @@ Form
           name: "fill_summary_unused"
           id: fill_summary_unused
           startValue: 'gray75'
+          enabled: moderator.count > 0
         }
 
         Esci.AlphaSelect
         {
           name: "alpha_summary_unused"
           id: alpha_summary_unused
+          enabled: moderator.count > 0
         }
 
         Label {

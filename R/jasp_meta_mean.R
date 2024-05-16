@@ -108,25 +108,6 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
   estimate <- try(do.call(what = call, args = args))
 
 
-  # myds <- createJaspHtml(
-  #   paste(
-  #     paste(args, collapse = ", "),
-  #     paste(names(args), collapse = ", "),
-  #     sep = "<BR>"
-  #   )
-  # )
-  # jaspResults[["myds"]] <- myds
-
-
-  # myest <- createJaspHtml(
-  #   paste(
-  #     paste(estimate, collapse = ", "),
-  #     paste(names(estimate), collapse = ", "),
-  #     sep = "<BR>"
-  #   )
-  # )
-  # jaspResults[["myest"]] <- myest
-
   if(is.null(estimate)) return()
   if(is(estimate, "try-error")) {
     # To do: pull the error text and return it as a jasp error
@@ -147,15 +128,13 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     }
   }
 
+  # Seems to be some encoding issue with presenting factors in JASP
+  estimate$raw_data$label <- as.character(estimate$raw_data$label)
+  if (has_moderator) estimate$raw_data$moderator <- as.character(estimate$raw_data$moderator)
 
-  # myds <- createJaspHtml(printmydf(estimate$es_meta))
-  # myds <- createJaspHtml(paste(levels(estimate$raw_data$label), collapse = ", "))
-  # jaspResults[["myds"]] <- myds
 
+  # Notes -- need to move creation of notes into esci
   mynotes <- jasp_meta_notes(options, args$reference_mean, FALSE, TRUE, estimate$properties$effect_size_name_html)
-
-  # myds <- createJaspHtml(paste(mynotes$meta_note, collapse = ", "))
-  # jaspResults[["myds"]] <- myds
 
 
   # Define and fill the raw_data
@@ -184,7 +163,6 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     jasp_table_fill(jaspResults[["es_metaTable"]], estimate$es_meta, mynotes$meta_note)
   }
 
-
   # Define and fill the es_heterogeneityTable table
   if (is.null(jaspResults[["es_heterogeneityTable"]])) {
     my_levels <- if (has_moderator) length(levels(dataset[[options$moderator]])) else 0
@@ -202,7 +180,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
-
+  # Define and fill the meta_difference table if there is a moderator
   if (has_moderator & is.null(jaspResults[["es_meta_differenceTable"]])) {
     jasp_es_meta_difference_prep(
       jaspResults,
@@ -217,11 +195,12 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
-
-
+  # Now the forest plot
   if (is.null(jaspResults[["forest_plot"]])) {
+    # Define the plot
     jasp_forest_plot_prep(jaspResults, options)
 
+    # Creat the plot
     meta_diamond_height <- options$meta_diamond_height
     explain_DR <- options$random_effects == "compare"
     include_PIs <- options$include_PIs & options$random_effects == "random_effects"
@@ -235,6 +214,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       explain_DR = explain_DR
     )
 
+    # Apply aesthetics to the plot
     xlab_replace <- paste(
       estimate$properties$effect_size_name_ggplot,
       ": ",
@@ -242,8 +222,8 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       sep = ""
     )
 
-
-    myplot <- jasp_meta_decorate(myplot, options, xlab_replace, has_moderator, estimate$es_meta_difference)
+    # passing such a strange variety of objects to this function; needs revisio
+    myplot <- jasp_forest_plot_decorate(myplot, options, xlab_replace, has_moderator, estimate$es_meta_difference)
 
     jaspResults[["forest_plot"]]$plotObject <- myplot
   }
@@ -285,7 +265,7 @@ jasp_meta_mean_read_data <- function(dataset, options) {
 }
 
 
-jasp_meta_decorate <- function(myplot, options, xlab_replace = "My Effect", has_moderator = FALSE, es_meta_difference = NULL) {
+jasp_forest_plot_decorate <- function(myplot, options, xlab_replace = "My Effect", has_moderator = FALSE, es_meta_difference = NULL) {
 
   # make compatible with jamovi code
   self <- list()
