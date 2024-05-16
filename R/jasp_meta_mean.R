@@ -73,19 +73,25 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
   args$conf_level <- self$options$conf_level
 
-  if (!(options$reference_mean %in% c("auto", "Auto", "AUTO", ""))) {
-    try(args$reference_mean <- as.numeric(options$reference_mean))
-    if (is.na(args$reference_mean)) args$reference_mean <- NULL
-  }
 
+  has_reference <- FALSE
   if (from_raw) {
     args$means <- self$options$means
     args$sds <- self$options$sds
     args$ns <- self$options$ns
     args$reported_effect_size <- self$options$reported_effect_size
+
+    if (!(options$reference_mean %in% c("auto", "Auto", "AUTO", ""))) {
+      try(args$reference_mean <- as.numeric(options$reference_mean))
+      if (is.na(args$reference_mean)) {
+        args$reference_mean <- NULL
+      } else {
+        has_refernece <- TRUE
+      }
+    }
   } else {
     args$ds <- self$options$ds
-    args$ns <- self$options$dns
+    args$ns <- self$options$ns
   }
 
   if (self$options$moderator != "") {
@@ -100,6 +106,26 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
 
   estimate <- try(do.call(what = call, args = args))
+
+
+  # myds <- createJaspHtml(
+  #   paste(
+  #     paste(args, collapse = ", "),
+  #     paste(names(args), collapse = ", "),
+  #     sep = "<BR>"
+  #   )
+  # )
+  # jaspResults[["myds"]] <- myds
+
+
+  # myest <- createJaspHtml(
+  #   paste(
+  #     paste(estimate, collapse = ", "),
+  #     paste(names(estimate), collapse = ", "),
+  #     sep = "<BR>"
+  #   )
+  # )
+  # jaspResults[["myest"]] <- myest
 
   if(is.null(estimate)) return()
   if(is(estimate, "try-error")) {
@@ -122,15 +148,15 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
   }
 
 
-  #myds <- createJaspHtml(printmydf(estimate$es_meta))
+  # myds <- createJaspHtml(printmydf(estimate$es_meta))
   # myds <- createJaspHtml(paste(levels(estimate$raw_data$label), collapse = ", "))
   # jaspResults[["myds"]] <- myds
 
+  mynotes <- jasp_meta_notes(options, args$reference_mean, FALSE, TRUE, estimate$properties$effect_size_name_html)
 
-  es_note <- if (options$random_effects == "fixed_effects")
-    "Estimate is based on a fixed effect (FE) model"
-  else
-    "Estimate is based on a random effects (RE) model"
+  # myds <- createJaspHtml(paste(mynotes$meta_note, collapse = ", "))
+  # jaspResults[["myds"]] <- myds
+
 
   # Define and fill the raw_data
   if (is.null(jaspResults[["meta_raw_dataTable"]])) {
@@ -141,7 +167,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       levels = nrow(dataset),
       effect_size_title = estimate$properties$effect_size_name_html
     )
-    jasp_table_fill(jaspResults[["meta_raw_dataTable"]], estimate$raw_data, NULL)
+    jasp_table_fill(jaspResults[["meta_raw_dataTable"]], estimate$raw_data, mynotes$raw_note)
   }
 
   # Define and fill the es_meta
@@ -155,7 +181,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       levels = row_expect,
       effect_size_title = estimate$properties$effect_size_name_html
     )
-    jasp_table_fill(jaspResults[["es_metaTable"]], estimate$es_meta, es_note)
+    jasp_table_fill(jaspResults[["es_metaTable"]], estimate$es_meta, mynotes$meta_note)
   }
 
 
@@ -187,93 +213,43 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     jasp_table_fill(
       jaspResults[["es_meta_differenceTable"]],
       estimate$es_meta_difference,
-      message = es_note
+      message = mynotes$meta_note
     )
   }
 
-  return()
 
 
+  if (is.null(jaspResults[["forest_plot"]])) {
+    jasp_forest_plot_prep(jaspResults, options)
+
+    meta_diamond_height <- options$meta_diamond_height
+    explain_DR <- options$random_effects == "compare"
+    include_PIs <- options$include_PIs & options$random_effects == "random_effects"
+
+    myplot <- esci::plot_meta(
+      estimate,
+      mark_zero = options$mark_zero,
+      include_PIs = include_PIs,
+      report_CIs = options$report_CIs,
+      meta_diamond_height = meta_diamond_height,
+      explain_DR = explain_DR
+    )
+
+    xlab_replace <- paste(
+      estimate$properties$effect_size_name_ggplot,
+      ": ",
+      estimate$es_meta$effect_label[[1]],
+      sep = ""
+    )
 
 
-  # Now prep and fill the plot
-  x <- 0
-  for (my_variable in options$outcome_variable) {
-    x <- x + 1
+    myplot <- jasp_meta_decorate(myplot, options, xlab_replace, has_moderator)
 
-    if (is.null(jaspResults[[my_variable]])) {
-      jasp_plot_m_prep(jaspResults, options, my_variable, if (x == 1) TRUE else FALSE)
-
-      effect_size = options$effect_size
-      if (effect_size == "mean_difference") effect_size <- "mean"
-      if (effect_size == "median_difference") effect_size <- "median"
-
-      args <- list()
-      args$estimate <- estimate[[my_variable]]
-      args$effect_size <- effect_size
-      args$data_layout <- options$data_layout
-      args$data_spread <- options$data_spread
-      args$error_layout <- options$error_layout
-      args$error_scale <- options$error_scale
-      args$error_nudge <- options$error_nudge
-
-      args$difference_axis_units <- self$options$difference_axis_units
-
-      difference_axis_breaks <- NULL
-      if (!(options$difference_axis_breaks %in% c("auto", "Auto", "AUTO", ""))) {
-        try(difference_axis_breaks <- as.numeric(options$difference_axis_breaks))
-        if (is.na(difference_axis_breaks)) difference_axis_breaks <- NULL
-      }
-
-      args$difference_axis_breaks <- difference_axis_breaks
-      args$difference_axis_space <- 0.5
-      args$simple_contrast_labels <- self$options$simple_contrast_labels
-
-      ylim <- c(NA, NA)
-
-      if (!(options$ymin %in% c("auto", "Auto", "AUTO", ""))) {
-        try(ylim[[1]] <- as.numeric(options$ymin))
-      }
-
-      if (!(options$ymax %in% c("auto", "Auto", "AUTO", ""))) {
-        try(ylim[[2]] <- as.numeric(options$ymax))
-      }
-
-      ybreaks <- NULL
-      if (!(options$ybreaks %in% c("auto", "Auto", "AUTO", ""))) {
-        try(ybreaks <- as.numeric(options$ybreaks))
-        if (is.na(ybreaks)) ybreaks <- NULL
-      }
-
-      args$ylim <- ylim
-      args$ybreaks <- ybreaks
-      args$difference_axis_breaks <- self$options$difference_axis_breaks
-      args$difference_axis_units <- self$options$difference_axis_units
-      args$difference_axis_space <- 0.5
-      args$simple_contrast_labels <- self$options$simple_contrast_labels
-
-      if (evaluate_h) {
-        args$rope <- c(
-          options$null_value - options$null_boundary,
-          options$null_value + options$null_boundary
-        )
-      }
-
-      myplot <- do.call(
-        what = esci::plot_mdiff,
-        args = args
-      )
-
-      #apply aesthetics
-      myplot <- jasp_plot_mdiff_decorate(myplot, options)
-
-      jaspResults[[my_variable]]$plotObject <- myplot
-
-
-    }
+    jaspResults[["forest_plot"]]$plotObject <- myplot
   }
 
   return()
+
 }
 
 
@@ -309,272 +285,215 @@ jasp_meta_mean_read_data <- function(dataset, options) {
 }
 
 
-jasp_meta_decorate <- function(myplot, options) {
+jasp_meta_decorate <- function(myplot, options, xlab_replace = "My Effect", has_moderator = FALSE) {
 
   # make compatible with jamovi code
   self <- list()
   self$options <- options
 
-  effect_size <- "mean"
-  from_raw <- TRUE  # (self$options$switch == "from_raw")
-  plot_median <- FALSE
-  if (from_raw) {
-    try(plot_median <- (self$options$effect_size == "median_difference"), silent = TRUE)
-  }
-  if (from_raw & plot_median) effect_size <- "median"
 
-  divider <- 1
-  if (effect_size == "median") divider <- 4
-
-  interval_null <- FALSE
-  htest <- FALSE
-  try(htest <- self$options$evaluate_hypotheses, silent = TRUE)
-
-
-  if (htest) {
-    myplot$layers[["null_line"]]$aes_params$colour <- self$options$null_color
-    if (interval_null) {
-      try(myplot$layers[["null_interval"]]$aes_params$fill <- self$options$null_color, silent = TRUE)
-
-      try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_interval_difference)/divider+1, silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(self$options$alpha_interval_difference), silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_interval_difference, silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
-
-      if (plot_median) {
-        try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_summary_difference, silent = TRUE)
-        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summarydifference)/divider*1.3, silent = TRUE)
-        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(self$options$alpha_summary_difference), silent = TRUE)
-        try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
-      }
-
-    }
-  }
-
-  # Basic graph options --------------------
-  # Font sizes
-  myplot <- myplot + ggplot2::theme(
-    axis.text.y = ggtext::element_markdown(size = options$axis.text.y),
-    axis.title.y = ggtext::element_markdown(size = options$axis.title.y),
-    axis.text.x = ggtext::element_markdown(size = options$axis.text.x),
-    axis.title.x = ggtext::element_markdown(size = options$axis.title.x)
+  myplot <- myplot + ggplot2::scale_size_continuous(
+    range = c(
+      as.numeric(self$options$size_base),
+      as.numeric(self$options$size_base) * as.numeric(self$options$size_multiplier)
+    )
   )
 
-  # Axis options
-  if (!(options$ylab %in% c("auto", "Auto", "AUTO", ""))) {
-    myplot <- myplot + ggplot2::ylab(options$ylab)
+  if (!is.null(myplot$layers$raw_Reference_point)) {
+    myplot$layers$raw_Reference_point$aes_params$shape <- self$options$shape_raw_reference
+    myplot$layers$raw_Reference_point$aes_params$colour <- self$options$color_raw_reference
+    myplot$layers$raw_Reference_point$aes_params$fill <- self$options$fill_raw_reference
+    myplot$layers$raw_Reference_point$aes_params$alpha <- 1 - as.numeric(self$options$alpha_raw_reference)
+
+    myplot$layers$raw_Reference_error$aes_params$colour <- self$options$color_interval_reference
+    myplot$layers$raw_Reference_error$aes_params$size <- as.numeric(self$options$size_interval_reference)
+    myplot$layers$raw_Reference_error$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_reference)
+    myplot$layers$raw_Reference_error$aes_params$linetype <- self$options$linetype_raw_reference
+  }
+  if (!is.null(myplot$layers$raw_Comparison_point)){
+    myplot$layers$raw_Comparison_point$aes_params$shape <- self$options$shape_raw_comparison
+    myplot$layers$raw_Comparison_point$aes_params$colour <- self$options$color_raw_comparison
+    myplot$layers$raw_Comparison_point$aes_params$fill <- self$options$fill_raw_comparison
+    myplot$layers$raw_Comparison_point$aes_params$alpha <- 1 - as.numeric(self$options$alpha_raw_comparison)
+
+    myplot$layers$raw_Comparison_error$aes_params$colour <- self$options$color_interval_comparison
+    myplot$layers$raw_Comparison_error$aes_params$size <- as.numeric(self$options$size_interval_comparison)
+    myplot$layers$raw_Comparison_error$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_comparison)
+    myplot$layers$raw_Comparison_error$aes_params$linetype <- self$options$linetype_raw_comparison
+  }
+  if (!is.null(myplot$layers$raw_Unused_point)) {
+    myplot$layers$raw_Unused_point$aes_params$shape <- self$options$shape_raw_unused
+    myplot$layers$raw_Unused_point$aes_params$colour <- self$options$color_raw_unused
+    myplot$layers$raw_Unused_point$aes_params$fill <- self$options$fill_raw_unused
+    myplot$layers$raw_Unused_point$aes_params$alpha <- 1 - as.numeric(self$options$alpha_raw_unused)
+
+    myplot$layers$raw_Unused_error$aes_params$colour <- self$options$color_interval_unused
+    myplot$layers$raw_Unused_error$aes_params$size <- as.numeric(self$options$size_interval_unused)
+    myplot$layers$raw_Unused_error$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_unused)
+    myplot$layers$raw_Unused_error$aes_params$linetype <- self$options$linetype_raw_unused
+  }
+
+  if (!is.null(myplot$layers$group_Overall_diamond)) {
+    myplot$layers$group_Overall_diamond$aes_params$colour <- self$options$color_summary_overall
+    myplot$layers$group_Overall_diamond$aes_params$fill <- self$options$fill_summary_overall
+    myplot$layers$group_Overall_diamond$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_overall)
+  }
+
+  if (!is.null(myplot$layers$group_Comparison_diamond)) {
+    myplot$layers$group_Comparison_diamond$aes_params$colour <- self$options$color_summary_comparison
+    myplot$layers$group_Comparison_diamond$aes_params$fill <- self$options$fill_summary_comparison
+    myplot$layers$group_Comparison_diamond$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_comparison)
+  }
+
+  if (!is.null(myplot$layers$group_Reference_diamond)) {
+    myplot$layers$group_Reference_diamond$aes_params$colour <- self$options$color_summary_reference
+    myplot$layers$group_Reference_diamond$aes_params$fill <- self$options$fill_summary_reference
+    myplot$layers$group_Reference_diamond$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_reference)
+  }
+
+  if (!is.null(myplot$layers$group_Difference_diamond)) {
+    myplot$layers$group_Difference_diamond$aes_params$shape <- self$options$shape_summary_difference
+    myplot$layers$group_Difference_diamond$aes_params$colour <- self$options$color_summary_difference
+    myplot$layers$group_Difference_diamond$aes_params$fill <- self$options$fill_summary_difference
+    myplot$layers$group_Difference_diamond$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_difference)
+  }
+
+  if (!is.null(myplot$layers$group_Difference_line)) {
+    myplot$layers$group_Difference_line$aes_params$colour <- self$options$color_interval_difference
+    myplot$layers$group_Difference_line$aes_params$size <-  as.numeric(self$options$size_interval_difference)
+    myplot$layers$group_Difference_line$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_difference)
+    myplot$layers$group_Difference_line$aes_params$linetype <- self$options$linetype_summary_difference
+  }
+
+  if (!is.null(myplot$layers$group_Unused_diamond)) {
+    myplot$layers$group_Unused_diamond$aes_params$colour <- self$options$color_summary_unused
+    myplot$layers$group_Unused_diamond$aes_params$fill <- self$options$fill_summary_unused
+    myplot$layers$group_Unused_diamond$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_unused)
+  }
+
+  if (!is.null(myplot$layers$group_Overall_PI)) {
+    myplot$layers$group_Overall_PI$aes_params$colour <- self$options$color_summary_overall
+    #myplot$layers$group_Overall_PI$aes_params$alpha <- as.numeric(self$options$alpha_summary_overall)
+    myplot$layers$group_Overall_PI$aes_params$size <- as.numeric(self$options$size_interval_comparison) + 1
+  }
+
+  if (!is.null(myplot$layers$group_Comparison_PI)) {
+    myplot$layers$group_Comparison_PI$aes_params$colour <- self$options$color_summary_comparison
+    #myplot$layers$group_Comparison_PI$aes_params$alpha <- as.numeric(self$options$alpha_summary_comparison)
+    myplot$layers$group_Comparison_PI$aes_params$size <- as.numeric(self$options$size_interval_comparison) + 1
+  }
+
+  if (!is.null(myplot$layers$group_Reference_PI)) {
+    myplot$layers$group_Reference_PI$aes_params$colour <- self$options$color_summary_reference
+    #myplot$layers$group_Reference_PI$aes_params$alpha <- as.numeric(self$options$alpha_summary_reference)
+    myplot$layers$group_Reference_PI$aes_params$size <- as.numeric(self$options$size_interval_reference) + 1
+  }
+
+  if (!is.null(myplot$layers$group_Unused_PI)) {
+    myplot$layers$group_Unused_P$aes_params$colour <- self$options$color_summary_unused
+    #myplot$layers$group_Unused_PI$aes_params$alpha <- as.numeric(self$options$alpha_summary_unused)
+    myplot$layers$group_Unused_PI$aes_params$size <- as.numeric(self$options$size_interval_unused) + 1
+  }
+
+
+  # Basic graph options --------------------
+  # Axis font sizes
+  axis.text.y <- self$options$axis.text.y
+  axis.text.x <- self$options$axis.text.x
+  axis.title.x <- self$options$axis.title.x
+
+  myplot <- myplot + ggplot2::theme(
+    axis.text.y = ggtext::element_markdown(size = axis.text.y),
+    axis.text.x = ggtext::element_markdown(size = axis.text.x),
+    axis.title.x = ggtext::element_markdown(size = axis.title.x)
+  )
+
+
+  xlim <- c(NA, NA)
+
+  if (!(options$xmin %in% c("auto", "Auto", "AUTO", ""))) {
+    try(xlim[[1]] <- as.numeric(options$xmin))
+  }
+
+  if (!(options$xmax %in% c("auto", "Auto", "AUTO", ""))) {
+    try(xlim[[2]] <- as.numeric(options$xmax))
+  }
+
+  xbreaks <- NULL
+  if (!(options$xbreaks %in% c("auto", "Auto", "AUTO", ""))) {
+    try(xbreaks <- as.numeric(options$xbreaks))
+    if (is.na(xbreaks)) xbreaks <- NULL
   }
 
   if (!(options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
-    myplot <- myplot + ggplot2::xlab(options$xlab)
+    xlab_replace <- myplot + ggplot2::xlab(options$xlab)
   }
 
 
-  shape_raw_reference <- "circle"
-  color_raw_reference <- "black"
-  fill_raw_reference <- "black"
-  size_raw_reference <- 1
-  alpha_raw_reference <- 1
-
-  shape_raw_difference <- "circle"
-  color_raw_difference <- "black"
-  fill_raw_difference <- "black"
-  size_raw_difference <- 1
-  alpha_raw_difference <- 1
-
-  shape_raw_unused <- "circle"
-  shape_summary_unused <- "circle"
-  color_raw_unused <- "black"
-  color_summary_unused <- "black"
-  fill_raw_unused <- "black"
-  fill_summary_unused <- "black"
-  size_raw_unused <- 1
-  size_summary_unused <- 1
-  alpha_raw_unused <- 1
-  alpha_summary_unused <- 1
-  alpha_error_reference <- 1
-  linetype_summary_unused <- "solid"
-  linetype_summary_reference <- "solid"
-  color_interval_unused <- "black"
-  color_interval_reference <- "black"
-  alpha_interval_unused <- 1
-  alpha_interval_reference <- 1
-  size_interval_unused <- 1
-  size_interval_reference <- 1
-  fill_error_unused <- "black"
-  fill_error_reference <- "black"
-  alpha_error_unused <- 1
-
-  try(shape_raw_difference <- self$options$shape_raw_difference, silent = TRUE)
-  try(color_raw_difference <- self$options$color_raw_difference, silent = TRUE)
-  try(fill_raw_difference <- self$options$fill_raw_difference, silent = TRUE)
-  try(size_raw_difference <- as.integer(self$options$size_raw_difference), silent = TRUE)
-  try(alpha_raw_difference <- as.numeric(self$options$alpha_raw_difference), silent = TRUE)
-
-  try(shape_raw_reference <- self$options$shape_raw_reference, silent = TRUE)
-  try(color_raw_reference <- self$options$color_raw_reference, silent = TRUE)
-  try(fill_raw_reference <- self$options$fill_raw_reference, silent = TRUE)
-  try(size_raw_reference <- as.integer(self$options$size_raw_reference), silent = TRUE)
-  try(alpha_raw_reference <- as.numeric(self$options$alpha_raw_reference), silent = TRUE)
-
-  try(shape_raw_unused <- self$options$shape_raw_unused, silent = TRUE)
-  try(shape_summary_unused <- self$options$shape_summary_unused, silent = TRUE)
-  try(color_raw_unused <- self$options$color_raw_unused, silent = TRUE)
-  try(color_summary_unused <- self$options$color_summary_unused, silent = TRUE)
-  try(fill_raw_unused <- self$options$fill_raw_unused, silent = TRUE)
-  try(fill_summary_unused <- self$options$fill_summary_unused, silent = TRUE)
-  try(size_raw_unused <- as.integer(self$options$size_raw_reference), silent = TRUE)
-  try(size_summary_unused <- as.integer(self$options$size_summary_unused), silent = TRUE)
-  try(alpha_raw_unused <- as.numeric(self$options$alpha_raw_unused), silent = TRUE)
-  try(alpha_summary_unused <- as.numeric(self$options$alpha_summary_unused), silent = TRUE)
-  try(linetype_summary_unused <- self$options$linetype_summary_unused, silent = TRUE)
-  try(linetype_summary_reference <- self$options$linetype_summary_reference, silent = TRUE)
-  try(color_interval_unused <- self$options$color_interval_unused, silent = TRUE)
-  try(color_interval_reference <- self$options$color_interval_reference, silent = TRUE)
-  try(alpha_interval_unusued <- as.numeric(self$options$alpha_interval_unused), silent = TRUE)
-  try(alpha_interval_reference <- as.numeric(self$options$alpha_interval_reference), silent = TRUE)
-  try(size_interval_unused <- as.integer(self$options$size_interval_unused), silent = TRUE)
-  try(size_interval_reference <- as.integer(self$options$size_interval_reference), silent = TRUE)
-  try(fill_error_unused <- self$options$fill_error_unused, silent = TRUE)
-  try(fill_error_reference <- self$options$fill_error_reference, silent = TRUE)
-  try(alpha_error_reference <- self$options$alpha_error_reference, silent = TRUE)
-  try(alpha_error_unused <- as.numeric(self$options$alpha_error_unused), silent = TRUE)
-
-
-  # Aesthetics
-  myplot <- myplot + ggplot2::scale_shape_manual(
-    values = c(
-      "Reference_raw" = shape_raw_reference,
-      "Comparison_raw" = self$options$shape_raw_comparison,
-      "Difference_raw" = shape_raw_difference,
-      "Unused_raw" = shape_raw_unused,
-      "Reference_summary" = self$options$shape_summary_reference,
-      "Comparison_summary" = self$options$shape_summary_comparison,
-      "Difference_summary" = self$options$shape_summary_difference,
-      "Unused_summary" = shape_summary_unused
-    )
+  # Apply axis labels and scales
+  myplot <- myplot + ggplot2::scale_x_continuous(
+    name = xlab_replace,
+    limits = xlim,
+    n.breaks = xbreaks,
+    position = "top"
   )
 
-  myplot <- myplot + ggplot2::scale_color_manual(
-    values = c(
-      "Reference_raw" = color_raw_reference,
-      "Comparison_raw" = self$options$color_raw_comparison,
-      "Difference_raw" = color_raw_difference,
-      "Unused_raw" = color_raw_unused,
-      "Reference_summary" = self$options$color_summary_reference,
-      "Comparison_summary" = self$options$color_summary_comparison,
-      "Difference_summary" = self$options$color_summary_difference,
-      "Unused_summary" = color_summary_unused
-    ),
-    aesthetics = c("color", "point_color")
-  )
+  if (has_moderator) {
+    dlab <- "Difference axis"
+    if (!(options$dlab %in% c("auto", "Auto", "AUTO", ""))) {
+      dlab <- options$dlab
+    }
 
-  myplot <- myplot + ggplot2::scale_fill_manual(
-    values = c(
-      "Reference_raw" = fill_raw_reference,
-      "Comparison_raw" = self$options$fill_raw_comparison,
-      "Difference_raw" = fill_raw_difference,
-      "Unused_raw" = fill_raw_unused,
-      "Reference_summary" = self$options$fill_summary_reference,
-      "Comparison_summary" = self$options$fill_summary_comparison,
-      "Difference_summary" = self$options$fill_summary_difference,
-      "Unused_summary" = fill_summary_unused
-    ),
-    aesthetics = c("fill", "point_fill")
-  )
 
-  divider <- 1
-  if (effect_size == "median") divider <- 4
+    dlim <- c(NA, NA)
 
-  myplot <- myplot + ggplot2::discrete_scale(
-    c("size", "point_size"),
-    "point_size_d",
-    function(n) return(c(
-      "Reference_raw" = size_raw_reference,
-      "Comparison_raw" = as.integer(self$options$size_raw_comparison),
-      "Difference_raw" = size_raw_difference,
-      "Unused_raw" = size_raw_unused,
-      "Reference_summary" = as.integer(self$options$size_summary_reference)/divider,
-      "Comparison_summary" = as.integer(self$options$size_summary_comparison)/divider,
-      "Difference_summary" = as.integer(self$options$size_summary_difference)/divider,
-      "Unused_summary" = size_summary_unused/divider
-    ))
-  )
+    if (!(options$dmin %in% c("auto", "Auto", "AUTO", ""))) {
+      try(dlim[[1]] <- as.numeric(options$dmin))
+    }
 
-  myplot <- myplot + ggplot2::discrete_scale(
-    c("alpha", "point_alpha"),
-    "point_alpha_d",
-    function(n) return(c(
-      "Reference_raw" = 1 - alpha_raw_reference,
-      "Comparison_raw" = 1 - as.numeric(self$options$alpha_raw_comparison),
-      "Difference_raw" = 1 - alpha_raw_difference,
-      "Unused_raw" = 1 - alpha_raw_unused,
-      "Reference_summary" = 1 - as.numeric(self$options$alpha_summary_reference),
-      "Comparison_summary" = 1 - as.numeric(self$options$alpha_summary_comparison),
-      "Difference_summary" = 1 - as.numeric(self$options$alpha_summary_difference),
-      "Unused_summary" = 1 - alpha_summary_unused
-    ))
-  )
+    if (!(options$xmax %in% c("auto", "Auto", "AUTO", ""))) {
+      try(dlim[[2]] <- as.numeric(options$dmax))
+    }
 
-  # Error bars
-  myplot <- myplot + ggplot2::scale_linetype_manual(
-    values = c(
-      "Reference_summary" = linetype_summary_reference,
-      "Comparison_summary" = self$options$linetype_summary_comparison,
-      "Difference_summary" = self$options$linetype_summary_difference,
-      "Unused_summary" = linetype_summary_unused
-    )
-  )
-  myplot <- myplot + ggplot2::scale_color_manual(
-    values = c(
-      "Reference_summary" = color_interval_reference,
-      "Comparison_summary" = self$options$color_interval_comparison,
-      "Difference_summary" = self$options$color_interval_difference,
-      "Unused_summary" = color_interval_unused
-    ),
-    aesthetics = "interval_color"
-  )
-  myplot <- myplot + ggplot2::discrete_scale(
-    "interval_alpha",
-    "interval_alpha_d",
-    function(n) return(c(
-      "Reference_summary" = 1 - as.numeric(alpha_interval_reference),
-      "Comparison_summary" = 1 - as.numeric(self$options$alpha_interval_comparison),
-      "Difference_summary" = 1 - as.numeric(self$options$alpha_interval_difference),
-      "Unused_summary" = 1 - alpha_interval_unused
-    ))
-  )
-  myplot <- myplot + ggplot2::discrete_scale(
-    "interval_size",
-    "interval_size_d",
-    function(n) return(c(
-      "Reference_summary" = as.integer(size_interval_reference),
-      "Comparison_summary" = as.integer(self$options$size_interval_comparison),
-      "Difference_summary" = as.integer(self$options$size_interval_difference),
-      "Unused_summary" = size_interval_unused
-    ))
-  )
+    dbreaks <- NULL
+    if (!(options$dbreaks %in% c("auto", "Auto", "AUTO", ""))) {
+      try(dbreaks <- as.numeric(options$dbreaks))
+      if (is.na(dbreaks)) dbreaks <- NULL
+    }
 
-  # Slab
-  myplot <- myplot + ggplot2::scale_fill_manual(
-    values = c(
-      "Reference_summary" = fill_error_reference,
-      "Comparison_summary" = self$options$fill_error_comparison,
-      "Difference_summary" = self$options$fill_error_difference,
-      "Unused_summary" = fill_error_unused
-    ),
-    aesthetics = "slab_fill"
-  )
-  myplot <- myplot + ggplot2::discrete_scale(
-    "slab_alpha",
-    "slab_alpha_d",
-    function(n) return(c(
-      "Reference_summary" = 1 - as.numeric(alpha_error_reference),
-      "Comparison_summary" = 1 - as.numeric(self$options$alpha_error_comparison),
-      "Difference_summary" = 1 - as.numeric(self$options$alpha_error_difference),
-      "Unused_summary" = 1 - alpha_error_unused
-    ))
-  )
+    #
+    #
+    # myplot <- esci_plot_difference_axis_x(
+    #   myplot,
+    #   estimate$es_meta_difference,
+    #   dlim = c(dmin, dmax),
+    #   d_n.breaks = dbreaks,
+    #   d_lab = dlab
+    # )
+  }
+
+
+
+
+
+  #
+  # moderator <- !is.null(self$options$moderator)
+  #
+  # if (has_switch) {
+  #   if (self$options$switch != "from_raw") {
+  #     moderator <- !is.null(self$options$dmoderator)
+  #   }
+  # }
+  #
+  # if (moderator) {
+  #   myplot <- esci_plot_difference_axis_x(
+  #     myplot,
+  #     estimate$es_meta_difference,
+  #     dlim = c(dmin, dmax),
+  #     d_n.breaks = dbreaks,
+  #     d_lab = dlab
+  #   )
+  # }
 
 
   return(myplot)

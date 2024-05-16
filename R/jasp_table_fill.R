@@ -10,7 +10,9 @@ jasp_table_fill <- function(jaspTable, esciTable, message = NULL) {
 
 
   if (!is.null(message)) {
-    jaspTable$addFootnote(message)
+      if (trimws(message) != "") {
+        something <- try(jaspTable$addFootnote(message))
+      }
   }
 
   return()

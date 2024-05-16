@@ -13,7 +13,9 @@ jasp_meta_table_depends_on <- function() {
       "reported_effect_size",
       "show_details",
       "random_effects",
-      "include_PIs"
+      "include_PIs",
+      "switch",
+      "from_raw"
     )
   )
 }

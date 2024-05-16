@@ -110,6 +110,7 @@ Form
         name: "reference_mean"
         label: qsTr("Compare to reference value")
         afterLabel: "(blank for none)"
+        enabled: from_raw.checked
     }
 
 		DropDown {
