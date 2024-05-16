@@ -314,12 +314,6 @@ Form
         placeholderText: "auto"
       }
 
-      TextField {
-        name: "difference_axis_breaks"
-        label: qsTr("Num. tick marks")
-        placeholderText: "auto"
-      }
-
     }
 
 

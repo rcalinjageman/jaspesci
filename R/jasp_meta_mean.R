@@ -243,7 +243,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     )
 
 
-    myplot <- jasp_meta_decorate(myplot, options, xlab_replace, has_moderator)
+    myplot <- jasp_meta_decorate(myplot, options, xlab_replace, has_moderator, estimate$es_meta_difference)
 
     jaspResults[["forest_plot"]]$plotObject <- myplot
   }
@@ -285,7 +285,7 @@ jasp_meta_mean_read_data <- function(dataset, options) {
 }
 
 
-jasp_meta_decorate <- function(myplot, options, xlab_replace = "My Effect", has_moderator = FALSE) {
+jasp_meta_decorate <- function(myplot, options, xlab_replace = "My Effect", has_moderator = FALSE, es_meta_difference = NULL) {
 
   # make compatible with jamovi code
   self <- list()
@@ -461,39 +461,15 @@ jasp_meta_decorate <- function(myplot, options, xlab_replace = "My Effect", has_
       if (is.na(dbreaks)) dbreaks <- NULL
     }
 
-    #
-    #
-    # myplot <- esci_plot_difference_axis_x(
-    #   myplot,
-    #   estimate$es_meta_difference,
-    #   dlim = c(dmin, dmax),
-    #   d_n.breaks = dbreaks,
-    #   d_lab = dlab
-    # )
+    myplot <- esci::esci_plot_difference_axis_x(
+      myplot,
+      es_meta_difference,
+      dlim = dlim,
+      d_n.breaks = dbreaks,
+      d_lab = dlab
+    )
   }
 
-
-
-
-
-  #
-  # moderator <- !is.null(self$options$moderator)
-  #
-  # if (has_switch) {
-  #   if (self$options$switch != "from_raw") {
-  #     moderator <- !is.null(self$options$dmoderator)
-  #   }
-  # }
-  #
-  # if (moderator) {
-  #   myplot <- esci_plot_difference_axis_x(
-  #     myplot,
-  #     estimate$es_meta_difference,
-  #     dlim = c(dmin, dmax),
-  #     d_n.breaks = dbreaks,
-  #     d_lab = dlab
-  #   )
-  # }
 
 
   return(myplot)
