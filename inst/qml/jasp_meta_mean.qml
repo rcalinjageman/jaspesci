@@ -131,6 +131,7 @@ Form
         name: "reported_effect_size"
         label: qsTr("Effect size of interest")
         startValue: 'mean_difference'
+        enabled: from_raw.checked
         values:
           [
             { label: "Original units", value: "mean_difference"},

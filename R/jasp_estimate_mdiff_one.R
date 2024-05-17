@@ -1,17 +1,27 @@
 jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
+  # Handles
+  from_raw <- options$switch == "from_raw"
+  evaluate_h <- options$evaluate_hypotheses
 
-  ready <- (length(options$outcome_variable) > 0)
+  ready <- FALSE
+  if (from_raw) {
+    ready <- (length(options$outcome_variable) > 0)
+  } else {
+    # Determine if summary data is ready
+    ready <- !is.null(options$n) & !is.null(options$sd) & !is.null(options$m)
+    if (ready) ready <- ready & options$n > 0 & options$sd > 0
 
-  myt <- createJaspHtml(paste(options$summary_data[[1]]$values, collapse = ", "))
-  jaspResults[["myt"]] <- myt
+    # Note we override effect size if working with summary data
+    options$effect_size <- "mean"
+  }
 
-  if (ready) {
+
+  # check for errors
+  if (from_raw & ready) {
     # read dataset
     dataset <- jasp_estimate_mdiff_one_read_data(dataset, options)
 
-
-    # check for errors
     for (variable in options$outcome_variable) {
       .hasErrors(
         dataset = dataset,
@@ -22,18 +32,42 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       )
 
     }
+  }
 
-    # Run the analysis
+  # Run the analysis
+  if (ready) {
     null_value <- 0
     if (options$evaluate_hypotheses) null_value <- options$null_value
 
-    estimate <- esci::estimate_mdiff_one(
-      data = dataset,
-      outcome_variable = encodeColNames(options$outcome_variable),
-      reference_mean = null_value,
-      conf_level = options$conf_level,
-      save_raw_data = TRUE
-    )
+    if (from_raw) {
+      estimate <- esci::estimate_mdiff_one(
+        data = dataset,
+        outcome_variable = encodeColNames(options$outcome_variable),
+        reference_mean = null_value,
+        conf_level = options$conf_level,
+        save_raw_data = TRUE
+      )
+
+    } else {
+
+      outcome_variable_name <- "Outcome variable"
+      if (!is.null(options$outcome_variable_name)) {
+        if (!(options$outcome_variable_name %in% c("auto", "Auto", "AUTO", ""))) {
+          outcome_variable_name <- options$outcome_variable_name
+        }
+      }
+
+      estimate <- esci::estimate_mdiff_one(
+        comparison_mean = options$mean,
+        comparison_sd = options$sd,
+        comparison_n = options$n,
+        outcome_variable_name = outcome_variable_name,
+        reference_mean = null_value,
+        conf_level = options$conf_level
+      )
+
+    }
+
 
     # Some results tweaks - future updates to esci will do these calcs within esci rather than here
     alpha <- 1 - as.numeric(options$conf_level)
@@ -42,33 +76,105 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     estimate$overview$n_component <- 1/sqrt(estimate$overview$n)
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
 
+    estimate$es_smd$reference_value <- null_value
+    estimate$es_smd$mean <- estimate$es_smd$numerator + null_value
 
-    # Define and fill the overview table
-    if (is.null(jaspResults[["overviewTable"]])) {
-      jasp_overview_prep(jaspResults, options, ready)
-      jasp_table_fill(jaspResults[["overviewTable"]], estimate$overview, NULL)
+
+    estimate_big <- estimate
+    estimate$raw_data <- NULL
+    if (from_raw) {
+      for (myvariable in options$outcome_variable) {
+        estimate[[myvariable]] <- NULL
+      }
     }
 
-
-    # Hypothesis evaluation
-    evaluate_h <- options$evaluate_hypotheses
 
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
-      jasp_test_mdiff(
-        jaspResults,
+      mytest <- jasp_test_mdiff(
         options,
-        ready,
         estimate
       )
+    } else {
+      mytest <- NULL
     }
 
 
-    # Now prep and fill the plot
-    if (is.null(jaspResults[["mdiffPlot"]])) {
-      jasp_plot_m_prep(jaspResults, options, add_citation = TRUE)
+  } else {
+    estimate <- NULL
+    estimate_big <- NULL
+  }
 
+
+  # Overview
+  if (is.null(jaspResults[["overviewTable"]])) {
+    jasp_overview_prep(
+      jaspResults,
+      options,
+      ready,
+      estimate,
+      level = 1
+    )
+
+    if (ready) {
+      jasp_table_fill(
+        jaspResults[["overviewTable"]],
+        estimate,
+        "overview"
+      )
+    }
+  }
+
+  # Hypothesis evaluation table and smd table
+  if(evaluate_h & is.null(jaspResults[["heTable"]])) {
+    jasp_he_prep(
+      jaspResults,
+      options,
+      ready,
+      mytest
+    )
+
+    if (ready) jasp_table_fill(
+      jaspResults[["heTable"]],
+      mytest,
+      "to_fill"
+    )
+
+  }
+
+  # Smd table
+  if(evaluate_h & options$effect_size == "mean" & is.null(jaspResults[["smdTable"]])) {
+    jasp_smd_prep(
+      jaspResults,
+      options,
+      ready,
+      estimate
+    )
+
+    if (ready) jasp_table_fill(
+      jaspResults[["smdTable"]],
+      estimate,
+      "es_smd"
+    )
+
+  }
+
+
+  # Figure
+  if (is.null(jaspResults[["mdiffPlot"]])) {
+    jasp_plot_m_prep(
+      jaspResults,
+      options,
+      ready,
+      add_citation = TRUE
+    )
+
+    if (ready) {
       args <- list()
-      args$estimate <- estimate
+      if (from_raw) {
+        args$estimate <- estimate_big
+      } else {
+        args$estimate <- estimate
+      }
       args$effect_size <- options$effect_size
       args$data_layout <- options$data_layout
       args$data_spread <- options$data_spread
@@ -91,11 +197,9 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
       jaspResults[["mdiffPlot"]]$plotObject <- myplot
 
-
     }
+  }
 
-
-  }  # end of ready
 
   return()
 }

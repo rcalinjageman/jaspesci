@@ -1,7 +1,17 @@
-jasp_meta_notes <- function(options, reference_mean = NULL, has_aev, has_switch, effect_size_name_html) {
+jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL) {
+
+  # Handles
   self <- list()
   self$options <- options
-  from_raw <- options$switch == "from_raw"
+
+  has_aev <- !is.null(options$assume_equal_variance)
+  has_switch <- !is.null(options$switch)
+  if (has_switch) {
+    from_raw <- options$switch == "from_raw"
+  } else {
+    from_raw <- FALSE
+  }
+
 
   # Update column headings if reference mean was used
   ref_note <- NULL
@@ -35,7 +45,6 @@ jasp_meta_notes <- function(options, reference_mean = NULL, has_aev, has_switch,
     "Estimate is based on a fixed effect (FE) model."
 
 
-
   correction_note <- NULL
   smd_reported <- FALSE
   if (has_switch) {
@@ -44,7 +53,7 @@ jasp_meta_notes <- function(options, reference_mean = NULL, has_aev, has_switch,
         smd_reported <- TRUE
         correction_note <- paste(
           "  The standardized mean difference (",
-          effect_size_name_html,
+          estimate$properties$effect_size_name_html,
           ") has been corrected for sampling bias.<br>",
           sep = ""
         )
@@ -60,7 +69,7 @@ jasp_meta_notes <- function(options, reference_mean = NULL, has_aev, has_switch,
 
       correction_note <- paste(
         "This analysis expected the inputted Cohen's <i>d</i> values to already be corrected for bias (",
-        effect_size_name_html,
+        estimate$properties$effect_size_name_html,
         ").  ",
         correction_warning,
         "<br>",
@@ -85,11 +94,22 @@ jasp_meta_notes <- function(options, reference_mean = NULL, has_aev, has_switch,
     " "
   )
 
-  mynotes <- list()
-  mynotes$meta_note <- meta_note
-  mynotes$raw_note <- raw_note
 
-  return(mynotes)
+  estimate$es_meta_properties <- list(
+    message_html = meta_note
+  )
+
+  if (!is.null(estimate$es_meta_difference)) {
+    estimate$es_meta_difference_properties <- list(
+      message_html = meta_note
+    )
+  }
+
+  estimate$raw_data_properties <- list(
+    message_html = raw_note
+  )
+
+  return(estimate)
 
 }
 
@@ -157,7 +177,8 @@ jasp_forest_plot_prep <- function(jaspResults, options) {
       "color_raw",
       "fill_raw",
       "alpha_raw",
-      "null_color"
+      "null_color",
+      "switch"
     )
   )
 

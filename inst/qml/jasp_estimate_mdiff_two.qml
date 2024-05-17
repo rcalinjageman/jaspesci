@@ -28,22 +28,182 @@ Form
 	id: form
 	property int framework:	Common.Type.Framework.Classical
 
-	VariablesForm
-	{
-		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
-		AvailableVariablesList { name: "allVariablesList" }
-		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
-		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
-	}
 
-  Group {
-  	columns: 2
-		Layout.columnSpan: 2
+	function alpha_adjust() {
+    alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+  }
 
-  	CheckBox {
-  	  name: "switch_comparison_order";
-  	  label: qsTr("Switch comparison order")
+  function switch_adjust() {
+      if (from_summary.checked) {
+        effect_size.currentValue = "mean_difference";
+        show_ratio.checked = false;
+      }
+  }
+
+
+  RadioButtonGroup {
+    columns: 2
+    name: "switch"
+    id: switch_source
+
+    RadioButton {
+      value: "from_raw";
+      label: qsTr("Analyze full data");
+      checked: true;
+      id: from_raw
     }
+
+    RadioButton {
+      value: "from_summary";
+      label: qsTr("Analyze summary data");
+      id: from_summary
+      onClicked: {
+         switch_adjust()
+      }
+    }
+  }
+
+  Section {
+    enabled: from_raw.checked
+    visible: from_raw.checked
+    expanded: from_raw.checked
+
+
+    	VariablesForm
+    	{
+    		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
+    		AvailableVariablesList { name: "allVariablesList" }
+    		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
+    		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
+    	}
+
+      Group {
+      	columns: 2
+    		Layout.columnSpan: 2
+
+      	CheckBox {
+      	  name: "switch_comparison_order";
+      	  label: qsTr("Switch comparison order")
+        }
+      }
+  }
+
+
+  Section {
+    enabled: from_summary.checked
+    visible: from_summary.checked
+    expanded: from_summary.checked
+
+    GridLayout {
+      id: summary_grid
+      columns: 3
+
+      Label {
+        text: ""
+      }
+
+      Label {
+        text: "Reference group"
+      }
+
+      Label {
+        text: "Comparison group"
+      }
+
+
+      Label {
+        text: qsTr("Name")
+      }
+
+      TextField
+      {
+        name: "reference_level_name"
+        placeholderText: "Reference group"
+      }
+
+      TextField
+      {
+        name: "comparison_level_name"
+        placeholderText: "Comparison group"
+      }
+
+      Label {
+        text: qsTr("Mean (<i>M</i>)")
+      }
+
+      DoubleField
+      {
+        name: "reference_mean"
+        defaultValue: 10
+      }
+
+      DoubleField
+      {
+        name: "comparison_mean"
+        defaultValue: 12
+      }
+
+
+      Label {
+        text: qsTr("Standard deviation (<i>s</i>)")
+      }
+
+      DoubleField
+      {
+        name: "reference_sd"
+        defaultValue: 3
+        min: 0
+      }
+
+      DoubleField
+      {
+        name: "comparison_sd"
+        defaultValue: 3
+        min: 0
+      }
+
+
+      Label {
+        text: qsTr("Sample size (<i>n</i>)")
+      }
+
+      IntegerField
+      {
+        name: "reference_n"
+        defaultValue: 20
+        min: 2
+      }
+
+      IntegerField
+      {
+        name: "comparison_n"
+        defaultValue: 20
+        min: 2
+      }
+
+    }
+
+
+    Group {
+      Layout.columnSpan: 2
+      TextField
+      {
+        name: "outcome_variable_name"
+        label: qsTr("Outcome variable name")
+        placeholderText: "Outcome variable"
+      }
+
+
+      TextField
+      {
+        name: "grouping_variable_name"
+        label: qsTr("Grouping variable name")
+        placeholderText: "Grouping variable"
+      }
+
+    }
+
+
   }
 
 	Group
@@ -62,6 +222,7 @@ Form
       {
         name: "effect_size"
         label: qsTr("Effect size of interest")
+        enabled: from_raw.checked
         values:
           [
             { label: "Mean diiference", value: "mean_difference"},
@@ -74,6 +235,7 @@ Form
 	    name: "assume_equal_variance";
 	    id: assume_equal_variance
 	    label: qsTr("Assume equal variance")
+	    checked: true
 	    enabled: effect_size.currentValue == "mean_difference"
     }
 
@@ -97,7 +259,9 @@ Form
 	   }
 	  CheckBox {
 	    name: "show_ratio";
+	    id: show_ratio
 	    label: qsTr("Ratio between groups (appropriate only for true ratio scales")
+	    enabled: from_raw.checked
     }
 	}
 
@@ -297,6 +461,7 @@ Form
       {
         name: "data_layout"
         id: data_layout
+        enabled: from_raw.checked
       }
 
 
@@ -304,6 +469,7 @@ Form
       {
         name: "data_spread"
         label: qsTr("Layout")
+        enabled: from_raw.checked
         defaultValue: 0.20
         min: 0
         max: 5
@@ -313,6 +479,7 @@ Form
       {
         name: "error_nudge"
         label: qsTr("Offset from CI")
+        enabled: from_raw.checked
         defaultValue: 0.5
         min: 0
         max: 5
@@ -706,6 +873,7 @@ Form
         name: "shape_raw_reference"
         id: shape_raw_reference
         startValue: 'circle filled'
+        enabled: from_raw.checked
       }
 
       Esci.ShapeSelect
@@ -713,6 +881,7 @@ Form
         name: "shape_raw_comparison"
         id: shape_raw_comparison
         startValue: 'circle filled'
+        enabled: from_raw.checked
       }
 
       Label {
@@ -729,6 +898,7 @@ Form
         name: "size_raw_reference"
         id: size_raw_reference
         defaultValue: 2
+        enabled: from_raw.checked
 
       }
 
@@ -737,6 +907,7 @@ Form
         name: "size_raw_comparison"
         id: size_raw_comparison
         defaultValue: 2
+        enabled: from_raw.checked
 
       }
 
@@ -753,6 +924,7 @@ Form
         name: "color_raw_reference"
         id: color_raw_reference
         startValue: "#008DF9"
+        enabled: from_raw.checked
       }
 
       Esci.ColorSelect
@@ -760,6 +932,7 @@ Form
         name: "color_raw_comparison"
         id: color_raw_comparison
         startValue: "#009F81"
+        enabled: from_raw.checked
       }
 
       Label {
@@ -776,6 +949,7 @@ Form
         name: "fill_raw_reference"
         id: fill_raw_reference
         startValue: "NA"
+        enabled: from_raw.checked
       }
 
       Esci.ColorSelect
@@ -783,6 +957,7 @@ Form
         name: "fill_raw_comparison"
         id: fill_raw_comparison
         startValue: "NA"
+        enabled: from_raw.checked
       }
 
       Label {
@@ -798,6 +973,7 @@ Form
       {
         name: "alpha_raw_reference"
         id: alpha_raw_reference
+        enabled: from_raw.checked
 
       }
 
@@ -805,6 +981,7 @@ Form
       {
         name: "alpha_raw_comparison"
         id: alpha_raw_comparison
+        enabled: from_raw.checked
 
       }
 

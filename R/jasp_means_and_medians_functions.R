@@ -1,4 +1,4 @@
-jasp_test_mdiff <- function(jaspResults, options, ready, estimate) {
+jasp_test_mdiff <- function(options, estimate) {
 
     # Test results
     effect_size = options$effect_size
@@ -10,7 +10,7 @@ jasp_test_mdiff <- function(jaspResults, options, ready, estimate) {
     rope_units <- "raw"
     try(rope_units <- options$rope_units, silent = TRUE)
 
-    test_results <- esci::test_mdiff(
+    mytest <- esci::test_mdiff(
       estimate,
       effect_size = effect_size,
       rope = c(rope_upper * -1, rope_upper),
@@ -19,20 +19,19 @@ jasp_test_mdiff <- function(jaspResults, options, ready, estimate) {
     )
 
 
-    jasp_he_prep(jaspResults, options, ready)
+    if (rope_upper > 0) {
+      mytest$to_fill <- mytest$interval_null
+    } else {
+      mytest$to_fill <- mytest$point_null
+    }
 
-    to_fill <- test_results$point_null
-    if (rope_upper > 0) to_fill <- test_results$interval_null
-
-    jasp_table_fill(jaspResults[["heTable"]], to_fill)
-
-    return()
+    return(mytest)
 
 }
 
 
 
-jasp_plot_m_prep <- function(jaspResults, options, my_variable = "mdiffPlot", add_citation = FALSE) {
+jasp_plot_m_prep <- function(jaspResults, options, ready, my_variable = "mdiffPlot", add_citation = FALSE) {
 
   my_title <- if (my_variable == "mdiffPlot") "Estimation Figure" else paste("Estimation Figure", my_variable, sep = " - ")
 
@@ -50,12 +49,7 @@ jasp_plot_m_prep <- function(jaspResults, options, my_variable = "mdiffPlot", ad
 
   mdiffPlot$dependOn(
     c(
-      "outcome_variable",
-      "grouping_variable",
-      "conf_level",
-      "assume_equal_variance",
-      "effect_size",
-      "switch_comparison_order",
+      jasp_mdiff_table_depends_on(),
       "null_value",
       "null_boundary",
       "null_color",
@@ -78,6 +72,7 @@ jasp_plot_m_prep <- function(jaspResults, options, my_variable = "mdiffPlot", ad
       "ymin",
       "ymax",
       "ybreaks",
+      "n.breaks",
       "difference_axis_units",
       "difference_axis_breaks",
       mydepends,
@@ -96,8 +91,7 @@ jasp_plot_m_prep <- function(jaspResults, options, my_variable = "mdiffPlot", ad
       "size_raw",
       "color_raw",
       "fill_raw",
-      "alpha_raw",
-      "null_color"
+      "alpha_raw"
     )
   )
 

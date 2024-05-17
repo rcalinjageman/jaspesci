@@ -32,6 +32,12 @@ Form
     alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
   }
 
+  function switch_adjust() {
+      if (from_summary.checked) {
+        effect_size.currentValue = "mean"
+      }
+  }
+
   RadioButtonGroup {
     columns: 2
     name: "switch"
@@ -42,12 +48,18 @@ Form
       label: qsTr("Analyze full data");
       checked: true;
       id: from_raw
+      onClicked: {
+         switch_adjust()
+      }
     }
 
     RadioButton {
       value: "from_summary";
       label: qsTr("Analyze summary data");
       id: from_summary
+      onClicked: {
+         switch_adjust()
+      }
     }
   }
 
@@ -73,42 +85,38 @@ Form
     visible: from_summary.checked
     expanded: from_summary.checked
 
-    TableView {
-      id: summary_data
-      modelType		      : JASP.Simple
-      source            : false
+    Group {
 
-      implicitWidth		  : 600
-			implicitHeight	  : 240
+      DoubleField
+      {
+        name: "mean"
+        label: qsTr("Mean (<i>M</i>)")
+        defaultValue: 10.1
+      }
 
-			initialRowCount		: 1
-			rowCount			    : 1
-			initialColumnCount	: 4
-			columnCount			  : 4
-      columnNames			  : [qsTr("Variable name"), qsTr("M"), qsTr("s"), qsTr("N")]
+      DoubleField
+      {
+        name: "sd"
+        label: qsTr("Standard deviation (<i>s</i>)")
+        defaultValue: 3
+        min: 0
+      }
 
-      name              : "summary_data"
-      cornerText			  : qsTr("Summary data")
-      itemTypePerColumn	: [JASP.string, JASP.Double, JASP.Double, Jasp.Integer]
+      IntegerField
+      {
+        name: "n"
+        label: qsTr("Sample size (<i>N</i>)")
+        defaultValue: 20
+        min: 2
+      }
 
-      function getRowHeaderText(headerText, rowIndex)	 { return String.fromCharCode(65 + rowIndex);	}
+      TextField
+      {
+        name: "outcome_variable_name"
+        label: qsTr("Outcome variable name")
+        placeholderText: "Outcome variable"
+      }
 
-      function getDefaultValue(columnIndex, rowIndex) {
-					if      (columnIndex === 0) return "MYVARIABLE";
-					else if (columnIndex === 1) return "10";
-		      else if (columnIndex === 2) return "3";
-					else           				return "20";
-				}
-
-				JASPDoubleValidator	       { id: doubleValidator; decimals: 3	                      }
-				RegularExpressionValidator { id: stringValidator; regularExpression: /^[LR]$/         }
-				RegularExpressionValidator { id: hexValidator; regularExpression: /^#[0-9A-Fa-f]{6}$/ }
-
-
-				function getValidator(columnIndex, rowIndex) {
-					if      (columnIndex === 0) return stringValidator;
-					else 						return doubleValidator;
-				}
 
     }
 
@@ -137,6 +145,7 @@ Form
             { label: "Median", value: "median"}
           ]
         id: effect_size
+        enabled: from_raw.checked
       }
 	}
 
@@ -315,6 +324,7 @@ Form
       {
         name: "data_layout"
         id: data_layout
+        enabled: from_raw.checked
       }
 
 
@@ -323,6 +333,7 @@ Form
         name: "data_spread"
         label: qsTr("Layout")
         defaultValue: 0.25
+        enabled: from_raw.checked
         min: 0
         max: 5
       }
@@ -332,6 +343,7 @@ Form
         name: "error_nudge"
         label: qsTr("Offset from CI")
         defaultValue: 0.3
+        enabled: from_raw.checked
         min: 0
         max: 5
       }
@@ -465,6 +477,7 @@ Form
         label: qsTr("Shape")
         name: "shape_raw"
         id: shape_raw
+        enabled: from_raw.checked
       }
 
       Esci.SizeSelect
@@ -472,6 +485,7 @@ Form
         label: qsTr("Size")
         name: "size_raw"
         defaultValue: 2
+        enabled: from_raw.checked
       }
 
       Esci.ColorSelect
@@ -480,6 +494,7 @@ Form
         label: qsTr("Outline")
         startValue: '#008DF9'
         id: color_raw
+        enabled: from_raw.checked
       }
 
       Esci.ColorSelect
@@ -488,11 +503,13 @@ Form
         label: qsTr("Fill")
         startValue: 'NA'
         id: fill_raw
+        enabled: from_raw.checked
       }
 
       Esci.AlphaSelect
       {
         name: "alpha_raw"
+        enabled: from_raw.checked
       }
 
 

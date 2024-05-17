@@ -1,6 +1,8 @@
 jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
+  # Handles
   from_raw <- options$switch == "from_raw"
+  has_moderator <- options$moderator != ""
 
   # Check if ready
   if (from_raw) {
@@ -11,128 +13,118 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     ready <- options$means != "" & options$ns != ""
   }
 
-  if (!ready) return()
 
-  # read dataset
-  dataset <- jasp_meta_mean_read_data(dataset, options)
+  if (ready) {
+
+    # read dataset
+    dataset <- jasp_meta_mean_read_data(dataset, options)
 
 
-  # check for errors
-  # ns are positive; if from_raw sds should all be positive, too
-  .hasErrors(
-    dataset = dataset,
-    type = c("observations", "variance", "infinity", "negativeValues"),
-    all.target = if (from_raw) c(options$sds, options$ns) else c(options$ns),
-    observations.amount  = "< 2",
-    exitAnalysisIfErrors = TRUE
-  )
-
-  has_moderator <- FALSE
-  if (options$moderator != "") {
-    has_moderator <- TRUE
-
-    # At least 2 levels in grouping variable
+    # check for errors
+    # ns are positive; if from_raw sds should all be positive, too
     .hasErrors(
       dataset = dataset,
-      type = "factorLevels",
-      factorLevels.target  = options$moderator,
-      factorLevels.amount  = "< 2",
-      exitAnalysisIfErrors = TRUE
-    )
-
-    # at least 2 observations in each level of the moderator
-    .hasErrors(
-      dataset = dataset,
-      type = c("observations", "variance", "infinity"),
-      all.grouping = options$moderator,
-      all.target = c(
-        if (from_raw) c(options$means, options$sds) else options$ds,
-        options$ns
-      ),
+      type = c("observations", "variance", "infinity", "negativeValues"),
+      all.target = if (from_raw) c(options$sds, options$ns) else c(options$ns),
       observations.amount  = "< 2",
       exitAnalysisIfErrors = TRUE
     )
 
-  }
+    if (options$moderator != "") {
+
+      # At least 2 levels in grouping variable
+      .hasErrors(
+        dataset = dataset,
+        type = "factorLevels",
+        factorLevels.target  = options$moderator,
+        factorLevels.amount  = "< 2",
+        exitAnalysisIfErrors = TRUE
+      )
+
+      # at least 2 observations in each level of the moderator
+      .hasErrors(
+        dataset = dataset,
+        type = c("observations", "variance", "infinity"),
+        all.grouping = options$moderator,
+        all.target = c(
+          if (from_raw) c(options$means, options$sds) else options$ds,
+          options$ns
+        ),
+        observations.amount  = "< 2",
+        exitAnalysisIfErrors = TRUE
+      )
+
+    }
 
 
-  # Run the analysis
-  self <- list()
-  self$options <- options
+    # Run the analysis
+    self <- list()
+    self$options <- options
 
-  args <- list()
+    args <- list()
 
-  call <- if (from_raw) esci::meta_mean else esci::meta_d1
+    call <- if (from_raw) esci::meta_mean else esci::meta_d1
 
-  args$data <- dataset
-  args$effect_label <- "My effect"
-  if (!self$options$effect_label %in% c("Auto", "auto", "AUTO", "")) args$effect_label <- self$options$effect_label
+    args$data <- dataset
+    args$effect_label <- jasp_text_fix(options, "effect_label", "My effect")
+    args$conf_level <- self$options$conf_level
 
-  args$conf_level <- self$options$conf_level
+    has_reference <- FALSE
+    if (from_raw) {
+      args$means <- self$options$means
+      args$sds <- self$options$sds
+      args$ns <- self$options$ns
+      args$reported_effect_size <- self$options$reported_effect_size
 
+      if (!(options$reference_mean %in% c("auto", "Auto", "AUTO", ""))) {
+        try(args$reference_mean <- as.numeric(options$reference_mean))
+        if (is.na(args$reference_mean)) {
+          args$reference_mean <- NULL
+        } else {
+          has_refernece <- TRUE
+        }
+      }
+    } else {
+      args$ds <- self$options$means
+      args$ns <- self$options$ns
+    }
 
-  has_reference <- FALSE
-  if (from_raw) {
-    args$means <- self$options$means
-    args$sds <- self$options$sds
-    args$ns <- self$options$ns
-    args$reported_effect_size <- self$options$reported_effect_size
+    if (self$options$moderator != "") {
+      args$moderator <- self$options$moderator
+    }
 
-    if (!(options$reference_mean %in% c("auto", "Auto", "AUTO", ""))) {
-      try(args$reference_mean <- as.numeric(options$reference_mean))
-      if (is.na(args$reference_mean)) {
-        args$reference_mean <- NULL
+    if (self$options$labels != "") {
+      args$labels <- self$options$labels
+    }
+
+    args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
+
+    estimate <- try(do.call(what = call, args = args))
+
+    # properties cleanup - need to move this into esci
+    if (!is.null(args$reference_mean) & from_raw) {
+      if (options$reported_effect_size == "mean_difference") {
+        estimate$properties$effect_size_name_html <- paste(
+          estimate$properties$effect_size_name_html,
+          " - <i>M</i><sub>Reference</sub>",
+          sep = ""
+        )
       } else {
-        has_refernece <- TRUE
       }
     }
+
+    # Seems to be some encoding issue with presenting factors in JASP
+    estimate$raw_data$label <- as.character(estimate$raw_data$label)
+    if (has_moderator) estimate$raw_data$moderator <- as.character(estimate$raw_data$moderator)
+
+    # Fix notes, also need to move to within esci
+    estimate <- jasp_meta_notes(options, estimate, args$reference_mean)
+
+
+
   } else {
-    args$ds <- self$options$means
-    args$ns <- self$options$ns
+    estimate <- NULL
   }
-
-  if (self$options$moderator != "") {
-    args$moderator <- self$options$moderator
-  }
-
-  if (self$options$labels != "") {
-    args$labels <- self$options$labels
-  }
-
-  args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
-
-
-  estimate <- try(do.call(what = call, args = args))
-
-
-  if(is.null(estimate)) return()
-  if(is(estimate, "try-error")) {
-    # To do: pull the error text and return it as a jasp error
-
-    return()
-
-  }
-
-  # properties cleanup - need to move this into esci
-  if (!is.null(args$reference_mean) & from_raw) {
-    if (options$reported_effect_size == "mean_difference") {
-      estimate$properties$effect_size_name_html <- paste(
-        estimate$properties$effect_size_name_html,
-        " - <i>M</i><sub>Reference</sub>",
-        sep = ""
-      )
-    } else {
-    }
-  }
-
-  # Seems to be some encoding issue with presenting factors in JASP
-  estimate$raw_data$label <- as.character(estimate$raw_data$label)
-  if (has_moderator) estimate$raw_data$moderator <- as.character(estimate$raw_data$moderator)
-
-
-  # Notes -- need to move creation of notes into esci
-  mynotes <- jasp_meta_notes(options, args$reference_mean, FALSE, TRUE, estimate$properties$effect_size_name_html)
-
 
   # Define and fill the raw_data
   if (is.null(jaspResults[["meta_raw_dataTable"]])) {
@@ -140,29 +132,43 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options = options,
       ready = ready,
-      levels = nrow(dataset),
-      effect_size_title = estimate$properties$effect_size_name_html
+      estimate = estimate
     )
-    jasp_table_fill(jaspResults[["meta_raw_dataTable"]], estimate$raw_data, mynotes$raw_note)
+
+    if (ready) jasp_table_fill(
+      jaspResults[["meta_raw_dataTable"]],
+      estimate,
+      "raw_data"
+    )
+
   }
+
 
   # Define and fill the es_meta
   if (is.null(jaspResults[["es_metaTable"]])) {
-    row_expect <- if (options$moderator != "") length(levels(dataset[[options$moderator]])) else 1
 
     jasp_es_meta_data_prep(
       jaspResults,
       options = options,
       ready = ready,
-      levels = row_expect,
-      effect_size_title = estimate$properties$effect_size_name_html
+      estimate = estimate
     )
-    jasp_table_fill(jaspResults[["es_metaTable"]], estimate$es_meta, mynotes$meta_note)
+    if (ready) jasp_table_fill(
+      jaspResults[["es_metaTable"]],
+      estimate,
+      "es_meta"
+    )
   }
+
+
 
   # Define and fill the es_heterogeneityTable table
   if (is.null(jaspResults[["es_heterogeneityTable"]])) {
-    my_levels <- if (has_moderator) length(levels(dataset[[options$moderator]])) else 0
+    if (ready) {
+      my_levels <- nrow(estimate$es_heterogeneity)
+    } else {
+      my_levels <- 0
+    }
 
     jasp_es_heterogeneity_data_prep(
       jaspResults,
@@ -170,12 +176,13 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       ready = ready,
       levels = my_levels
     )
-    jasp_table_fill(
+    if (ready) jasp_table_fill(
       jaspResults[["es_heterogeneityTable"]],
-      estimate$es_heterogeneity,
-      message = estimate$es_heterogeneity_properties$message_html
+      estimate,
+      "es_heterogeneity"
     )
   }
+
 
   # Define and fill the meta_difference table if there is a moderator
   if (has_moderator & is.null(jaspResults[["es_meta_differenceTable"]])) {
@@ -183,47 +190,57 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options = options,
       ready = ready,
-      effect_size_title = estimate$properties$effect_size_name_html
+      estimate = estimate
     )
-    jasp_table_fill(
+    if (ready) jasp_table_fill(
       jaspResults[["es_meta_differenceTable"]],
-      estimate$es_meta_difference,
-      message = mynotes$meta_note
+      estimate,
+      "es_meta_difference"
     )
   }
+
 
   # Now the forest plot
   if (is.null(jaspResults[["forest_plot"]])) {
     # Define the plot
     jasp_forest_plot_prep(jaspResults, options)
 
-    # Creat the plot
-    meta_diamond_height <- options$meta_diamond_height
-    explain_DR <- options$random_effects == "compare"
-    include_PIs <- options$include_PIs & options$random_effects == "random_effects"
 
-    myplot <- esci::plot_meta(
-      estimate,
-      mark_zero = options$mark_zero,
-      include_PIs = include_PIs,
-      report_CIs = options$report_CIs,
-      meta_diamond_height = meta_diamond_height,
-      explain_DR = explain_DR
-    )
+    if (ready) {
+      # Create the plot
+      meta_diamond_height <- options$meta_diamond_height
+      explain_DR <- options$random_effects == "compare"
+      include_PIs <- options$include_PIs & options$random_effects == "random_effects"
 
-    # Apply aesthetics to the plot
-    xlab_replace <- paste(
-      estimate$properties$effect_size_name_ggplot,
-      ": ",
-      estimate$es_meta$effect_label[[1]],
-      sep = ""
-    )
+      myplot <- esci::plot_meta(
+        estimate,
+        mark_zero = options$mark_zero,
+        include_PIs = include_PIs,
+        report_CIs = options$report_CIs,
+        meta_diamond_height = meta_diamond_height,
+        explain_DR = explain_DR
+      )
 
-    # passing such a strange variety of objects to this function; needs revisio
-    myplot <- jasp_forest_plot_decorate(myplot, options, xlab_replace, has_moderator, estimate$es_meta_difference)
+      # Apply aesthetics to the plot
+      xlab_replace <- paste(
+        estimate$properties$effect_size_name_ggplot,
+        ": ",
+        estimate$es_meta$effect_label[[1]],
+        sep = ""
+      )
 
-    jaspResults[["forest_plot"]]$plotObject <- myplot
+
+      # passing such a strange variety of objects to this function; needs revision
+      es_meta_difference <- if (has_moderator) estimate$es_meta_difference else NULL
+
+
+      myplot <- jasp_forest_plot_decorate(myplot, options, xlab_replace, has_moderator, es_meta_difference)
+
+      jaspResults[["forest_plot"]]$plotObject <- myplot
+
+    }
   }
+
 
   return()
 
