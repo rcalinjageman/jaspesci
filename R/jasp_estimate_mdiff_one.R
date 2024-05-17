@@ -3,6 +3,9 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
   ready <- (length(options$outcome_variable) > 0)
 
+  myt <- createJaspHtml(paste(options$summary_data[[1]]$values, collapse = ", "))
+  jaspResults[["myt"]] <- myt
+
   if (ready) {
     # read dataset
     dataset <- jasp_estimate_mdiff_one_read_data(dataset, options)

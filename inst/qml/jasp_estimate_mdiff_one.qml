@@ -32,13 +32,87 @@ Form
     alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
   }
 
-	VariablesForm
-	{
-		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
-		AvailableVariablesList { name: "allVariablesList" }
-		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
-	}
+  RadioButtonGroup {
+    columns: 2
+    name: "switch"
+    id: switch_source
 
+    RadioButton {
+      value: "from_raw";
+      label: qsTr("Analyze full data");
+      checked: true;
+      id: from_raw
+    }
+
+    RadioButton {
+      value: "from_summary";
+      label: qsTr("Analyze summary data");
+      id: from_summary
+    }
+  }
+
+
+
+  Section {
+    enabled: from_raw.checked
+    visible: from_raw.checked
+    expanded: from_raw.checked
+
+  	VariablesForm
+  	{
+  		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
+  		AvailableVariablesList { name: "allVariablesList" }
+  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"] }
+  	}
+
+  }
+
+
+  Section {
+    enabled: from_summary.checked
+    visible: from_summary.checked
+    expanded: from_summary.checked
+
+    TableView {
+      id: summary_data
+      modelType		      : JASP.Simple
+      source            : false
+
+      implicitWidth		  : 600
+			implicitHeight	  : 240
+
+			initialRowCount		: 1
+			rowCount			    : 1
+			initialColumnCount	: 4
+			columnCount			  : 4
+      columnNames			  : [qsTr("Variable name"), qsTr("M"), qsTr("s"), qsTr("N")]
+
+      name              : "summary_data"
+      cornerText			  : qsTr("Summary data")
+      itemTypePerColumn	: [JASP.string, JASP.Double, JASP.Double, Jasp.Integer]
+
+      function getRowHeaderText(headerText, rowIndex)	 { return String.fromCharCode(65 + rowIndex);	}
+
+      function getDefaultValue(columnIndex, rowIndex) {
+					if      (columnIndex === 0) return "MYVARIABLE";
+					else if (columnIndex === 1) return "10";
+		      else if (columnIndex === 2) return "3";
+					else           				return "20";
+				}
+
+				JASPDoubleValidator	       { id: doubleValidator; decimals: 3	                      }
+				RegularExpressionValidator { id: stringValidator; regularExpression: /^[LR]$/         }
+				RegularExpressionValidator { id: hexValidator; regularExpression: /^#[0-9A-Fa-f]{6}$/ }
+
+
+				function getValidator(columnIndex, rowIndex) {
+					if      (columnIndex === 0) return stringValidator;
+					else 						return doubleValidator;
+				}
+
+    }
+
+  }
 
 	Group
 	{
