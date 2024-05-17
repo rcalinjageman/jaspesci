@@ -28,6 +28,10 @@ Form
 	id: form
 	property int framework:	Common.Type.Framework.Classical
 
+	function alpha_adjust() {
+    alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+  }
+
 	VariablesForm
 	{
 		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
@@ -45,6 +49,9 @@ Form
 		  {
 		    name: "conf_level"
 		    id: conf_level
+		    onFocusChanged: {
+         alpha_adjust()
+        }
 		  }
 		DropDown
       {
@@ -445,7 +452,6 @@ Form
     Group
     {
       columns: 2
-      Layout.columnSpan: 2
 
       DoubleField
       {
@@ -465,7 +471,13 @@ Form
         negativeValues: false
         enabled: evaluate_hypotheses.checked
         visible: evaluate_hypotheses.checked
-        afterLabel: "alpha: " + conf_level.currentValue
+      }
+
+      Label {
+        text: "at alpha = .05"
+        id: alpha_label
+        enabled: evaluate_hypotheses.checked
+        visible: evaluate_hypotheses.checked
       }
 
 

@@ -8,16 +8,13 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       options$sds != "" &
       options$ns != ""
   } else {
-    ready <- options$ds != "" & options$ns != ""
+    ready <- options$means != "" & options$ns != ""
   }
 
   if (!ready) return()
 
   # read dataset
   dataset <- jasp_meta_mean_read_data(dataset, options)
-
-  # myds <- createJaspHtml(printmydf(dataset))
-  # jaspResults[["myds"]] <- myds
 
 
   # check for errors
@@ -90,7 +87,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       }
     }
   } else {
-    args$ds <- self$options$ds
+    args$ds <- self$options$means
     args$ns <- self$options$ns
   }
 
@@ -245,7 +242,7 @@ jasp_meta_mean_read_data <- function(dataset, options) {
     if (from_raw) {
       args$columns.as.numeric = c(options$means, options$sds, options$ns)
     } else {
-      args$columns.as.numeric = c(options$ds, options$ns)
+      args$columns.as.numeric = c(options$means, options$ns)
     }
 
     args$columns.as.factor <- NULL

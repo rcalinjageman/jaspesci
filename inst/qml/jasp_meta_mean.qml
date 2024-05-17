@@ -28,73 +28,86 @@ Form
 	id: form
 	property int framework:	Common.Type.Framework.Classical
 
+	function dlab() {
+    if (from_raw.checked) {
+      means.label = "Means"
+    } else {
+      means.label = "Cohen's <i>d</i>, unbiased"
+    }
+  }
+
+
   RadioButtonGroup {
     columns: 2
-    Layout.columnSpan: 2
     name: "switch"
     id: switch_source
-    RadioButton { value: "from_raw"; label: qsTr("Analyze original units"); checked: true; id: from_raw }
-    RadioButton { value: "from_d"; label: qsTr("Analyze Cohen's <i>d</i>"); id: from_d }
+
+    RadioButton {
+      value: "from_raw";
+      label: qsTr("Analyze original units");
+      checked: true;
+      id: from_raw
+      onClicked: {
+         dlab()
+      }
+    }
+
+    RadioButton {
+      value: "from_d";
+      label: qsTr("Analyze Cohen's <i>d</i>");
+      id: from_d
+      onClicked: {
+         dlab()
+      }
+    }
   }
 
-  Group {
-    Layout.rowSpan: 20
-
-  	VariablesForm {
-  		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
-  		AvailableVariablesList {
-  		  name: "allVariablesList"
-  		}
-  		AssignedVariablesList {
-  		  name: "means";
-  		  title: qsTr("Means");
-  		  suggestedColumns: ["scale"];
-  		  singleVariable: true
-  		  enabled: from_raw.checked
-  		}
-  		AssignedVariablesList {
-  		  name: "sds";
-  		  title: qsTr("Standard deviations");
-  		  suggestedColumns: ["scale"];
-  		  singleVariable: true
-  		  enabled: from_raw.checked
-  		}
-  		AssignedVariablesList {
-  		  name: "ds";
-  		  title: qsTr("Cohen's <i>d</i>, unbiased");
-  		  suggestedColumns: ["scale"];
-  		  singleVariable: true
-  		  enabled: from_d.checked
-  		}
-  		AssignedVariablesList {
-  		  name: "ns";
-  		  title: qsTr("Sample sizes");
-  		  suggestedColumns: ["scale"];
-  		  singleVariable: true
-  		}
-  		AssignedVariablesList {
-  		  name: "labels";
-  		  title: qsTr("Study labels (optional");
-  		  suggestedColumns: ["nominal"];
-  		  singleVariable: true
-  		}
-  		AssignedVariablesList {
-  		  name: "moderator";
-  		  id: moderator;
-  		  title: qsTr("Moderator (optional");
-  		  suggestedColumns: ["nominal"];
-  		  singleVariable: true
-  		}
-  	}
-
-  }
-
+      	VariablesForm {
+      	  height: 40
+      		AvailableVariablesList {
+      		  name: "allVariablesList"
+      		}
+      		AssignedVariablesList {
+      		  name: "means";
+      		  id: means
+      		  label: qsTr("Means");
+      		  suggestedColumns: ["scale"];
+      		  singleVariable: true
+      		}
+      		AssignedVariablesList {
+      		  name: "sds";
+      		  title: qsTr("Standard deviations");
+      		  suggestedColumns: ["scale"];
+      		  singleVariable: true
+      		  enabled: from_raw.checked
+      		  visible: from_raw.checked
+      		}
+      		AssignedVariablesList {
+      		  name: "ns";
+      		  title: qsTr("Sample sizes");
+      		  suggestedColumns: ["scale"];
+      		  singleVariable: true
+      		}
+      		AssignedVariablesList {
+      		  name: "labels";
+      		  title: qsTr("Study labels (optional");
+      		  suggestedColumns: ["nominal"];
+      		  singleVariable: true
+      		}
+      		AssignedVariablesList {
+      		  name: "moderator";
+      		  id: moderator;
+      		  title: qsTr("Moderator (optional");
+      		  suggestedColumns: ["nominal"];
+      		  singleVariable: true
+      		}
+      	}
 
 
 	Group {
 		title: qsTr("<b>Analysis options</b>")
 		columns: 1
-		Layout.columnSpan: 2
+		Layout.rowSpan: 1
 
 		Esci.ConfLevel {
 		    name: "conf_level"
@@ -167,7 +180,7 @@ Form
     {
     title: qsTr("Dimensions")
     columns: 2
-    Layout.columnSpan: 2
+    Layout.rowSpan: 1
     IntegerField
       {
         name: "width"
