@@ -209,13 +209,15 @@ Form
 	Group
 	{
 		title: qsTr("<b>Analysis options</b>")
-		columns: 1
 		Layout.columnSpan: 2
 
 		Esci.ConfLevel
 		  {
 		    name: "conf_level"
 		    id: conf_level
+		    onFocusChanged: {
+         alpha_adjust()
+        }
 		  }
 
 		DropDown
@@ -225,7 +227,7 @@ Form
         enabled: from_raw.checked
         values:
           [
-            { label: "Mean diiference", value: "mean_difference"},
+            { label: "Mean difference", value: "mean_difference"},
             { label: "Median difference", value: "median_difference"}
           ]
         id: effect_size
@@ -244,8 +246,6 @@ Form
 	Group
 	{
 	  title: qsTr("<b>Results options</b>")
-		columns: 1
-		Layout.columnSpan: 2
 	  CheckBox
 	  {
 	    name: "show_details";
@@ -265,15 +265,20 @@ Form
     }
 	}
 
+
   Section
   {
     title: qsTr("Figure Options")
-    Group
-    {
-    title: qsTr("Dimensions")
-    columns: 2
-    Layout.columnSpan: 2
-    IntegerField
+
+    GridLayout {
+      id: fgrid
+      columns: 3
+
+      Label {
+        text: qsTr("Dimensions")
+      }
+
+      IntegerField
       {
         name: "width"
         label: qsTr("Width")
@@ -282,7 +287,7 @@ Form
         max: 3000
       }
 
-    IntegerField
+      IntegerField
       {
         name: "height"
         label: qsTr("Height")
@@ -291,28 +296,26 @@ Form
         max: 3000
       }
 
-    }
+            Label {
+        text: qsTr("<i>Y</i> axis")
+      }
 
-
-    Group
-    {
-    title: qsTr("<i>Y</i> axis")
-    columns: 2
-    Layout.columnSpan: 2
-
-    Group
-    {
-      Layout.columnSpan: 2
       TextField
       {
         name: "ylab"
         label: qsTr("Label")
         placeholderText: "auto"
       }
-    }
 
+      Label {
+        text: " "
+      }
 
-    IntegerField
+      Label {
+        text: " "
+      }
+
+      IntegerField
       {
         name: "axis.text.y"
         label: qsTr("Tick Font Size")
@@ -330,11 +333,16 @@ Form
         max: 80
       }
 
+      Label {
+        text: " "
+      }
+
     TextField
       {
         name: "ymin"
         label: qsTr("Min")
         placeholderText: "auto"
+        fieldWidth: 60
       }
 
     TextField
@@ -342,24 +350,28 @@ Form
         name: "ymax"
         label: qsTr("Max")
         placeholderText: "auto"
+        fieldWidth: 60
       }
 
-    TextField
+      Label {
+        text: " "
+      }
+
+      TextField
       {
-        name: "ybreaks"
+        name: "n.breaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
+        fieldWidth: 60
       }
-    }
 
-    Group
-    {
-    title: qsTr("<i>X</i> axis")
-    columns: 2
-    Layout.columnSpan: 2
+      Label {
+        text: " "
+      }
 
-    Group {
-      Layout.columnSpan: 2
+      Label {
+        text: qsTr("<i>X</i> axis")
+      }
 
       TextField
       {
@@ -367,9 +379,16 @@ Form
         label: qsTr("Label")
         placeholderText: "auto"
       }
-    }
 
-    IntegerField
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+      IntegerField
       {
         name: "axis.text.x"
         label: qsTr("Tick Font Size")
@@ -387,24 +406,26 @@ Form
         max: 80
       }
 
+      Label {
+        text: " "
+      }
+
+
       CheckBox {
 	      name: "simple_contrast_labels";
 	      label: qsTr("Simple labels")
 	      checked: true
       }
-    }
 
+      Label {
+        text: " "
+      }
 
-    Group
-    {
-    title: qsTr("Difference axis")
-    columns: 2
-    Layout.columnSpan: 2
+      Label {
+        text: qsTr("Difference axis")
+      }
 
-    Group {
-      Layout.columnSpan: 2
-
-      DropDown
+           DropDown
       {
         name: "difference_axis_units"
         label: qsTr("Units")
@@ -415,25 +436,31 @@ Form
             { label: "Standard deviations", value: "sd"}
           ]
       }
-    }
 
-    TextField
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+      TextField
       {
         name: "difference_axis_breaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
       }
 
-    }
+      Label {
+        text: " "
+      }
 
+      Label {
+        text: qsTr("Distributions")
+      }
 
-    Group
-    {
-    title: qsTr("Distributions")
-    columns: 2
-    Layout.columnSpan: 2
-
-    DoubleField
+      DoubleField
       {
         name: "error_scale"
         label: qsTr("Width")
@@ -442,6 +469,13 @@ Form
         max: 5
       }
 
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
 
     Esci.ErrorLayout
       {
@@ -449,15 +483,15 @@ Form
         id: error_layout
       }
 
-    }
+      Label {
+        text: " "
+      }
 
-    Group
-    {
-    title: qsTr("Data")
-    columns: 2
-    Layout.columnSpan: 2
+      Label {
+        text: qsTr("Data")
+      }
 
-    Esci.DataLayout
+      Esci.DataLayout
       {
         name: "data_layout"
         id: data_layout
@@ -469,22 +503,26 @@ Form
       {
         name: "data_spread"
         label: qsTr("Layout")
+        defaultValue: 0.25
         enabled: from_raw.checked
-        defaultValue: 0.20
         min: 0
         max: 5
       }
+
+      Label {
+        text: " "
+      }
+
 
     DoubleField
       {
         name: "error_nudge"
         label: qsTr("Offset from CI")
+        defaultValue: 0.3
         enabled: from_raw.checked
-        defaultValue: 0.5
         min: 0
         max: 5
       }
-
 
     }
 
@@ -1019,15 +1057,18 @@ Form
 
     }
 
-    Group
-    {
-      columns: 4
-      Layout.rowSpan: 2
+    GridLayout {
+      id: hgrid
+      columns: 5
+
+      Label {
+        text: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
+        visible: evaluate_hypotheses.checked
+      }
 
       DoubleField
       {
         name: "null_value"
-        label: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
         defaultValue: 0
         negativeValues: true
         enabled: false
@@ -1044,7 +1085,6 @@ Form
         visible: evaluate_hypotheses.checked
       }
 
-
       DropDown {
         name: "rope_units"
         enabled: evaluate_hypotheses.checked
@@ -1056,19 +1096,21 @@ Form
         id: rope_units
       }
 
-
       Label {
-        text: "alpha"
+        text: "at alpha = .05"
+        id: alpha_label
         enabled: evaluate_hypotheses.checked
         visible: evaluate_hypotheses.checked
       }
 
-    }
 
+
+    }
 
     Group {
       columns: 2
       Layout.columnSpan: 2
+
 
       Esci.ColorSelect {
         name: "null_color"
@@ -1078,7 +1120,6 @@ Form
         visible: evaluate_hypotheses.checked
         id: null_color
       }
-
     }
 
   }

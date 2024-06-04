@@ -125,7 +125,6 @@ Form
 	Group
 	{
 		title: qsTr("<b>Analysis options</b>")
-		columns: 2
 		Layout.columnSpan: 2
 		Esci.ConfLevel
 		  {
@@ -152,8 +151,6 @@ Form
 	Group
 	{
 	  title: qsTr("<b>Results options</b>")
-		columns: 2
-		Layout.columnSpan: 2
 	  CheckBox
 	  {
 	    name: "show_details";
@@ -167,15 +164,21 @@ Form
 	   }
 	}
 
+
   Section
   {
     title: qsTr("Figure Options")
-    Group
-    {
-    title: qsTr("Dimensions")
-    columns: 2
-    Layout.columnSpan: 2
-    IntegerField
+
+
+    GridLayout {
+      id: fgrid
+      columns: 3
+
+      Label {
+        text: qsTr("Dimensions")
+      }
+
+      IntegerField
       {
         name: "width"
         label: qsTr("Width")
@@ -193,28 +196,26 @@ Form
         max: 3000
       }
 
-    }
+      Label {
+        text: qsTr("<i>Y</i> axis")
+      }
 
-
-    Group
-    {
-    title: qsTr("<i>Y</i> axis")
-    columns: 2
-    Layout.columnSpan: 2
-
-    Group
-    {
-      Layout.columnSpan: 2
       TextField
       {
         name: "ylab"
         label: qsTr("Label")
         placeholderText: "auto"
       }
-    }
 
+      Label {
+        text: " "
+      }
 
-    IntegerField
+      Label {
+        text: " "
+      }
+
+      IntegerField
       {
         name: "axis.text.y"
         label: qsTr("Tick Font Size")
@@ -232,11 +233,16 @@ Form
         max: 80
       }
 
+      Label {
+        text: " "
+      }
+
     TextField
       {
         name: "ymin"
         label: qsTr("Min")
         placeholderText: "auto"
+        fieldWidth: 60
       }
 
     TextField
@@ -244,24 +250,28 @@ Form
         name: "ymax"
         label: qsTr("Max")
         placeholderText: "auto"
+        fieldWidth: 60
       }
 
-    TextField
+      Label {
+        text: " "
+      }
+
+      TextField
       {
         name: "n.breaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
+        fieldWidth: 60
       }
-    }
 
-    Group
-    {
-    title: qsTr("<i>X</i> axis")
-    columns: 2
-    Layout.columnSpan: 2
+      Label {
+        text: " "
+      }
 
-    Group {
-      Layout.columnSpan: 2
+      Label {
+        text: qsTr("<i>X</i> axis")
+      }
 
       TextField
       {
@@ -269,9 +279,16 @@ Form
         label: qsTr("Label")
         placeholderText: "auto"
       }
-    }
 
-    IntegerField
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+      IntegerField
       {
         name: "axis.text.x"
         label: qsTr("Tick Font Size")
@@ -288,15 +305,13 @@ Form
         min: 2
         max: 80
       }
-    }
 
-    Group
-    {
-    title: qsTr("Distributions")
-    columns: 2
-    Layout.columnSpan: 2
 
-    DoubleField
+      Label {
+        text: qsTr("Distributions")
+      }
+
+      DoubleField
       {
         name: "error_scale"
         label: qsTr("Width")
@@ -305,6 +320,13 @@ Form
         max: 5
       }
 
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
 
     Esci.ErrorLayout
       {
@@ -312,15 +334,15 @@ Form
         id: error_layout
       }
 
-    }
+      Label {
+        text: " "
+      }
 
-    Group
-    {
-    title: qsTr("Data")
-    columns: 2
-    Layout.columnSpan: 2
+      Label {
+        text: qsTr("Data")
+      }
 
-    Esci.DataLayout
+      Esci.DataLayout
       {
         name: "data_layout"
         id: data_layout
@@ -337,6 +359,11 @@ Form
         min: 0
         max: 5
       }
+
+      Label {
+        text: qsTr("Data")
+      }
+
 
     DoubleField
       {
@@ -437,6 +464,7 @@ Form
       Esci.AlphaSelect
       {
         name: "alpha_interval"
+        label: qsTr("Transparency")
       }
 
 
@@ -460,6 +488,7 @@ Form
       Esci.AlphaSelect
       {
         name: "alpha_error"
+        label: qsTr("Transparency")
       }
 
 
@@ -510,6 +539,7 @@ Form
       {
         name: "alpha_raw"
         enabled: from_raw.checked
+        label: qsTr("Transparency")
       }
 
 
@@ -528,7 +558,6 @@ Form
 
     Group
     {
-      columns: 2
       Layout.columnSpan: 2
 
       CheckBox
@@ -540,9 +569,9 @@ Form
 
     }
 
-    Group
-    {
-      columns: 2
+    GridLayout {
+      id: hgrid
+      columns: 3
 
       DoubleField
       {
@@ -571,10 +600,6 @@ Form
         visible: evaluate_hypotheses.checked
       }
 
-
-    }
-
-
       Esci.ColorSelect
       {
         name: "null_color"
@@ -584,6 +609,10 @@ Form
         visible: evaluate_hypotheses.checked
         id: null_color
       }
+
+
+    }
+
 
   }
 
