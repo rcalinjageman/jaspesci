@@ -15,7 +15,14 @@ jasp_meta_table_depends_on <- function() {
       "random_effects",
       "include_PIs",
       "switch",
-      "from_raw"
+      "from_raw",
+      "reference_means",
+      "reference_sds",
+      "reference_ns",
+      "comparison_means",
+      "comparison_sds",
+      "comparison_ns",
+      "assume_equal_variance"
     )
   )
 }

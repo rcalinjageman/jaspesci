@@ -41,5 +41,12 @@ Description
 		func:	"jasp_meta_mean"
 	}
 
+	Analysis
+	{
+		title:	qsTr("Difference in Means")
+		func:	"jasp_meta_mdiff_two"
+	}
+
+
 
 }

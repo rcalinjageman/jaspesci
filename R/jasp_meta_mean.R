@@ -46,10 +46,9 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
         dataset = dataset,
         type = c("observations", "variance", "infinity"),
         all.grouping = options$moderator,
-        all.target = c(
-          if (from_raw) c(options$means, options$sds) else options$ds,
-          options$ns
-        ),
+        all.target = if (from_raw) c(options$means, options$sds)
+          else c(options$means, options$ns)
+        ,
         observations.amount  = "< 2",
         exitAnalysisIfErrors = TRUE
       )
