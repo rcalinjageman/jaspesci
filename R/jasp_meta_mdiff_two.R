@@ -144,7 +144,8 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options = options,
       ready = ready,
-      estimate = estimate
+      estimate = estimate,
+      effect_size = "mdiff"
     )
 
     if (ready) jasp_table_fill(

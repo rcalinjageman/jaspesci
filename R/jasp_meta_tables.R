@@ -28,7 +28,7 @@ jasp_meta_table_depends_on <- function() {
 }
 
 # Prep an meta analysis raw_data table
-jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL) {
+jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL, effect_size = "mean") {
   from_raw <- options$switch == "from_raw"
   has_moderator <- options$moderator != ""
   has_estimate <- !is.null(estimate)
@@ -99,7 +99,7 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
         type = "number"
       )
 
-      if(from_raw & options$reported_effect_size != "mean difference") {
+      if(from_raw & options$reported_effect_size != "mean difference" & effect_size == "mean") {
         overviewTable$addColumnInfo(
           name = "mean",
           title = "<i>M</i>",
@@ -123,6 +123,70 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
           title = "<i>p</i>, two tailed",
           type = "pvalue"
         )
+      }
+
+      if (effect_size == "mdiff") {
+        if (from_raw) {
+          overviewTable$addColumnInfo(
+            name = "reference_mean",
+            title = "<i>M</i><sub>reference</sub>",
+            type = "number"
+          )
+
+          overviewTable$addColumnInfo(
+            name = "reference_sd",
+            title = "<i>s</i><sub>reference</sub>",
+            type = "number"
+          )
+
+        }
+
+        overviewTable$addColumnInfo(
+          name = "reference_n",
+          title = "<i>n</i><sub>reference</sub>",
+          type = "integer"
+        )
+
+        if (from_raw) {
+          overviewTable$addColumnInfo(
+            name = "comparison_mean",
+            title = "<i>M</i><sub>comparison</sub>",
+            type = "number"
+          )
+
+          overviewTable$addColumnInfo(
+            name = "comparison_sd",
+            title = "<i>s</i><sub>comparison</sub>",
+            type = "number"
+          )
+
+        }
+
+        overviewTable$addColumnInfo(
+          name = "comparison_n",
+          title = "<i>n</i><sub>comparison</sub>",
+          type = "integer"
+        )
+
+
+        overviewTable$addColumnInfo(
+          name = "r",
+          title = "<i>r</i>",
+          type = "number"
+        )
+
+        overviewTable$addColumnInfo(
+          name = "df",
+          title = "<i>df</i>",
+          type = "integer"
+        )
+
+        overviewTable$addColumnInfo(
+          name = "p",
+          title = "<i>p</i>, two tailed",
+          type = "pvalue"
+        )
+
       }
 
   }

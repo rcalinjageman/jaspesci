@@ -63,7 +63,7 @@ Form
   }
 
       	VariablesForm {
-      	  height: 40
+      	  height: 200
       		AvailableVariablesList {
       		  name: "allVariablesList"
       		}
@@ -132,6 +132,33 @@ Form
       		  singleVariable: true
       		}
       	}
+
+
+  Label {
+        text: qsTr(" ")
+      }
+
+  Label {
+        text: qsTr(" ")
+      }
+
+  Label {
+        text: qsTr(" ")
+      }
+
+  Label {
+        text: qsTr(" ")
+      }
+
+  Label {
+        text: qsTr(" ")
+      }
+
+  Label {
+        text: qsTr(" ")
+      }
+
+
 
 
 	Group {
@@ -206,11 +233,15 @@ Form
   Section
   {
     title: qsTr("Figure Options")
-    Group
-    {
-    title: qsTr("Dimensions")
-    columns: 2
-    Layout.rowSpan: 1
+
+     GridLayout {
+      id: fgrid
+      columns: 3
+
+     Label {
+        text: qsTr("Dimensions")
+      }
+
     IntegerField
       {
         name: "width"
@@ -229,18 +260,9 @@ Form
         max: 3000
       }
 
-    }
-
-
-    Group
-    {
-    title: qsTr("<i>Y</i> axis")
-    columns: 2
-    Layout.columnSpan: 2
-
-    Group
-    {
-      Layout.columnSpan: 2
+     Label {
+        text: qsTr("<i>Y</i> axis")
+      }
 
       DoubleField
       {
@@ -256,9 +278,11 @@ Form
   	    label: qsTr("Include CIs")
   	  }
 
-    }
+  	  Label {
+        text: " "
+      }
 
-    IntegerField
+  	   IntegerField
       {
         name: "axis.text.y"
         label: qsTr("Tick Font Size")
@@ -267,24 +291,31 @@ Form
         max: 80
       }
 
+      Label {
+        text: " "
+      }
 
-    Group
-    {
-      title: qsTr("<i>X</i> axis")
-      columns: 2
-      Layout.columnSpan: 2
 
-    Group {
-      Layout.columnSpan: 2
+       Label {
+        text: qsTr("<i>X</i> axis")
+      }
 
       TextField {
         name: "xlab"
         label: qsTr("Label")
         placeholderText: "auto"
       }
-    }
 
-    IntegerField {
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+
+      IntegerField {
         name: "axis.text.x"
         label: qsTr("Tick Font Size")
         defaultValue: 14
@@ -300,6 +331,11 @@ Form
         max: 80
     }
 
+     Label {
+        text: " "
+      }
+
+
     TextField {
         name: "xmin"
         label: qsTr("Min")
@@ -312,26 +348,25 @@ Form
         placeholderText: "auto"
     }
 
-    TextField {
+     Label {
+        text: " "
+      }
+
+      TextField {
         name: "xbreaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
       }
-    }
 
-  	CheckBox {
+      CheckBox {
   	    name: "mark_zero";
   	    label: qsTr("Mark zero")
   	    checked: true
   	}
 
-    }
-
-
-    Group {
-      title: qsTr("Difference axis")
-      columns: 2
-      Layout.columnSpan: 2
+  	      Label {
+        text: qsTr("Difference axis")
+      }
 
 
       TextField {
@@ -341,7 +376,16 @@ Form
         enabled: moderator.count > 0
       }
 
-      TextField {
+           Label {
+        text: " "
+      }
+
+           Label {
+        text: " "
+      }
+
+
+    TextField {
         name: "dmin"
         label: qsTr("Min")
         placeholderText: "auto"
@@ -355,22 +399,26 @@ Form
         enabled: moderator.count > 0
       }
 
-      TextField {
+      Label {
+        text: " "
+      }
+
+       TextField {
         name: "dbreaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
         enabled: moderator.count > 0
       }
 
-    }
+            Label {
+        text: " "
+      }
 
+      Label {
+        text: qsTr("Sample-size scaling")
+      }
 
-    Group {
-      title: qsTr("Sample-size scaling")
-      columns: 2
-      Layout.columnSpan: 2
-
-      DoubleField {
+       DoubleField {
         name: "size_base"
         label: qsTr("Minimum")
         defaultValue: 2
@@ -385,6 +433,7 @@ Form
         min: 1
         max: 5
       }
+
 
     }
 
