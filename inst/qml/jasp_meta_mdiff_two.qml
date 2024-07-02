@@ -197,7 +197,7 @@ Form
 
     DropDown {
         name: "random_effects"
-        label: qsTr("Effect size of interest")
+        label: qsTr("Model")
         startValue: 'random_effects'
         values:
           [

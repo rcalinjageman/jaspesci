@@ -1,16 +1,16 @@
-jasp_meta_proportion <- function(jaspResults, dataset = NULL, options, ...) {
+jasp_meta_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
   # Handles
   has_moderator <- options$moderator != ""
 
   # Check if ready
-  ready <- options$cases != "" & options$ns != ""
+  ready <- options$reference_cases != "" & options$reference_ns != "" & options$comparison_cases != "" & options$comparison_ns != ""
 
 
   if (ready) {
 
     # read dataset
-    dataset <- jasp_meta_proportion_read_data(dataset, options)
+    dataset <- jasp_meta_pdiff_two_read_data(dataset, options)
 
 
     # check for errors
@@ -53,13 +53,19 @@ jasp_meta_proportion <- function(jaspResults, dataset = NULL, options, ...) {
 
     args <- list()
 
-    call <- esci::meta_proportion
+    call <- esci::meta_pdiff_two
 
     args$data <- dataset
     args$effect_label <- jasp_text_fix(options, "effect_label", "My effect")
     args$conf_level <- self$options$conf_level
-    args$cases <- self$options$cases
-    args$ns <- self$options$ns
+    args$reference_cases <- self$options$reference_cases
+    args$reference_ns <- self$options$reference_ns
+    args$comparison_cases <- self$options$comparison_cases
+    args$comparison_ns <- self$options$comparison_ns
+
+    args$reported_effect_size <- self$options$reported_effect_size
+    args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
+
 
     if (self$options$moderator != "") {
       args$moderator <- self$options$moderator
@@ -69,9 +75,17 @@ jasp_meta_proportion <- function(jaspResults, dataset = NULL, options, ...) {
       args$labels <- self$options$labels
     }
 
-    args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
+
+    # debugtext <- createJaspHtml(text = paste(dataset, collapse = "<BR>"))
+    # debugtext$dependOn(jasp_meta_table_depends_on())
+    # jaspResults[["debugtext"]] <- debugtext
 
     estimate <- try(do.call(what = call, args = args))
+
+    # add pref and pcomp to raw data, should be moved to esci
+    estimate$raw_data$reference_P <- estimate$raw_data$reference_cases / estimate$raw_data$reference_N
+    estimate$raw_data$comparison_P <- estimate$raw_data$comparison_cases / estimate$raw_data$comparison_N
+
 
     # Seems to be some encoding issue with presenting factors in JASP
     estimate$raw_data$label <- as.character(estimate$raw_data$label)
@@ -93,7 +107,7 @@ jasp_meta_proportion <- function(jaspResults, dataset = NULL, options, ...) {
       options = options,
       ready = ready,
       estimate = estimate,
-      effect_size = "proportion"
+      effect_size = "pdiff"
     )
 
     if (ready) jasp_table_fill(
@@ -209,13 +223,18 @@ jasp_meta_proportion <- function(jaspResults, dataset = NULL, options, ...) {
 
 
 
-jasp_meta_proportion_read_data <- function(dataset, options) {
+jasp_meta_pdiff_two_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
   else {
 
     args <- list()
-    args$columns.as.numeric = c(options$cases, options$ns)
+    args$columns.as.numeric = c(
+      options$reference_cases,
+      options$reference_ns,
+      options$comparison_cases,
+      options$comparison_ns
+    )
 
     args$columns.as.factor <- NULL
 

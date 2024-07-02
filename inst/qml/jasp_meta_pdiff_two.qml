@@ -27,39 +27,6 @@ Form
 	id: form
 	property int framework:	Common.Type.Framework.Classical
 
-	function dlab() {
-    if (from_raw.checked) {
-      means.label = "Means"
-    } else {
-      means.label = "Cohen's <i>d</i>, unbiased"
-    }
-  }
-
-
-  RadioButtonGroup {
-    columns: 2
-    name: "switch"
-    id: switch_source
-
-    RadioButton {
-      value: "from_raw";
-      label: qsTr("Analyze original units");
-      checked: true;
-      id: from_raw
-      onClicked: {
-         dlab()
-      }
-    }
-
-    RadioButton {
-      value: "from_d";
-      label: qsTr("Analyze Cohen's <i>d</i>");
-      id: from_d
-      onClicked: {
-         dlab()
-      }
-    }
-  }
 
       	VariablesForm {
       	  height: 40
@@ -67,23 +34,28 @@ Form
       		  name: "allVariablesList"
       		}
       		AssignedVariablesList {
-      		  name: "means";
-      		  id: means
-      		  label: qsTr("Means");
+      		  name: "reference_cases";
+      		  id: reference_cases
+      		  label: qsTr("Case counts in reference group");
       		  suggestedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
-      		  name: "sds";
-      		  title: qsTr("Standard deviations");
+      		  name: "reference_ns";
+      		  title: qsTr("Sample sizes in reference group");
       		  suggestedColumns: ["scale"];
       		  singleVariable: true
-      		  enabled: from_raw.checked
-      		  visible: from_raw.checked
       		}
       		AssignedVariablesList {
-      		  name: "ns";
-      		  title: qsTr("Sample sizes");
+      		  name: "comparison_cases";
+      		  id: comparison_cases
+      		  label: qsTr("Case counts in comparison group");
+      		  suggestedColumns: ["scale"];
+      		  singleVariable: true
+      		}
+      		AssignedVariablesList {
+      		  name: "comparison_ns";
+      		  title: qsTr("Sample sizes in comparison group");
       		  suggestedColumns: ["scale"];
       		  singleVariable: true
       		}
@@ -119,25 +91,21 @@ Form
         placeholderText: "My effect"
     }
 
-    TextField {
-        name: "reference_mean"
-        label: qsTr("Compare to reference value")
-        afterLabel: "(blank for none)"
-        enabled: from_raw.checked
-    }
-
-		DropDown {
+    DropDown {
         name: "reported_effect_size"
-        label: qsTr("Effect size of interest")
-        startValue: 'mean_difference'
-        enabled: from_raw.checked
+        label: qsTr("Effect size")
+        startValue: 'RD'
         values:
           [
-            { label: "Original units", value: "mean_difference"},
-            { label: "Standardized mean difference", value: "smd_unbiased"}
+            { label: "Risk difference (<i>P</i><sub>diff</sub>)", value: "RD"},
+            { label: "Log risk ratio (ln(<i>RR</i>))", value: "RR"},
+            { label: "Log odds ratio (ln(<i>OR</i>))", value: "AS"},
+            { label: "Arcsine-square-root-transformed risk difference (1/2 * Cohen's H)", value: "AS"},
+            { label: "Log odds ratio, Peto's method (ln(<i>OR</i>)<sub>Peto</sub>)", value: "PETO"}
           ]
-        id: effect_size
+        id: reported_effect_size
     }
+
 
     DropDown {
         name: "random_effects"
@@ -146,8 +114,7 @@ Form
         values:
           [
             { label: "Random effects (RE)", value: "random_effects"},
-            { label: "Fixed effect (FE)", value: "fixed_effects"},
-            { label: "Compare fixed and random effects", value: "compare"}
+            { label: "Fixed effect (FE)", value: "fixed_effects"}
           ]
         id: random_effects
     }

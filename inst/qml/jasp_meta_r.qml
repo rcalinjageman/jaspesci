@@ -81,13 +81,12 @@ Form
 
     DropDown {
         name: "random_effects"
-        label: qsTr("Effect size of interest")
+        label: qsTr("Model")
         startValue: 'random_effects'
         values:
           [
             { label: "Random effects (RE)", value: "random_effects"},
-            { label: "Fixed effect (FE)", value: "fixed_effects"},
-            { label: "Compare fixed and random effects", value: "compare"}
+            { label: "Fixed effect (FE)", value: "fixed_effects"}
           ]
         id: random_effects
     }

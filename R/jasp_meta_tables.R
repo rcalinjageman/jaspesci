@@ -147,20 +147,85 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
   }  # end show details for r
 
 
-  if (options$show_details & effect_size %in% c("mdiff", "mean")) {
+  if (options$show_details & effect_size %in% c("mdiff", "mean", "proportion", "pdiff")) {
+    plus_sub <- if (effect_size == "pdiff") "<sub>proportion</sub" else ""
+
     overviewTable$addColumnInfo(
       name = "SE",
-      title = "<i>SE</i>",
+      title = paste("<i>SE</i>", plus_sub, sep = ""),
       type = "number"
     )
 
     overviewTable$addColumnInfo(
       name = "sample_variance",
-      title = "<i>SE</i><sup>2</sup>",
+      title = paste("<i>SE</i><sup>2</sup>",plus_sub, sep = ""),
       type = "number"
     )
 
   }  # end show details common to mdiff and mean
+
+
+  if (options$show_details & effect_size %in% c("proportion")) {
+    overviewTable$addColumnInfo(
+      name = "cases",
+      title = "Cases",
+      type = "integer"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "N",
+      title = "<i>N</i>",
+      type = "integer"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "P_adjusted",
+      title = "<i>P</i><sub>adjusted</sub>",
+      type = "number"
+    )
+
+  }  # end show details for proportion
+
+
+  if (options$show_details & effect_size %in% c("pdiff")) {
+    overviewTable$addColumnInfo(
+      name = "reference_P",
+      title = "<i>P</i><sub>reference</sub>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "reference_cases",
+      title = "Cases<sub>reference</sub>",
+      type = "integer"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "reference_N",
+      title = "<i>N</i><sub>reference</sub>",
+      type = "integer"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "comparison_P",
+      title = "<i>P</i><sub>comparison</sub>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "comparison_cases",
+      title = "Cases<sub>comparison</sub>",
+      type = "integer"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "comparison_N",
+      title = "<i>N</i><sub>comparison</sub>",
+      type = "integer"
+    )
+
+
+  }  # end show details for pdiff
 
 
   if (options$show_details & from_raw & reported_effect_size != "mean difference" & effect_size == "mean") {

@@ -59,4 +59,10 @@ Description
 		func:	"jasp_meta_proportion"
 	}
 
+		Analysis
+	{
+		title:	qsTr("Difference in Proportions")
+		func:	"jasp_meta_pdiff_two"
+	}
+
 }
