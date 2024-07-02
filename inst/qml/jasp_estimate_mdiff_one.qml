@@ -18,7 +18,6 @@
 
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Dialogs
 import JASP
 import JASP.Controls
 import "./esci" as Esci

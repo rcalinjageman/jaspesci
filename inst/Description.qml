@@ -47,6 +47,16 @@ Description
 		func:	"jasp_meta_mdiff_two"
 	}
 
+	Analysis
+	{
+		title:	qsTr("Correlations")
+		func:	"jasp_meta_r"
+	}
 
+	Analysis
+	{
+		title:	qsTr("Proportions")
+		func:	"jasp_meta_proportion"
+	}
 
 }

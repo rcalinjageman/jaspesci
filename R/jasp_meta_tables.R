@@ -29,7 +29,16 @@ jasp_meta_table_depends_on <- function() {
 
 # Prep an meta analysis raw_data table
 jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL, effect_size = "mean") {
-  from_raw <- options$switch == "from_raw"
+  from_raw <- FALSE
+  if (!is.null(options$switch)) {
+    from_raw <- options$switch == "from_raw"
+  }
+
+  reported_effect_size <- ""
+  if (!is.null(options$reported_effect_size)) {
+      reported_effect_size <- options$reported_effect_size
+  }
+
   has_moderator <- options$moderator != ""
   has_estimate <- !is.null(estimate)
 
@@ -77,9 +86,17 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
     overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
+  if (effect_size == "r") {
+    overviewTable$addColumnInfo(
+      name = "N",
+      title = "<i>N</i>",
+      type = "integer"
+    )
+
+  }
+
   if (options$show_details) {
       w_title <- if (options$random_effects == "fixed_effects") "FE weight" else "RE weight"
-
 
       overviewTable$addColumnInfo(
         name = "weight",
@@ -87,109 +104,155 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
         type = "number"
       )
 
-      overviewTable$addColumnInfo(
-        name = "SE",
-        title = "<i>SE</i>",
-        type = "number"
-      )
+  } # end show details for all effect sizes
 
-      overviewTable$addColumnInfo(
-        name = "sample_variance",
-        title = "<i>SE</i><sup>2</sup>",
-        type = "number"
-      )
 
-      if(from_raw & options$reported_effect_size != "mean difference" & effect_size == "mean") {
-        overviewTable$addColumnInfo(
-          name = "mean",
-          title = "<i>M</i>",
-          type = "number"
-        )
+  if (options$show_details & effect_size == "r") {
+    overviewTable$addColumnInfo(
+      name = "z",
+      title = "<i>Z</i><sub><i>r</i></sub>",
+      type = "number"
+    )
 
-        overviewTable$addColumnInfo(
-          name = "sd",
-          title = "<i>s</i>",
-          type = "number"
-        )
+    overviewTable$addColumnInfo(
+      name = "SE",
+      title = "<i>SE</i><sub><i>Z</i></sub>",
+      type = "number"
+    )
 
-        overviewTable$addColumnInfo(
-          name = "n",
-          title = "<i>N</i>",
-          type = "integer"
-        )
+    overviewTable$addColumnInfo(
+      name = "sample_variance",
+      title = "<i>SE</i><sup>2</sup><sub><i>Z</i></sub>",
+      type = "number"
+    )
 
-        overviewTable$addColumnInfo(
-          name = "p",
-          title = "<i>p</i>, two tailed",
-          type = "pvalue"
-        )
-      }
+    overviewTable$addColumnInfo(
+      name = "t",
+      title = "<i>t</i>",
+      type = "number"
+    )
 
-      if (effect_size == "mdiff") {
-        if (from_raw) {
+    overviewTable$addColumnInfo(
+      name = "df",
+      title = "<i>df</i>",
+      type = "integer"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "p",
+      title = "<i>p</i>, two tailed",
+      type = "pvalue"
+    )
+
+  }  # end show details for r
+
+
+  if (options$show_details & effect_size %in% c("mdiff", "mean")) {
+    overviewTable$addColumnInfo(
+      name = "SE",
+      title = "<i>SE</i>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "sample_variance",
+      title = "<i>SE</i><sup>2</sup>",
+      type = "number"
+    )
+
+  }  # end show details common to mdiff and mean
+
+
+  if (options$show_details & from_raw & reported_effect_size != "mean difference" & effect_size == "mean") {
           overviewTable$addColumnInfo(
-            name = "reference_mean",
-            title = "<i>M</i><sub>reference</sub>",
+            name = "mean",
+            title = "<i>M</i>",
             type = "number"
           )
 
           overviewTable$addColumnInfo(
-            name = "reference_sd",
-            title = "<i>s</i><sub>reference</sub>",
-            type = "number"
-          )
-
-        }
-
-        overviewTable$addColumnInfo(
-          name = "reference_n",
-          title = "<i>n</i><sub>reference</sub>",
-          type = "integer"
-        )
-
-        if (from_raw) {
-          overviewTable$addColumnInfo(
-            name = "comparison_mean",
-            title = "<i>M</i><sub>comparison</sub>",
+            name = "sd",
+            title = "<i>s</i>",
             type = "number"
           )
 
           overviewTable$addColumnInfo(
-            name = "comparison_sd",
-            title = "<i>s</i><sub>comparison</sub>",
+            name = "n",
+            title = "<i>N</i>",
+            type = "integer"
+          )
+
+          overviewTable$addColumnInfo(
+            name = "p",
+            title = "<i>p</i>, two tailed",
+            type = "pvalue"
+          )
+   } # end show details for mean when from raw and d reported
+
+   if (options$show_details & effect_size == "mdiff") {
+          if (from_raw) {
+            overviewTable$addColumnInfo(
+              name = "reference_mean",
+              title = "<i>M</i><sub>reference</sub>",
+              type = "number"
+            )
+
+            overviewTable$addColumnInfo(
+              name = "reference_sd",
+              title = "<i>s</i><sub>reference</sub>",
+              type = "number"
+            )
+
+          }
+
+          overviewTable$addColumnInfo(
+            name = "reference_n",
+            title = "<i>n</i><sub>reference</sub>",
+            type = "integer"
+          )
+
+          if (from_raw) {
+            overviewTable$addColumnInfo(
+              name = "comparison_mean",
+              title = "<i>M</i><sub>comparison</sub>",
+              type = "number"
+            )
+
+            overviewTable$addColumnInfo(
+              name = "comparison_sd",
+              title = "<i>s</i><sub>comparison</sub>",
+              type = "number"
+            )
+
+          }
+
+          overviewTable$addColumnInfo(
+            name = "comparison_n",
+            title = "<i>n</i><sub>comparison</sub>",
+            type = "integer"
+          )
+
+
+          overviewTable$addColumnInfo(
+            name = "r",
+            title = "<i>r</i>",
             type = "number"
           )
 
-        }
+          overviewTable$addColumnInfo(
+            name = "df",
+            title = "<i>df</i>",
+            type = "integer"
+          )
 
-        overviewTable$addColumnInfo(
-          name = "comparison_n",
-          title = "<i>n</i><sub>comparison</sub>",
-          type = "integer"
-        )
+          overviewTable$addColumnInfo(
+            name = "p",
+            title = "<i>p</i>, two tailed",
+            type = "pvalue"
+          )
 
+  }  # end show details for mdiff
 
-        overviewTable$addColumnInfo(
-          name = "r",
-          title = "<i>r</i>",
-          type = "number"
-        )
-
-        overviewTable$addColumnInfo(
-          name = "df",
-          title = "<i>df</i>",
-          type = "integer"
-        )
-
-        overviewTable$addColumnInfo(
-          name = "p",
-          title = "<i>p</i>, two tailed",
-          type = "pvalue"
-        )
-
-      }
-
-  }
 
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE

@@ -1,46 +1,40 @@
-jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
+jasp_meta_proportion <- function(jaspResults, dataset = NULL, options, ...) {
+
+  return()
 
   # Handles
-  from_raw <- options$switch == "from_raw"
   has_moderator <- options$moderator != ""
 
   # Check if ready
-  if (from_raw) {
-    ready <- options$reference_means != "" &
-      options$reference_sds != "" &
-      options$reference_ns != "" &
-      options$comparison_means != "" &
-      options$comparison_sds != "" &
-      options$comparison_ns != ""
-  } else {
-    ready <- options$reference_means != "" &
-      options$reference_ns != "" &
-      options$comparison_ns != ""
-  }
+  ready <- options$rs != "" & options$ns != ""
+
 
   if (ready) {
 
     # read dataset
-    dataset <- jasp_meta_mdiff_two_read_data(dataset, options)
+    dataset <- jasp_meta_r_read_data(dataset, options)
 
 
     # check for errors
-    # ns are positive; if from_raw sds should all be positive, too
+    # ns are positive;
     .hasErrors(
       dataset = dataset,
       type = c("observations", "variance", "infinity", "negativeValues"),
-      all.target = if (from_raw) c(
-        options$reference_sds,
-        options$reference_ns,
-        options$comparison_sds,
-        options$comparison_ns
-      ) else c(
-        options$comparison_ns,
-        options$reference_ns
-      ),
+      all.target = c(options$ns),
       observations.amount  = "< 2",
       exitAnalysisIfErrors = TRUE
     )
+
+    # rs are in range;
+    .hasErrors(
+      dataset = dataset,
+      type = c("limits"),
+      target = c(options$rs),
+      min = -1,
+      max = 1,
+      exitAnalysisIfErrors = TRUE
+    )
+
 
     if (options$moderator != "") {
 
@@ -58,18 +52,7 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         dataset = dataset,
         type = c("observations", "variance", "infinity"),
         all.grouping = options$moderator,
-        all.target = if (from_raw) c(
-            options$comparison_means,
-            options$comparison_sds,
-            options$comparison_ns,
-            options$reference_means,
-            options$reference_sds,
-            options$reference_ns
-          ) else c(
-          options$reference_means,
-          options$reference_ns,
-          options$comparison_ns
-         ),
+        all.target = c(options$rs, options$ns),
         observations.amount  = "< 2",
         exitAnalysisIfErrors = TRUE
       )
@@ -83,33 +66,13 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
     args <- list()
 
-    call <- if (from_raw) esci::meta_mdiff_two else esci::meta_d2
+    call <- esci::meta_r
 
     args$data <- dataset
     args$effect_label <- jasp_text_fix(options, "effect_label", "My effect")
     args$conf_level <- self$options$conf_level
-    args$assume_equal_variance <- self$options$assume_equal_variance
-
-    if (from_raw) {
-      args$reference_means <- self$options$reference_means
-      args$reference_sds <- self$options$reference_sds
-      args$reference_ns <- self$options$reference_ns
-      args$comparison_means <- self$options$comparison_means
-      args$comparison_sds <- self$options$comparison_sds
-      args$comparison_ns <- self$options$comparison_ns
-      args$reported_effect_size <- self$options$reported_effect_size
-
-
-
-    } else {
-      args$ds <- self$options$reference_means
-      args$reference_ns <- self$options$reference_ns
-      args$comparison_ns <- self$options$comparison_ns
-    }
-
-    if (options$r != "") {
-      args$r <- self$options$r
-    }
+    args$rs <- self$options$rs
+    args$ns <- self$options$ns
 
     if (self$options$moderator != "") {
       args$moderator <- self$options$moderator
@@ -130,13 +93,11 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     # Fix notes, also need to move to within esci
     estimate <- jasp_meta_notes(options, estimate)
 
+
+
   } else {
     estimate <- NULL
   }
-
-  # debugtext <- createJaspHtml(text = paste(estimate$raw_data, collapse = "<BR>"))
-  # debugtext$dependOn(jasp_meta_table_depends_on())
-  # jaspResults[["debugtext"]] <- debugtext
 
   # Define and fill the raw_data
   if (is.null(jaspResults[["meta_raw_dataTable"]])) {
@@ -145,7 +106,7 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       options = options,
       ready = ready,
       estimate = estimate,
-      effect_size = "mdiff"
+      effect_size = "r"
     )
 
     if (ready) jasp_table_fill(
@@ -172,6 +133,8 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       "es_meta"
     )
   }
+
+
 
   # Define and fill the es_heterogeneityTable table
   if (is.null(jaspResults[["es_heterogeneityTable"]])) {
@@ -259,33 +222,13 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
 
 
-jasp_meta_mdiff_two_read_data <- function(dataset, options) {
+jasp_meta_proportion_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
   else {
 
-    from_raw <- options$switch == "from_raw"
-
     args <- list()
-    if (from_raw) {
-      args$columns.as.numeric = c(
-        options$reference_means,
-        options$reference_sds,
-        options$reference_ns,
-        options$comparison_means,
-        options$comparison_sds,
-        options$comparison_ns,
-        if (options$r != "") options$r else NULL
-      )
-    } else {
-      args$columns.as.numeric = c(
-        options$reference_means,
-        options$reference_ns,
-        options$comparison_ns,
-        if (options$r != "") options$r else NULL
-      )
-    }
-
+    args$columns.as.numeric = c(options$rs, options$ns)
 
     args$columns.as.factor <- NULL
 
@@ -302,5 +245,3 @@ jasp_meta_mdiff_two_read_data <- function(dataset, options) {
     )
   }
 }
-
-
