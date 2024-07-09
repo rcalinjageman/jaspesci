@@ -419,7 +419,7 @@ jasp_forest_plot_decorate <- function(myplot, options, xlab_replace = "My Effect
   }
 
   if (!(options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
-    xlab_replace <- myplot + ggplot2::xlab(options$xlab)
+    xlab_replace <- options$xlab
   }
 
 
