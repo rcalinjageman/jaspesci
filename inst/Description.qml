@@ -3,15 +3,15 @@ import JASP.Module	1.0
 
 Description
 {
-	name		: "jaspesci"
-	title		: qsTr("esci")
+	name		    : "jaspesci"
+	title		    : qsTr("esci")
 	description	: qsTr("esci in JASP")
-	version		: "0.1"
-	author		: "Robert Calin-Jageman"
+	version		  : "0.1"
+	author		  : "Robert Calin-Jageman"
 	maintainer	: "Robert Calin-Jageman <rcalinjageman@dom.edu>"
-	website		: "https://thenewstatistics.com/"
-	icon		: "esci_logo.svg"
-	license		: "GPL (>= 2)"
+	website		  : "https://thenewstatistics.com/"
+	icon		    : "esci_logo.svg"
+	license		  : "GPL (>= 2)"
 
 	GroupTitle
 	{
@@ -20,13 +20,15 @@ Description
 
 	Analysis
 	{
-		title:	qsTr("Single Group")
+		title:	qsTr("esci Means and Medians: Single Group")
+		menu:	qsTr("Single Group")
 		func:	"jasp_estimate_mdiff_one"
 	}
 
 	Analysis
 	{
-		title:	qsTr("Two Groups")
+		title:	qsTr("esci Means and Medians: Two Groups")
+		menu:	qsTr("Two Groups")
 		func:	"jasp_estimate_mdiff_two"
 	}
 
@@ -37,31 +39,36 @@ Description
 
 	Analysis
 	{
-		title:	qsTr("Means")
+		title:	qsTr("esci Meta-Analysis: Means")
+		menu:	qsTr("Means")
 		func:	"jasp_meta_mean"
 	}
 
 	Analysis
 	{
-		title:	qsTr("Difference in Means")
+		title:	qsTr("esci Meta-Analysis: Difference in Means")
+		menu:	qsTr("Difference in Means")
 		func:	"jasp_meta_mdiff_two"
 	}
 
 	Analysis
 	{
-		title:	qsTr("Correlations")
+		title:	qsTr("esci Meta-Analysis: Correlations")
+		menu:	qsTr("Correlations")
 		func:	"jasp_meta_r"
 	}
 
 	Analysis
 	{
-		title:	qsTr("Proportions")
+		title:	qsTr("esci Meta-Analysis: Proportions")
+		menu:	qsTr("Proportions")
 		func:	"jasp_meta_proportion"
 	}
 
 		Analysis
 	{
-		title:	qsTr("Difference in Proportions")
+	  title: qsTr("esci Meta-Anlaysis: Difference in Proportions")
+		menu:	qsTr("Difference in Proportions")
 		func:	"jasp_meta_pdiff_two"
 	}
 
