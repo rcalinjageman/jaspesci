@@ -1,6 +1,7 @@
 import(jaspBase)
 export(jasp_estimate_mdiff_one)
 export(jasp_estimate_mdiff_two)
+export(jasp_estimate_pdiff_one)
 export(jasp_meta_mean)
 export(jasp_meta_mdiff_two)
 export(jasp_meta_r)

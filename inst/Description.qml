@@ -34,6 +34,53 @@ Description
 
 	GroupTitle
 	{
+		title:	qsTr("Correlations")
+	}
+
+	Analysis
+	{
+		title:	qsTr("esci Correlations: Single Group")
+		menu:	qsTr("Single Group")
+		func:	"jasp_estimate_r"
+	}
+
+	Analysis
+	{
+		title:	qsTr("esci Correlations: Two Groups")
+		menu:	qsTr("Two Groups")
+		func:	"jasp_estimate_rdiff_two"
+	}
+
+
+	GroupTitle
+	{
+		title:	qsTr("Proportions")
+	}
+
+	Analysis
+	{
+		title:	qsTr("esci Proportions: Single Group")
+		menu:	qsTr("Single Group")
+		func:	"jasp_estimate_pdiff_one"
+	}
+
+	Analysis
+	{
+		title:	qsTr("esci Proportions: Two Groups")
+		menu:	qsTr("Two Groups")
+		func:	"jasp_estimate_pdiff_two"
+	}
+
+	Analysis
+	{
+		title:	qsTr("esci Proportions: Paired")
+		menu:	qsTr("Paired")
+		func:	"jasp_estimate_pdiff_paired"
+	}
+
+
+	GroupTitle
+	{
 		title:	qsTr("Meta-Analysis")
 	}
 
