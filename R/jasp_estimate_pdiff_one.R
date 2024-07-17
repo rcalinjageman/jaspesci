@@ -37,55 +37,48 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
   # Run the analysis
   if (ready) {
+    call <- esci::estimate_pdiff_one
+    args <- list()
+
+
     null_value <- 0
     if (options$evaluate_hypotheses) null_value <- options$null_value
     if (is.null(null_value)) null_value <- 0
 
+    args$conf_level <- options$conf_level
+    args$reference_p <- null_value
+    args$count_NA <- options$count_NA
+
     if (from_raw) {
-      estimate <- esci::estimate_pdiff_one(
-        data = dataset,
-        outcome_variable = encodeColNames(options$outcome_variable),
-        reference_p = null_value,
-        conf_level = options$conf_level,
-        count_NA = options$count_NA
-      )
-
+      args$data <- dataset
+      args$outcome_variable <- encodeColNames(options$outcome_variable)
     } else {
-
       outcome_variable_name <- "Outcome variable"
       if (!is.null(options$outcome_variable_name)) {
         if (!(options$outcome_variable_name %in% c("auto", "Auto", "AUTO", ""))) {
           outcome_variable_name <- options$outcome_variable_name
         }
       }
-
-      mysum <- options$cases + options$not_cases
-
-      estimate <- esci::estimate_mdiff_one(
-        comparison_cases = options$cases,
-        comparison_n = mysum,
-#        case_label = c(options$case_label, options$not_case_label),
-        outcome_variable_name = outcome_variable_name,
-        reference_p = null_value,
-        conf_level = options$conf_level
-      )
-
+      args$comparison_n <- options$comparison_cases + options$not_cases
+      args$case_label <- options$case_label
+      args$outcome_variable_name <- outcome_variable_name
     }
 
+    estimate <- try(do.call(what = call, args = args))
 
-    debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
-    debugtext$dependOn(c("outcome_variable", "count_NA"))
-    jaspResults[["debugtext"]] <- debugtext
+
+    # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
+    # debugtext$dependOn(c("outcome_variable", "count_NA"))
+    # jaspResults[["debugtext"]] <- debugtext
 
 
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
-      mytest <- jasp_test_mdiff(
+      options$effect_size <- "pdiff"
+      mytest <- jasp_test_pdiff(
         options,
         estimate
       )
     }
-
-
   }
 
 
@@ -108,11 +101,8 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     }
   }
 
-  return()
 
-
-
-  # Hypothesis evaluation table and smd table
+  # Hypothesis evaluation table and pdiff table
   if(evaluate_h & is.null(jaspResults[["heTable"]])) {
     jasp_he_prep(
       jaspResults,
@@ -126,25 +116,9 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       mytest,
       "to_fill"
     )
-
   }
 
-  # Smd table
-  if(evaluate_h & options$effect_size == "mean" & is.null(jaspResults[["smdTable"]])) {
-    jasp_smd_prep(
-      jaspResults,
-      options,
-      ready,
-      estimate
-    )
-
-    if (ready) jasp_table_fill(
-      jaspResults[["smdTable"]],
-      estimate,
-      "es_smd"
-    )
-
-  }
+  return()
 
 
   # Figure

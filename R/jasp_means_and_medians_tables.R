@@ -439,6 +439,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   # Handles
   is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference")) TRUE else FALSE
   is_mean <- if (options$effect_size %in% c("mean_difference", "mean")) TRUE else FALSE
+  is_pdiff <- if (options$effect_size %in% c("pdiff")) TRUE else FALSE
   is_interval <- if (options$null_boundary > 0) TRUE else FALSE
   from_raw <- options$switch == "from_raw"
 
@@ -449,6 +450,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   overviewTable$dependOn(
     c(
       jasp_mdiff_table_depends_on(),
+      jasp_pdiff_table_depends_on(),
       "null_value",
       "null_boundary",
       "rope_units",
@@ -508,7 +510,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
     )
   }
 
-  if (is_mean & !is_interval) {
+  if ( (is_mean)  & !is_interval) {
     overviewTable$addColumnInfo(
       name = "t",
       title = "<i>t</i>",
@@ -528,11 +530,27 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
     )
 
   } else {
-    overviewTable$addColumnInfo(
-      name = "p_result",
-      title = "<i>p</i>, two tailed",
-      type = "pvalue"
-    )
+
+    if (is_pdiff & ! is_interval) {
+      overviewTable$addColumnInfo(
+        name = "t",
+        title = "<i>z</i>",
+        type = "number"
+      )
+
+      overviewTable$addColumnInfo(
+        name = "p",
+        title = "<i>p</i>, two tailed",
+        type = "pvalue"
+      )
+
+    } else {
+      overviewTable$addColumnInfo(
+        name = "p_result",
+        title = "<i>p</i>, two tailed",
+        type = "pvalue"
+      )
+    }
   }
 
   if (!is_interval) {

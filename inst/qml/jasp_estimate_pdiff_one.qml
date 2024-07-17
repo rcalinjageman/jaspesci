@@ -32,7 +32,7 @@ Form
   }
 
   function not_case_label_adjust() {
-    not_case_label.text = "Not " + case_label.text
+    not_case_label.displayText = "Not " + case_label.displayText
   }
 
 

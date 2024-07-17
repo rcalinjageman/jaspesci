@@ -10,7 +10,8 @@ jasp_pdiff_table_depends_on <- function() {
       "not_cases",
       "case_label",
       "not_case_label",
-      "outcome_variable_name"
+      "outcome_variable_name",
+      "count_NA"
     )
   )
 }
@@ -263,9 +264,6 @@ jasp_phe_prep <- function(jaspResults, options, ready, mytest = NULL) {
 jasp_es_p_difference_prep <- function(jaspResults, options, ready, estimate = NULL) {
   # Handles
   from_raw <- options$switch == "from_raw"
-  is_mean <- FALSE
-  if (options$effect_size == "mean_difference") is_mean <- TRUE
-
 
   overviewTable <- createJaspTable(
     title = if (is_mean) "Mean Difference" else "Median Difference"
