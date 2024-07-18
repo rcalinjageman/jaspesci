@@ -252,16 +252,16 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     try(limits[[2]] <- as.numeric(options$ymax))
   }
 
-  n.breaks <- NULL
-  if (!(options$n.breaks %in% c("auto", "Auto", "AUTO", ""))) {
-    try(n.breaks <- as.numeric(options$n.breaks))
-    if (is.na(n.breaks)) n.breaks <- NULL
+  ybreaks <- NULL
+  if (!(options$ybreaks %in% c("auto", "Auto", "AUTO", ""))) {
+    try(ybreaks <- as.numeric(options$ybreaks))
+    if (is.na(ybreaks)) ybreaks <- NULL
   }
 
 
   myplot <- myplot + ggplot2::scale_y_continuous(
     limits = limits,
-    n.breaks = n.breaks
+    n.breaks = ybreaks
   )
 
 

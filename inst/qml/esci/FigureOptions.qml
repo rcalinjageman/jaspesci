@@ -13,6 +13,8 @@ import "./" as Esci
     property alias difference_axis_grid_visible: difference_axis_grid.visible
     property alias data_grid_visible: data_grid.visible
     property alias distributions_grid_visible: distributions_grid.visible
+    property alias ymin_placeholderText: ymin.placeholderText
+    property alias ymax_placeholderText: ymax.placeholderText
 
 
     GridLayout {
@@ -92,16 +94,18 @@ import "./" as Esci
       TextField
         {
           name: "ymin"
+          id: ymin
           label: qsTr("Min")
-          placeholderText: "0"
+          placeholderText: "auto"
           fieldWidth: 60
         }
 
       TextField
         {
           name: "ymax"
+          id: ymax
           label: qsTr("Max")
-          placeholderText: "1"
+          placeholderText: "auto"
           fieldWidth: 60
         }
 
@@ -111,7 +115,7 @@ import "./" as Esci
 
         TextField
         {
-          name: "n.breaks"
+          name: "ybreaks"
           label: qsTr("Num. tick marks")
           placeholderText: "auto"
           fieldWidth: 60

@@ -174,6 +174,8 @@ Form
     difference_axis_grid_visible: false
     data_grid_visible: false
     distributions_grid_visible: false
+    ymin_placeholderText: "0"
+    ymax_placeholderText: "1"
   }
 
 
