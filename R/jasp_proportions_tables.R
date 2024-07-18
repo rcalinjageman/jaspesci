@@ -9,7 +9,6 @@ jasp_pdiff_table_depends_on <- function() {
       "cases",
       "not_cases",
       "case_label",
-      "not_case_label",
       "outcome_variable_name",
       "count_NA"
     )

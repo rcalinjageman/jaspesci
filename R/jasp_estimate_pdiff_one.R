@@ -40,7 +40,6 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     call <- esci::estimate_pdiff_one
     args <- list()
 
-
     null_value <- 0
     if (options$evaluate_hypotheses) null_value <- options$null_value
     if (is.null(null_value)) null_value <- 0
@@ -59,10 +58,15 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
           outcome_variable_name <- options$outcome_variable_name
         }
       }
-      args$comparison_n <- options$comparison_cases + options$not_cases
+      args$comparison_cases <- options$cases
+      args$comparison_n <- options$cases + options$not_cases
       args$case_label <- options$case_label
       args$outcome_variable_name <- outcome_variable_name
     }
+
+    # debugtext <- createJaspHtml(text = paste(args, collapse = "<BR>"))
+    # debugtext$dependOn(c("outcome_variable", "count_NA"))
+    # jaspResults[["debugtext"]] <- debugtext
 
     estimate <- try(do.call(what = call, args = args))
 

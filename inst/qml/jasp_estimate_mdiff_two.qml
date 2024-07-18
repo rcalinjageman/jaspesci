@@ -358,7 +358,7 @@ Form
 
       TextField
       {
-        name: "n.breaks"
+        name: "ybreaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
         fieldWidth: 60
