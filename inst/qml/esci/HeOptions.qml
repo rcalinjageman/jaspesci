@@ -8,6 +8,12 @@ import "./" as Esci
   {
     title: qsTr("Hypothesis evaluation")
 
+    property alias null_value_enabled: null_value.enabled
+    property alias null_value_min: null_value.min
+    property alias null_value_max: null_value.max
+    property alias null_value_negativeValues: null_value.negativeValues
+    property alias null_boundary_max: null_boundary.max
+
     Group
     {
       Layout.columnSpan: 2
@@ -32,6 +38,8 @@ import "./" as Esci
         defaultValue: 0
         id: null_value
         negativeValues: true
+        min: -Infinity
+        max: Infinity
         enabled: evaluate_hypotheses.checked
         visible: evaluate_hypotheses.checked
       }
@@ -43,6 +51,7 @@ import "./" as Esci
         label: qsTr("+/- ")
         defaultValue: 0
         negativeValues: false
+        max: Infinity
         enabled: evaluate_hypotheses.checked
         visible: evaluate_hypotheses.checked
       }
