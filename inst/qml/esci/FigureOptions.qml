@@ -11,6 +11,7 @@ import "./" as Esci
     property alias simple_labels_enabled: simple_contrast_labels.enabled
     property alias simple_labels_visible: simple_contrast_labels.visible
     property alias difference_axis_grid_visible: difference_axis_grid.visible
+    property alias difference_axis_units_visible: difference_axis_units.visible
     property alias data_grid_visible: data_grid.visible
     property alias distributions_grid_visible: distributions_grid.visible
     property alias ymin_placeholderText: ymin.placeholderText
@@ -203,6 +204,8 @@ import "./" as Esci
              DropDown
         {
           name: "difference_axis_units"
+          id: difference_axis_units
+          Layout.columnSpan: 2
           label: qsTr("Units")
           startValue: 'raw'
           values:
@@ -210,10 +213,6 @@ import "./" as Esci
               { label: "Original units", value: "raw"},
               { label: "Standard deviations", value: "sd"}
             ]
-        }
-
-        Label {
-          text: " "
         }
 
         Label {

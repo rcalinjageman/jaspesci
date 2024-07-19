@@ -437,7 +437,7 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
 # Prep a hypothesis evaluation table
 jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   # Handles
-  is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference")) TRUE else FALSE
+  is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference", "proportion_difference")) TRUE else FALSE
   is_mean <- if (options$effect_size %in% c("mean_difference", "mean")) TRUE else FALSE
   is_pdiff <- if (options$effect_size %in% c("pdiff")) TRUE else FALSE
   is_interval <- if (options$null_boundary > 0) TRUE else FALSE
@@ -469,7 +469,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   }
 
   overviewTable$addColumnInfo(
-    name = "effect",
+    name = if (options$effect_size == "proportion_difference") "effect_plus" else "effect",
     title = "Effect",
     type = "string",
     combine = FALSE

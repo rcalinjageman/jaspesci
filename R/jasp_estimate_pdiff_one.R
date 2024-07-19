@@ -87,6 +87,10 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
       estimate[[ov_name]] <- estimate
       options$outcome_variable <- ov_name
+    } else {
+      if (length(options$outcome_variable) == 1) {
+        estimate[[options$outcome_variable[[1]]]] <- estimate
+      }
     }
 
     # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
@@ -144,6 +148,10 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
   # Figure
   # Now prep and fill the plot
   for (my_variable in options$outcome_variable) {
+
+    # debugtext <- createJaspHtml(text = paste(my_variable, " - </BR>"))
+    # debugtext$dependOn(c("outcome_variable", "count_NA"))
+    # jaspResults[[paste(my_variable, "debugtext", sep = "")]] <- debugtext
 
 
     if (is.null(jaspResults[[my_variable]])) {

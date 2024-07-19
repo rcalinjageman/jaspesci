@@ -13,6 +13,7 @@ import "./" as Esci
     property alias null_value_max: null_value.max
     property alias null_value_negativeValues: null_value.negativeValues
     property alias null_boundary_max: null_boundary.max
+    property alias alpha_label_text: alpha_label.text
 
     Group
     {

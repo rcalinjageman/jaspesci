@@ -26,15 +26,11 @@ Form
 {
 	id: form
 	property int framework:	Common.Type.Framework.Classical
+	property alias conf_level_value: conf_level.value
 
 	function alpha_adjust() {
-    alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+    alpha_label_text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
   }
-
-  function not_case_label_adjust() {
-    not_case_label.text = "Not " + case_label.text
-  }
-
 
 
   RadioButtonGroup {
@@ -68,6 +64,7 @@ Form
   		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
   		AvailableVariablesList { name: "allVariablesList" }
   		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["nominal"] }
+  		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
   	}
 
   }
@@ -80,33 +77,66 @@ Form
 
     Group {
 
-      TextField
-      {
-        name: "outcome_variable_name"
-        label: qsTr("Outcome variable name")
-        placeholderText: "Outcome variable"
-      }
 
       GridLayout {
       id: sgrid
-      columns: 2
+      columns: 3
+
+        Label {
+          text: " "
+        }
+
+
+        TextField {
+          name: "grouping_variable_name"
+          Layout.columnSpan: 2
+          label: ""
+          placeholderText: "Grouping variable"
+        }
+
+
+        TextField {
+          name: "outcome_variable_name"
+          label: ""
+          placeholderText: "Outcome variable"
+        }
+
+        TextField {
+          name: "grouping_variable_level1"
+          label: ""
+          placeholderText: "Control"
+        }
+
+        TextField {
+          name: "grouping_variable_level2"
+          label: ""
+          placeholderText: "Treated"
+        }
+
 
         TextField
         {
           name: "case_label"
           id: case_label
           label: ""
-          placeholderText: "Affected"
-          onFocusChanged: {
-            not_case_label_adjust()
-          }
+          placeholderText: "Sick"
         }
 
         IntegerField
         {
-          name: "cases"
-          label: qsTr("Cases")
+          name: "reference_cases"
+          id: reference_cases
+          label: ""
           defaultValue: 20
+          min: 0
+        }
+
+        IntegerField
+        {
+          name: "comparison_cases"
+          id: comparison_cases
+          label: ""
+          defaultValue: 40
           min: 0
         }
 
@@ -114,19 +144,29 @@ Form
         {
           name: "not_case_label"
           id: not_case_label
-          enabled: false
           label: ""
-          placeholderText: "Not Affected"
+          placeholderText: "Well"
         }
 
         IntegerField
         {
-          name: "not_cases"
-          label: qsTr("Sample size")
+          name: "reference_not_cases"
+          id: reference_not_cases
+          label: ""
           defaultValue: 80
           min: 0
         }
-      }  // 2 column grid
+
+        IntegerField
+        {
+          name: "comparison_not_cases"
+          id: comparison_not_cases
+          label: ""
+          defaultValue: 60
+          min: 0
+        }
+
+      }  // 3 column grid
     }  // end of group for summary
 
   }
@@ -162,20 +202,71 @@ Form
 	   }
 	  CheckBox
 	  {
-	    name: "plot_possible";
-	    label: qsTr("Lines at proportion intervals");
+	    name: "show_ratio";
+	    label: qsTr("Odds ratio");
 	   }
-	}
+	  CheckBox
+	  {
+	    name: "show_phi";
+	    label: qsTr("Correlation (&#981;)");
+	   }
+
+
+      GridLayout {
+      id: show_chi_square_grid
+      columns: 4
+    	 	CheckBox
+    	  {
+    	    name: "show_chi_square";
+    	    id: show_chi_square;
+    	    label: qsTr("&#120536;<sup>2</sup> analysis");
+    	  }
+
+
+        RadioButtonGroup {
+          columns: 3
+          name: "chi_table_option"
+          id: chi_table_option
+
+          RadioButton {
+            value: "observed";
+            label: qsTr("Observed frequencies");
+            id: observed
+            enabled: show_chi_square.checked
+          }
+
+          RadioButton {
+            value: "expected";
+            label: qsTr("Expected frequencies");
+            id: expected
+            enabled: show_chi_square.checked
+          }
+
+          RadioButton {
+            value: "both";
+            label: qsTr("Both");
+            id: both;
+            checked: true;
+            enabled: show_chi_square.checked
+          }
+      } // end chi_table_option
+
+    } // end show_chi_square 4-column grid
+
+}
 
 
   Esci.FigureOptions {
     simple_labels_enabled: false
     simple_labels_visible: false
-    difference_axis_grid_visible: false
+    difference_axis_grid_visible: true
+    difference_axis_units_visible: false
     data_grid_visible: false
     distributions_grid_visible: false
-    ymin_placeholderText: "0"
-    ymax_placeholderText: "1"
+    ymin_placeholderText: "auto"
+    ymax_placeholderText: "auto"
+
+
   }
 
 
@@ -209,9 +300,7 @@ Form
 
 
   Esci.HeOptions {
-    null_value_min: 0
-    null_value_max: 1
-    null_value_negativeValues: false
+    null_value_enabled: false
     null_boundary_max: 1
   }
 
