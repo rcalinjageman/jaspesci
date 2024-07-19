@@ -20,6 +20,7 @@ import "./" as Esci
     GridLayout {
       id: dimensions_grid
       columns: 3
+      Layout.columnSpan: 2
 
       Label {
         text: qsTr("Dimensions")
@@ -48,6 +49,7 @@ import "./" as Esci
     GridLayout {
       id: yaxis_grid
       columns: 3
+      Layout.columnSpan: 2
 
 
         Label {
@@ -131,6 +133,7 @@ import "./" as Esci
       GridLayout {
       id: xaxiss_grid
       columns: 3
+      Layout.columnSpan: 2
 
 
         Label {
@@ -192,6 +195,7 @@ import "./" as Esci
       GridLayout {
       id: difference_axis_grid
       columns: 3
+      Layout.columnSpan: 2
         Label {
           text: qsTr("Difference axis")
         }
@@ -232,6 +236,7 @@ import "./" as Esci
       GridLayout {
       id: distributions_grid
       columns: 3
+      Layout.columnSpan: 2
 
         Label {
           text: qsTr("Distributions")
@@ -270,6 +275,7 @@ import "./" as Esci
     GridLayout {
       id: data_grid
       columns: 3
+      Layout.columnSpan: 2
 
 
       Label {

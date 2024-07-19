@@ -32,7 +32,7 @@ Form
   }
 
   function not_case_label_adjust() {
-    not_case_label.displayText = "Not " + case_label.displayText
+    not_case_label.text = "Not " + case_label.text
   }
 
 
@@ -170,7 +170,6 @@ Form
 
   Esci.FigureOptions {
     simple_labels_enabled: false
-    simple_labels_visible: false
     difference_axis_grid_visible: false
     data_grid_visible: false
     distributions_grid_visible: false
@@ -183,49 +182,7 @@ Form
   {
     title: qsTr("Aesthetics")
 
-    Group
-    {
-    title: qsTr("Summary")
-    columns: 2
-    Layout.columnSpan: 2
-
-      Esci.ShapeSelect
-      {
-        label: qsTr("Shape")
-        name: "shape_summary"
-        id: shape_summary
-      }
-
-      Esci.SizeSelect
-      {
-        label: qsTr("Size")
-        name: "size_summary"
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_summary"
-        label: qsTr("Outline")
-        startValue: '#008DF9'
-        id: color_summary
-      }
-
-
-      Esci.ColorSelect
-      {
-        name: "fill_summary"
-        label: qsTr("Fill")
-        startValue: '#008DF9'
-        id: fill_summary
-      }
-
-
-      Esci.AlphaSelect
-      {
-        label: qsTr("Transparency")
-        name: "alpha_summary"
-      }
-
+    Esci.AestheticsSummary {
 
     }
 
@@ -243,105 +200,6 @@ Form
         name: "linetype_summary"
         id: linetype_summary
       }
-
-      IntegerField
-      {
-        name: "size_interval"
-        label: qsTr("Thickness")
-        defaultValue: 3
-        min: 1
-        max: 10
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_interval"
-        label: qsTr("Color")
-        startValue: 'black'
-        id: color_interval
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_interval"
-        label: qsTr("Transparency")
-      }
-
-
-    }
-
-
-    Group
-    {
-    title: qsTr("Error distribution")
-    columns: 2
-    Layout.columnSpan: 2
-
-      Esci.ColorSelect
-      {
-        name: "fill_error"
-        label: qsTr("Fill")
-        startValue: 'gray75'
-        id: fill_error
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_error"
-        label: qsTr("Transparency")
-      }
-
-
-    }
-
-
-    Group
-    {
-    title: qsTr("The raw data")
-    columns: 2
-    Layout.columnSpan: 2
-
-      Esci.ShapeSelect
-      {
-        label: qsTr("Shape")
-        name: "shape_raw"
-        id: shape_raw
-        enabled: from_raw.checked
-      }
-
-      Esci.SizeSelect
-      {
-        label: qsTr("Size")
-        name: "size_raw"
-        defaultValue: 2
-        enabled: from_raw.checked
-      }
-
-      Esci.ColorSelect
-      {
-        name: "color_raw"
-        label: qsTr("Outline")
-        startValue: '#008DF9'
-        id: color_raw
-        enabled: from_raw.checked
-      }
-
-      Esci.ColorSelect
-      {
-        name: "fill_raw"
-        label: qsTr("Fill")
-        startValue: 'NA'
-        id: fill_raw
-        enabled: from_raw.checked
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "alpha_raw"
-        enabled: from_raw.checked
-        label: qsTr("Transparency")
-      }
-
 
     }
 

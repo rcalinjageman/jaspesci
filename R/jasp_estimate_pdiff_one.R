@@ -60,8 +60,16 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       }
       args$comparison_cases <- options$cases
       args$comparison_n <- options$cases + options$not_cases
-      args$case_label <- options$case_label
-      args$outcome_variable_name <- outcome_variable_name
+      args$case_label <- jasp_text_fix(
+        options,
+        "case_label",
+        "Affected"
+      )
+      args$outcome_variable_name <- jasp_text_fix(
+        options,
+        "outcome_variable_name",
+        "Outcome variable"
+      )
     }
 
     # debugtext <- createJaspHtml(text = paste(args, collapse = "<BR>"))
@@ -70,6 +78,16 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
     estimate <- try(do.call(what = call, args = args))
 
+    if (!from_raw) {
+      ov_name <- jasp_text_fix(
+        options,
+        "outcome_variable_name",
+        "Outcome variable"
+      )
+
+      estimate[[ov_name]] <- estimate
+      options$outcome_variable <- ov_name
+    }
 
     # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
     # debugtext$dependOn(c("outcome_variable", "count_NA"))
@@ -122,49 +140,47 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
-  return()
-
 
   # Figure
-  if (is.null(jaspResults[["mdiffPlot"]])) {
-    jasp_plot_m_prep(
-      jaspResults,
-      options,
-      ready,
-      add_citation = TRUE
-    )
+  # Now prep and fill the plot
+  for (my_variable in options$outcome_variable) {
 
-    if (ready) {
-      args <- list()
-      if (from_raw) {
-        args$estimate <- estimate_big
-      } else {
-        args$estimate <- estimate
-      }
-      args$effect_size <- options$effect_size
-      args$data_layout <- options$data_layout
-      args$data_spread <- options$data_spread
-      args$error_layout <- options$error_layout
-      args$error_scale <- options$error_scale
-      args$error_nudge <- options$error_nudge
-      if (evaluate_h) {
-        args$rope <- c(
-          options$null_value - options$null_boundary,
-          options$null_value + options$null_boundary
-        )
-      }
 
-      myplot <- do.call(
-        what = esci::plot_magnitude,
-        args = args
+    if (is.null(jaspResults[[my_variable]])) {
+      jasp_plot_m_prep(
+        jaspResults,
+        options,
+        ready,
+        my_variable = my_variable,
+        add_citation = FALSE
       )
 
-      myplot <- jasp_plot_magnitude_decorate(myplot, options)
+      if (ready) {
+        args <- list()
+        args$estimate <- estimate[[my_variable]]
+        args$plot_possible <- options$plot_possible
 
-      jaspResults[["mdiffPlot"]]$plotObject <- myplot
+        if (evaluate_h) {
+          args$rope <- c(
+            options$null_value - options$null_boundary,
+            options$null_value + options$null_boundary
+          )
+        }
 
-    }
-  }
+        myplot <- do.call(
+          what = esci::plot_proportion,
+          args = args
+        )
+
+        myplot <- jasp_plot_proportion_decorate(myplot, options)
+
+        jaspResults[[my_variable]]$plotObject <- myplot
+
+      }  # end plot creation
+
+
+    } # end check if plot is null
+  } # end loop through outcome variables
 
 
   return()
@@ -181,3 +197,114 @@ jasp_estimate_pdiff_one_read_data <- function(dataset, options) {
 
 
 
+jasp_plot_proportion_decorate <- function(myplot, options) {
+
+  self <- list()
+  self$options <- options
+
+  # Basic plot
+  divider <- 4
+
+
+  # Basic graph options --------------------
+  # Axis font sizes
+  myplot <- myplot + ggplot2::theme(
+    axis.text.y = ggtext::element_markdown(size = self$options$axis.text.y),
+    axis.title.y = ggtext::element_markdown(size = self$options$axis.title.y),
+    axis.text.x = ggtext::element_markdown(size = self$options$axis.text.x),
+    axis.title.x = ggtext::element_markdown(size = self$options$axis.title.x)
+  )
+
+
+  if (!(self$options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::xlab(self$options$xlab)
+  }
+  if (!(self$options$ylab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::ylab(self$options$ylab)
+  }
+
+
+  ylim <- c(0, 1)
+
+  if (!(options$ymin %in% c("auto", "Auto", "AUTO", ""))) {
+    try(ylim[[1]] <- as.numeric(options$ymin))
+  }
+
+  if (!(options$ymax %in% c("auto", "Auto", "AUTO", ""))) {
+    try(ylim[[2]] <- as.numeric(options$ymax))
+  }
+
+  ybreaks <- NULL
+  if (!(options$ybreaks %in% c("auto", "Auto", "AUTO", ""))) {
+    try(ybreaks <- as.numeric(options$ybreaks))
+    if (is.na(ybreaks)) ybreaks <- NULL
+  }
+
+
+  # Axis breaks
+  myplot <- myplot + ggplot2::scale_y_continuous(
+    limits = ylim,
+    n.breaks = ybreaks,
+  )
+
+  #aesthetics
+  myplot <- myplot + ggplot2::scale_shape_manual(
+    values = c(
+      "summary" = self$options$shape_summary
+    )
+  )
+
+
+  myplot <- myplot + ggplot2::scale_color_manual(
+    values = c(
+      "summary" = self$options$color_summary
+    ),
+    aesthetics = c("color", "point_color")
+  )
+
+
+  myplot <- myplot + ggplot2::scale_fill_manual(
+    values = c(
+      "summary" = self$options$fill_summary
+    ),
+    aesthetics = c("fill", "point_fill")
+  )
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    c("size", "point_size"),
+    "point_size_d",
+    function(n) return(c(
+      "summary" = as.numeric(self$options$size_summary)/divider
+    ))
+  )
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    c("alpha", "point_alpha"),
+    "point_alpha_d",
+    function(n) return(c(
+      "summary" = 1 - as.numeric(self$options$alpha_summary)
+    ))
+  )
+
+  myplot <- myplot + ggplot2::scale_linetype_manual(
+    values = c(
+      "summary" = self$options$linetype_summary
+    )
+  )
+
+
+  if (self$options$evaluate_hypotheses) {
+    myplot$layers[["null_line"]]$aes_params$colour <- self$options$null_color
+    if ((self$options$null_boundary != 0)) {
+        try(myplot$layers[["null_interval"]]$aes_params$fill <- self$options$null_color)
+        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summary)/divider+1)
+        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(self$options$alpha_summary))
+        try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_summary)
+        try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$linetype_summary)
+    }
+  }
+
+
+  return(myplot)
+
+}

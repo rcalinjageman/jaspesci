@@ -321,7 +321,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   x <- 0
   for (my_variable in options$outcome_variable) {
     x <- x + 1
-    my_variable <- options$outcome_variable[[1]]
+    # my_variable <- options$outcome_variable[[x]]
 
 
     if (is.null(jaspResults[[my_variable]])) {

@@ -91,7 +91,8 @@ jasp_plot_m_prep <- function(jaspResults, options, ready, my_variable = "mdiffPl
       "size_raw",
       "color_raw",
       "fill_raw",
-      "alpha_raw"
+      "alpha_raw",
+      jasp_pdiff_table_depends_on()
     )
   )
 
