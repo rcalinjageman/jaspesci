@@ -87,9 +87,6 @@ jasp_plot_pdiff_decorate <- function(myplot, options) {
     }
   }
 
-  return (myplot)
-  #
-  #
   shape_summary_unused <- "circle"
   color_summary_unused <- "black"
   fill_summary_unused <- "black"
@@ -175,10 +172,10 @@ jasp_plot_pdiff_decorate <- function(myplot, options) {
     c("alpha", "point_alpha"),
     "point_alpha_d",
     function(n) return(c(
-      "Reference_summary" = as.numeric(self$options$alpha_summary_reference),
-      "Comparison_summary" = as.numeric(self$options$alpha_summary_comparison),
-      "Difference_summary" = as.numeric(self$options$alpha_summary_difference),
-      "Unused_summary" = alpha_summary_unused
+      "Reference_summary" = 1- as.numeric(self$options$alpha_summary_reference),
+      "Comparison_summary" = 1 - as.numeric(self$options$alpha_summary_comparison),
+      "Difference_summary" = 1 - as.numeric(self$options$alpha_summary_difference),
+      "Unused_summary" = 1 - alpha_summary_unused
     ))
   )
   #
@@ -191,110 +188,7 @@ jasp_plot_pdiff_decorate <- function(myplot, options) {
       "Unused_summary" = linetype_summary_unused
     )
   )
-  # myplot <- myplot + ggplot2::scale_color_manual(
-  #   values = c(
-  #     "Reference_summary" = color_interval_reference,
-  #     "Comparison_summary" = self$options$color_interval_comparison,
-  #     "Difference_summary" = self$options$color_interval_difference,
-  #     "Unused_summary" = color_interval_unused
-  #   ),
-  #   aesthetics = "interval_color"
-  # )
-  # myplot <- myplot + ggplot2::discrete_scale(
-  #   "interval_alpha",
-  #   "interval_alpha_d",
-  #   function(n) return(c(
-  #     "Reference_summary" = as.numeric(alpha_interval_reference),
-  #     "Comparison_summary" = as.numeric(self$options$alpha_interval_comparison),
-  #     "Difference_summary" = as.numeric(self$options$alpha_interval_difference),
-  #     "Unused_summary" = alpha_interval_unused
-  #   ))
-  # )
-  # myplot <- myplot + ggplot2::discrete_scale(
-  #   "interval_size",
-  #   "interval_size_d",
-  #   function(n) return(c(
-  #     "Reference_summary" = as.integer(size_interval_reference),
-  #     "Comparison_summary" = as.integer(self$options$size_interval_comparison),
-  #     "Difference_summary" = as.integer(self$options$size_interval_difference),
-  #     "Unused_summary" = size_interval_unused
-  #   ))
-  # )
-  #
-  # # Slab
-  # myplot <- myplot + ggplot2::scale_fill_manual(
-  #   values = c(
-  #     "Reference_summary" = fill_error_reference,
-  #     "Comparison_summary" = self$options$fill_error_comparison,
-  #     "Difference_summary" = self$options$fill_error_difference,
-  #     "Unused_summary" = fill_error_unused
-  #   ),
-  #   aesthetics = "slab_fill"
-  # )
-  # myplot <- myplot + ggplot2::discrete_scale(
-  #   "slab_alpha",
-  #   "slab_alpha_d",
-  #   function(n) return(c(
-  #     "Reference_summary" = as.numeric(alpha_error_reference),
-  #     "Comparison_summary" = as.numeric(self$options$alpha_error_comparison),
-  #     "Difference_summary" = as.numeric(self$options$alpha_error_difference),
-  #     "Unused_summary" = alpha_error_unused
-  #   ))
-  # )
 
-
-  width <- jamovi_sanitize(
-    my_value = self$options$es_plot_width,
-    return_value = 400,
-    convert_to_number = TRUE,
-    lower = 10,
-    lower_inclusive = TRUE,
-    upper = 3000,
-    upper_inclusive = TRUE,
-    my_value_name = "Plot width"
-  )
-  height <- jamovi_sanitize(
-    my_value = self$options$es_plot_height,
-    return_value = 450,
-    convert_to_number = TRUE,
-    lower = 10,
-    lower_inclusive = TRUE,
-    upper = 4000,
-    upper_inclusive = TRUE,
-    my_value_name = "Plot height"
-  )
-
-  # Struggling to get htest warnings to show up... so copying this in
-  #  again?
-
-  rope_upper <- jamovi_sanitize(
-    self$options$null_boundary,
-    na_ok = FALSE,
-    return_value = 0,
-    lower = 0,
-    lower_inclusive = TRUE,
-    upper = 1,
-    upper_inclusive = TRUE,
-    convert_to_number = TRUE,
-    my_value_name = "Hypothesis Evaluation: Null range (+/-)"
-  )
-
-
-  self$results$estimation_plot_warnings$setState(
-    c(
-      notes,
-      names(xlab),
-      names(ylab),
-      names(axis.text.y),
-      names(axis.title.y),
-      names(axis.text.x),
-      names(axis.title.x),
-      names(width),
-      names(height),
-      names(rope_upper)
-    )
-  )
-  jamovi_set_notes(self$results$estimation_plot_warnings)
 
   return(myplot)
 }

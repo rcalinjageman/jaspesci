@@ -274,24 +274,43 @@ Form
   {
     title: qsTr("Aesthetics")
 
-    Esci.AestheticsSummary {
-
+    Esci.AestheticsSummaryByGroup {
+      Layout.columnSpan: 2
     }
 
 
+    GridLayout {
+      id: aesthetics_summary_by_group
+      columns: 4
 
-    Group
-    {
-    title: qsTr("CI")
-    columns: 2
-    Layout.columnSpan: 2
+      Label {
+        text: qsTr("CI")
+        Layout.columnSpan: 4
+      }
+
+      Label {
+        text: qsTr("Style")
+      }
 
       Esci.LineTypeSelect
       {
-        label: qsTr("Style")
-        name: "linetype_summary"
-        id: linetype_summary
+        name: "linetype_summary_reference"
+        id: linetype_summary_reference
       }
+
+      Esci.LineTypeSelect
+      {
+        name: "linetype_summary_comparison"
+        id: linetype_summary_comparison
+      }
+
+      Esci.LineTypeSelect
+      {
+        name: "linetype_summary_difference"
+        id: linetype_summary_difference
+      }
+
+
 
     }
 
