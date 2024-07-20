@@ -310,7 +310,7 @@ jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, tab
     if (from_raw) {
       overviewTable$setExpectedSize(1 * oc_multiplier * multiplier)
     } else {
-      overviewTable$setExpectedSize(1 * mutliplier)
+      overviewTable$setExpectedSize(1 * multiplier)
     }
   }
 

@@ -16,6 +16,8 @@ import "./" as Esci
     property alias distributions_grid_visible: distributions_grid.visible
     property alias ymin_placeholderText: ymin.placeholderText
     property alias ymax_placeholderText: ymax.placeholderText
+    property alias width_defaultValue: width.defaultValue
+    property alias height_defaultValue: height.defaultValue
 
 
     GridLayout {
@@ -30,6 +32,7 @@ import "./" as Esci
       IntegerField
       {
         name: "width"
+        id: width
         label: qsTr("Width")
         defaultValue: 300
         min: 100
@@ -39,6 +42,7 @@ import "./" as Esci
     IntegerField
       {
         name: "height"
+        id: height
         label: qsTr("Height")
         defaultValue: 400
         min: 100
@@ -182,6 +186,7 @@ import "./" as Esci
 	      name: "simple_contrast_labels";
 	      id: simple_contrast_labels
 	      label: qsTr("Simple labels")
+	      checked: true
 	    }
 
 
