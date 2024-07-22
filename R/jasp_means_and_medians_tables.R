@@ -15,6 +15,9 @@ jasp_mdiff_table_depends_on <- function() {
       "mean",
       "sd",
       "n",
+      "r",
+      "x",
+      "y",
       "comparison_mean",
       "comparison_sd",
       "comparison_n",
@@ -64,7 +67,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   }
 
 
-  if (options$effect_size %in% c("mean", "mean_difference")) {
+  if (options$effect_size %in% c("mean", "mean_difference", "r")) {
     overviewTable$addColumnInfo(
       name = "mean",
       title = "<i>M</i>",
@@ -99,7 +102,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
       )
     }
 
-    if (from_raw) {
+    if (from_raw & options$effect_size != "r") {
       overviewTable$addColumnInfo(
         name = "median",
         title = "<i>Mdn</i>",
@@ -111,7 +114,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   }  # end of mean, mean difference
 
 
-  if (options$effect_size %in% c("median", "median_difference")) {
+  if (options$effect_size %in% c("median", "median_difference", "r")) {
     overviewTable$addColumnInfo(
       name = "median",
       title = "<i>Mdn</i>",
@@ -140,11 +143,14 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
       )
     }
 
-    overviewTable$addColumnInfo(
-      name = "mean",
-      title = "<i>M</i>",
-      type = "number"
-    )
+    if (options$effect_size != "r") {
+      overviewTable$addColumnInfo(
+        name = "mean",
+        title = "<i>M</i>",
+        type = "number"
+      )
+
+    }
   } # end of median, median difference
 
 
@@ -200,7 +206,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   }
 
 
-  if (options$show_details & options$effect_size %in% c("mean", "mean_difference")) {
+  if (options$show_details & options$effect_size %in% c("mean", "mean_difference", "r")) {
     mytype <- "integer"
     if (!is.null(options$assume_equal_variance)) {
       mytype <- if (options$assume_equal_variance) "integer" else "number"
@@ -440,6 +446,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference", "proportion_difference")) TRUE else FALSE
   is_mean <- if (options$effect_size %in% c("mean_difference", "mean")) TRUE else FALSE
   is_pdiff <- if (options$effect_size %in% c("pdiff")) TRUE else FALSE
+  is_r <- if (options$effect_size %in% c("r", "rdiff")) TRUE else FALSE
   is_interval <- if (options$null_boundary > 0) TRUE else FALSE
   from_raw <- options$switch == "from_raw"
 
@@ -545,11 +552,23 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
       )
 
     } else {
-      overviewTable$addColumnInfo(
-        name = "p_result",
-        title = "<i>p</i>, two tailed",
-        type = "pvalue"
-      )
+
+      if (is_r & ! is_interval) {
+        overviewTable$addColumnInfo(
+          name = "p",
+          title = "<i>p</i>, two tailed",
+          type = "pvalue"
+        )
+
+      } else {
+        overviewTable$addColumnInfo(
+          name = "p_result",
+          title = "<i>p</i>, two tailed",
+          type = "pvalue"
+        )
+
+      }
+
     }
   }
 
