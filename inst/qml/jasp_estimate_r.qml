@@ -159,6 +159,7 @@ Form
     CheckBox
 	  {
 	    name: "do_regression";
+	    id: do_regression
 	    label: qsTr("Regression analysis")
 	    enabled: from_raw.checked
       visible: from_raw.checked
@@ -169,22 +170,25 @@ Form
 
 	      CheckBox {
     	    name: "show_line";
+    	    id: show_line
 	        label: qsTr("Line")
-	        enabled: from_raw.checked
+	        enabled: do_regression.checked
           visible: from_raw.checked
 	      }
 
 	      CheckBox {
     	    name: "show_line_CI";
+    	    id: show_line_CI
 	        label: qsTr("CI on Line")
-	        enabled: from_raw.checked
+	        enabled: do_regression.checked
           visible: from_raw.checked
 	      }
 
 	      CheckBox {
     	    name: "show_residuals";
+    	    id: show_residuals
 	        label: qsTr("Residuals")
-	        enabled: from_raw.checked
+	        enabled: do_regression.checked
           visible: from_raw.checked
 	      }
 	  }
@@ -192,16 +196,18 @@ Form
     CheckBox
 	  {
 	    name: "show_PI";
-	    label: qsTr("Prediction labels")
-	    enabled: from_raw.checked
+	    id: show_PI
+	    label: qsTr("Prediction interval")
+	    enabled: do_regression.checked
       visible: from_raw.checked
 	   }
 
 	   TextField {
          name: "predict_from_x"
+         id: predict_from_x
          label: qsTr("Enter <i>X</i> value to generate prediction (<i>&#374;</i>)")
          placeholderText: "Enter an X value"
-   	     enabled: from_raw.checked
+   	     enabled: do_regression.checked
          visible: from_raw.checked
      }
 
@@ -210,7 +216,7 @@ Form
 
     Section
   {
-    title: qsTr("Scatterplot Options")
+    title: qsTr("Scatterplot options")
     enabled: from_raw.checked
     visible: from_raw.checked
 
@@ -427,10 +433,158 @@ Form
   }
 
 
+    Section
+  {
+    title: qsTr("Scatterplot aesthetics")
+    enabled: from_raw.checked
+    visible: from_raw.checked
+
+     GridLayout {
+      id: sp_raw_grid
+      columns: 1
+      Layout.columnSpan: 2
+
+      Label {
+          text: qsTr("Raw data")
+      }
+
+      Esci.ShapeSelect
+      {
+        name: "sp_shape_raw_reference"
+        id: sp_shape_raw_reference
+        label: qsTr("Shape")
+        startValue: 'circle filled'
+        enabled: from_raw.checked
+      }
+
+      Esci.SizeSelect
+      {
+        name: "sp_size_raw_reference"
+        id: sp_size_raw_reference
+        label: qsTr("Size")
+        defaultValue: 3
+        enabled: from_raw.checked
+
+      }
+
+      Esci.ColorSelect
+      {
+        name: "sp_color_raw_reference"
+        id: sp_color_raw_reference
+        label: qsTr("Outline")
+        startValue: "black"
+        enabled: from_raw.checked
+      }
+
+      Esci.ColorSelect
+      {
+        name: "sp_fill_raw_reference"
+        id: sp_fill_raw_reference
+        label: qsTr("Fill")
+        startValue: "#008DF9"
+        enabled: from_raw.checked
+      }
+
+      Esci.AlphaSelect
+      {
+        name: "sp_alpha_raw_reference"
+        label: qsTr("Transparency")
+        id: sp_alpha_raw_reference
+        enabled: from_raw.checked
+      }
+
+
+    }
+
+    GridLayout {
+      id: sp_linetypes_grid
+      columns: 4
+      Layout.columnSpan: 2
+      enabled: do_regression.checked
+
+      Label {
+          text: ""
+      }
+
+      Label {
+          text: qsTr("Regression")
+      }
+
+      Label {
+          text: qsTr("Prediction")
+      }
+
+
+      Label {
+          text: qsTr("Residual")
+      }
+
+      Label {
+          text: "Style"
+      }
+
+      Esci.LineTypeSelect
+      {
+        name: "sp_linetype_summary_reference"
+        id: sp_linetype_summary_reference
+        enabled: show_line.checked
+      }
+
+      Esci.LineTypeSelect
+      {
+        name: "sp_linetype_PI_reference"
+        id: sp_linetype_PI_reference
+        enabled: show_PI.checked
+      }
+
+      Esci.LineTypeSelect
+      {
+        name: "sp_linetype_residual_reference"
+        id: sp_linetype_residual_reference
+        enabled: show_residuals.checked
+      }
+
+      Label {
+          text: "Thickness"
+      }
+
+      IntegerField
+      {
+        name: "sp_size_interval_reference"
+        defaultValue: 3
+        min: 1
+        max: 10
+        enabled: show_line.checked
+      }
+
+      IntegerField
+      {
+        name: "sp_size_PI_reference"
+        defaultValue: 3
+        min: 1
+        max: 10
+        enabled: show_PI.checked
+      }
+
+      IntegerField
+      {
+        name: "sp_size_residual_reference"
+        defaultValue: 3
+        min: 1
+        max: 10
+        enabled: show_residuals.checked
+      }
+
+
+
+    }
+
+  }
+
 
 
   Esci.FigureOptions {
-    title: qsTr("Estimation Figure Options")
+    title: qsTr("Estimation figure options")
     simple_labels_enabled: false
     simple_labels_visible: false
     difference_axis_grid_visible: false
@@ -447,7 +601,7 @@ Form
 
     Section
   {
-    title: qsTr("Estimation Figure Aesthetics")
+    title: qsTr("Estimation figure aesthetics")
 
     Esci.AestheticsSummary {
     }

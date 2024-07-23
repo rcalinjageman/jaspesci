@@ -166,6 +166,59 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
+  # scatterplot
+  if (is.null(jaspResults[["scatterPlot"]])) {
+    jasp_plot_m_prep(
+      jaspResults,
+      options,
+      ready,
+      my_variable = "scatterPlot",
+      add_citation = FALSE
+    )
+
+    jaspResults[["scatterPlot"]]$dependOn(
+      c(
+        jaspResults[["scatterPlot"]]$dependOn(),
+        "show_line",
+        "show_line_CI",
+        "show_PI",
+        "show_residuals",
+        "show_mean_lines",
+        "plot_as_z",
+        "show_r",
+        "predict_from_x",
+        "x",
+        "y"
+      )
+    )
+
+    if (ready) {
+      args <- list()
+      args$estimate <- estimate
+      args$show_line <- options$show_line
+      args$show_line_CI <- options$show_line_CI
+      args$show_PI <- options$show_PI
+      args$show_residuals <- options$show_residuals
+      args$show_mean_lines <- options$show_mean_lines
+      args$plot_as_z <- options$plot_as_z
+      args$show_r <- options$show_r
+      args$predict_from_x <- jasp_numeric_fix(options, "predict_from_x", NULL)
+
+
+      myplot <- do.call(
+        what = esci::plot_scatter,
+        args = args
+      )
+
+      # myplot <- jasp_plot_correlation_decorate(myplot, options)
+
+      jaspResults[["scatterPlot"]]$plotObject <- myplot
+
+    }  # end scatterplot creation
+  } # end scatterplot
+
+
+  # estimation plot
   if (is.null(jaspResults[["mdiffPlot"]])) {
     jasp_plot_m_prep(
       jaspResults,
@@ -176,6 +229,7 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
     if (ready) {
       args <- list()
       args$estimate <- estimate
+      args$error_layout <- "none"
 
       if (evaluate_h) {
         args$rope <- c(
@@ -189,14 +243,12 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
         args = args
       )
 
-      #myplot <- jasp_plot_pdiff_decorate(myplot, options)
+      myplot <- jasp_plot_correlation_decorate(myplot, options)
 
       jaspResults[["mdiffPlot"]]$plotObject <- myplot
 
-    }  # end plot creation
-
-
-  }
+    }  # end estimationplot creation
+  } # end estimation plot
 
 
   return()
@@ -215,3 +267,144 @@ jasp_estimate_r_read_data <- function(dataset, options) {
     )
 }
 
+
+jasp_plot_correlation_decorate <- function(myplot, options) {
+  self <- list()
+  self$options <- options
+
+
+  # Font sizes
+  myplot <- myplot + ggplot2::theme(
+    axis.text.y = ggtext::element_markdown(size = options$axis.text.y),
+    axis.title.y = ggtext::element_markdown(size = options$axis.title.y),
+    axis.text.x = ggtext::element_markdown(size = options$axis.text.x),
+    axis.title.x = ggtext::element_markdown(size = options$axis.title.x)
+  )
+
+  # Axis options
+  if (!(options$ylab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::ylab(options$ylab)
+  }
+
+  if (!(options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::xlab(options$xlab)
+  }
+
+
+  ylim <- c(
+    jasp_numeric_fix(options, "ymin", -1),
+    jasp_numeric_fix(options, "ymax", 1)
+  )
+
+  ybreaks <- jasp_numeric_fix(options, "ybreaks", NULL)
+
+  myplot <- myplot + ggplot2::scale_y_continuous(
+    limits = ylim,
+    n.breaks = ybreaks
+  )
+
+
+  if (self$options$evaluate_hypotheses) {
+    myplot$layers[["null_line"]]$aes_params$colour <- self$options$null_color
+    if ( options$null_boundary > 0) {
+      divider <- 1
+      try(myplot$layers[["null_interval"]]$aes_params$fill <- self$options$null_color, silent = TRUE)
+      try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_interval)/divider+1, silent = TRUE)
+      try(myplot$layers[["ta_CI"]]$aes_params$alpha <-1 - as.numeric(self$options$alpha_interval), silent = TRUE)
+      try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_interval, silent = TRUE)
+      try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$linetype_summary, silent = TRUE)
+
+    }
+  }
+
+
+  # Slab
+  # myplot <- myplot + ggplot2::scale_fill_manual(
+  #   values = c(
+  #     "summary" = self$options$fill_error
+  #   ),
+  #   aesthetics = "slab_fill"
+  # )
+  #
+  # myplot <- myplot + ggplot2::discrete_scale(
+  #   "slab_alpha",
+  #   "slab_alpha_d",
+  #   function(n) return(c(
+  #     "summary" = 1 - as.numeric(self$options$alpha_error)
+  #   ))
+  # )
+
+
+  #aesthetics
+  myplot <- myplot + ggplot2::scale_shape_manual(
+    values = c(
+      "raw" = "circle",
+      "summary" = self$options$shape_summary
+    )
+  )
+
+  myplot <- myplot + ggplot2::scale_color_manual(
+    values = c(
+      "raw" = "black",
+      "summary" = self$options$color_summary
+    ),
+    aesthetics = c("color", "point_color")
+  )
+
+  myplot <- myplot + ggplot2::scale_fill_manual(
+    values = c(
+      "raw" = "black",
+      "summary" = self$options$fill_summary
+    ),
+    aesthetics = c("fill", "point_fill")
+  )
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    c("size", "point_size"),
+    "point_size_d",
+    function(n) return(c(
+      "raw" = 2,
+      "summary" = as.numeric(self$options$size_summary)
+    ))
+  )
+
+  myplot <- myplot + ggplot2::discrete_scale(
+    c("alpha", "point_alpha"),
+    "point_alpha_d",
+    function(n) return(c(
+      "raw" = 1,
+      "summary" = 1 - as.numeric(self$options$alpha_summary)
+    ))
+  )
+
+  myplot <- myplot + ggplot2::scale_linetype_manual(
+    values = c(
+      "summary" = self$options$linetype_summary
+    )
+  )
+
+  myplot <- myplot + ggplot2::scale_color_manual(
+    values = c(
+      "summary" = self$options$color_interval
+    ),
+    aesthetics = "interval_color"
+  )
+  myplot <- myplot + ggplot2::discrete_scale(
+    "interval_alpha",
+    "interval_alpha_d",
+    function(n) return(c(
+      "summary" = 1 - as.numeric(self$options$alpha_interval)
+    ))
+  )
+  myplot <- myplot + ggplot2::discrete_scale(
+    "interval_size",
+    "interval_size_d",
+    function(n) return(c(
+      "summary" = as.numeric(self$options$size_interval)
+    ))
+  )
+
+
+  return(myplot)
+
+}
