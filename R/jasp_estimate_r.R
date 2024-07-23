@@ -168,17 +168,15 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
 
   # scatterplot
   if (is.null(jaspResults[["scatterPlot"]])) {
-    jasp_plot_m_prep(
-      jaspResults,
-      options,
-      ready,
-      my_variable = "scatterPlot",
-      add_citation = FALSE
+
+    scatterplot <- createJaspPlot(
+      title = "Scatterplot",
+      width = options$sp_plot_width,
+      height = options$sp_plot_height
     )
 
-    jaspResults[["scatterPlot"]]$dependOn(
+    scatterplot$dependOn(
       c(
-        jaspResults[["scatterPlot"]]$dependOn(),
         "show_line",
         "show_line_CI",
         "show_PI",
@@ -188,9 +186,47 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
         "show_r",
         "predict_from_x",
         "x",
-        "y"
+        "y",
+        "sp_plot_width",
+        "sp_plot_height",
+        "sp_ylab",
+        "sp_axis.text.y",
+        "sp_axis.title.y",
+        "sp_ymin",
+        "sp_ymax",
+        "sp_ybreaks",
+        "sp_xlab",
+        "sp_axis.text.x",
+        "sp_axis.title.x",
+        "sp_xmin",
+        "sp_xmax",
+        "sp_xbreaks",
+        "show_mean_lines",
+        "plot_as_z",
+        "show_r",
+        "sp_shape_raw_reference",
+        "sp_color_raw_reference",
+        "sp_fill_raw_reference",
+        "sp_size_raw_reference",
+        "sp_alpha_raw_reference",
+        "sp_linetype_summary_reference",
+        "sp_linetype_PI_reference",
+        "sp_linetype_residual_reference",
+        "sp_size_summary_reference",
+        "sp_size_PI_reference",
+        "sp_size_residual_reference",
+        "sp_color_summary_reference",
+        "sp_color_PI_reference",
+        "sp_color_residual_reference",
+        "sp_alpha_summary_reference",
+        "sp_alpha_PI_reference",
+        "sp_alpha_residual_reference",
+        "sp_prediction_label",
+        "sp_prediction_color"
       )
     )
+
+    jaspResults[["scatterPlot"]] <- scatterplot
 
     if (ready) {
       args <- list()
@@ -210,7 +246,7 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
         args = args
       )
 
-      # myplot <- jasp_plot_correlation_decorate(myplot, options)
+      myplot <- jasp_scatterplot_decorate(myplot, options, r_value = estimate$es_r$effect_size[[1]])
 
       jaspResults[["scatterPlot"]]$plotObject <- myplot
 
@@ -407,4 +443,161 @@ jasp_plot_correlation_decorate <- function(myplot, options) {
 
   return(myplot)
 
+}
+
+
+jasp_scatterplot_decorate <- function(myplot, options, r_value) {
+  self <- list()
+  self$options <- options
+
+  if (self$options$show_r) {
+
+    font_size <- self$options$sp_axis.title.x
+
+    new_label <- paste(
+      "<span style='font-size:",
+      font_size,
+      "pt'>*r* = ",
+      format(r_value, digits = 2),
+      "</span>",
+      sep = ""
+    )
+    if (!is.null(myplot$layers$r_label)) {
+      myplot$layers$r_label$mapping$label<- new_label
+    }
+  }
+
+
+  # Axis options
+  if (!(options$sp_ylab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::ylab(options$sp_ylab)
+  }
+
+  if (!(options$sp_xlab %in% c("auto", "Auto", "AUTO", ""))) {
+    myplot <- myplot + ggplot2::xlab(options$sp_xlab)
+  }
+
+
+  xlim <- c(
+    jasp_numeric_fix(options, "sp_xmin", myplot$esci_xmin),
+    jasp_numeric_fix(options, "sp_xmax", myplot$esci_xmax)
+  )
+
+  xbreaks <- jasp_numeric_fix(options, "sp_xbreaks", NULL)
+
+  myplot <- myplot + ggplot2::scale_x_continuous(
+    limits = xlim,
+    n.breaks = xbreaks,
+    expand = c(0, 0)
+  )
+
+  ylim <- c(
+    jasp_numeric_fix(options, "sp_ymin", myplot$esci_ymin),
+    jasp_numeric_fix(options, "sp_ymax", myplot$esci_ymax)
+  )
+
+  ybreaks <- jasp_numeric_fix(options, "sp_ybreaks", NULL)
+
+  myplot <- myplot + ggplot2::scale_y_continuous(
+    limits = ylim,
+    n.breaks = ybreaks,
+    expand = c(0, 0)
+  )
+
+
+  myplot <- myplot + ggplot2::theme(
+    axis.text.y = ggtext::element_markdown(size = self$options$sp_axis.text.y),
+    axis.title.y = ggtext::element_markdown(size = self$options$sp_axis.title.y),
+    axis.text.x = ggtext::element_markdown(size = self$options$sp_axis.text.x),
+    axis.title.x = ggtext::element_markdown(size = self$options$sp_axis.title.x),
+    legend.title = ggtext::element_markdown(),
+    legend.text = ggtext::element_markdown()
+  )
+
+  myplot$layers$raw_Reference_point$aes_params$fill <- self$options$sp_fill_raw_reference
+  myplot$layers$raw_Reference_point$aes_params$colour <- self$options$sp_color_raw_reference
+  myplot$layers$raw_Reference_point$aes_params$size <- as.numeric(self$options$sp_size_raw_reference)
+  myplot$layers$raw_Reference_point$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_raw_reference)
+  myplot$layers$raw_Reference_point$aes_params$shape <- self$options$sp_shape_raw_reference
+  #
+
+  if (!is.null(myplot$layers$summary_Reference_line) & self$options$show_line) {
+    myplot$layers$summary_Reference_line$aes_params$colour <- self$options$sp_color_summary_reference
+    #myplot$layers$summary_Reference_line$aes_params$fill <- self$options$sp_color_summary_reference
+    #myplot$layers$summary_Reference_line$aes_params$alpha <- as.numeric(self$options$sp_alpha_summary_reference)
+    myplot$layers$summary_Reference_line$aes_params$linetype <- self$options$sp_linetype_summary_reference
+    myplot$layers$summary_Reference_line$aes_params$size <- as.numeric(self$options$sp_size_summary_reference)/2
+
+  }
+
+
+  if (!is.null(myplot$layers$summary_Reference_line_CI) & self$options$show_line_CI) {
+    #myplot$layers$summary_Reference_line$aes_params$colour <- self$options$sp_color_summary_reference
+    myplot$layers$summary_Reference_line_CI$aes_params$fill <- self$options$sp_color_summary_reference
+    myplot$layers$summary_Reference_line_CI$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_summary_reference)
+    #myplot$layers$summary_Reference_line$aes_params$linetype <- self$options$sp_linetype_summary_reference
+    #myplot$layers$summary_Reference_line$aes_params$size <- as.numeric(self$options$sp_size_summary_reference)/2
+  }
+
+  if (!is.null(myplot$layers$residuals)) {
+    myplot$layers$residuals$aes_params$colour <- self$options$sp_color_residual_reference
+    myplot$layers$residuals$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_residual_reference)
+    myplot$layers$residuals$aes_params$linetype <- self$options$sp_linetype_residual_reference
+    myplot$layers$residuals$aes_params$size <- as.numeric(self$options$sp_size_residual_reference)/2
+  }
+
+  if (!is.null(myplot$layers$prediction_interval_upper)) {
+    myplot$layers$prediction_interval_upper$aes_params$colour <- self$options$sp_color_PI_reference
+    myplot$layers$prediction_interval_upper$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_PI_reference)
+    myplot$layers$prediction_interval_upper$aes_params$linetype <- self$options$sp_linetype_PI_reference
+    myplot$layers$prediction_interval_upper$aes_params$size <- as.numeric(self$options$sp_size_PI_reference)/2
+  }
+
+  if (!is.null(myplot$layers$prediction_interval_lower)) {
+    myplot$layers$prediction_interval_lower$aes_params$colour <- self$options$sp_color_PI_reference
+    myplot$layers$prediction_interval_lower$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_PI_reference)
+    myplot$layers$prediction_interval_lower$aes_params$linetype <- self$options$sp_linetype_PI_reference
+    myplot$layers$prediction_interval_lower$aes_params$size <- as.numeric(self$options$sp_size_PI_reference)/2
+  }
+
+  if (!is.null(myplot$layers$prediction_y_label)) {
+    myplot$layers$prediction_y_label$aes_params$size <- as.numeric(self$options$sp_prediction_label)
+    myplot$layers$prediction_y_label$aes_params$text.colour <- self$options$sp_prediction_color
+  }
+
+  if (!is.null(myplot$layers$prediction_x_label)) {
+    myplot$layers$prediction_x_label$aes_params$size <- as.numeric(self$options$sp_prediction_label)
+    myplot$layers$prediction_x_label$aes_params$text.colour <- self$options$sp_prediction_color
+  }
+
+  if (!is.null(myplot$layers$prediction_prediction_interval)) {
+    myplot$layers$prediction_prediction_interval$aes_params$colour <- self$options$sp_color_PI
+    myplot$layers$prediction_prediction_interval$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_PI)/15
+    myplot$layers$prediction_prediction_interval$aes_params$linetype <- self$options$sp_linetype_PI
+    myplot$layers$prediction_prediction_interval$aes_params$size <- as.numeric(self$options$sp_size_PI)/2
+  }
+
+  if (!is.null(myplot$layers$prediction_confidence_interval)) {
+    myplot$layers$prediction_confidence_interval$aes_params$colour <- self$options$sp_color_CI
+    myplot$layers$prediction_confidence_interval$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_CI)/15
+    myplot$layers$prediction_confidence_interval$aes_params$linetype <- self$options$sp_linetype_CI
+    myplot$layers$prediction_confidence_interval$aes_params$size <- as.numeric(self$options$sp_size_CI)/2
+  }
+
+  if (!is.null(myplot$layers$prediction_vertical_line)) {
+    myplot$layers$prediction_vertical_line$aes_params$colour <- self$options$sp_color_ref
+    myplot$layers$prediction_vertical_line$aes_params$alpha <- 1 - (as.numeric(self$options$sp_alpha_ref)/15)
+    myplot$layers$prediction_vertical_line$aes_params$linetype <- self$options$sp_linetype_ref
+    myplot$layers$prediction_vertical_line$aes_params$size <- as.numeric(self$options$sp_size_ref)/2
+  }
+
+  if (!is.null(myplot$layers$prediction_horizontal_line)) {
+    myplot$layers$prediction_horizontal_line$aes_params$colour <- self$options$sp_color_ref
+    myplot$layers$prediction_horizontal_line$aes_params$alpha <- 1 - (as.numeric(self$options$sp_alpha_ref)/15)
+    myplot$layers$prediction_horizontal_line$aes_params$linetype <- self$options$sp_linetype_ref
+    myplot$layers$prediction_horizontal_line$aes_params$size <- as.numeric(self$options$sp_size_ref)/2
+  }
+
+
+  return(myplot)
 }
