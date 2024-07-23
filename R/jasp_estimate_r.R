@@ -222,7 +222,19 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
         "sp_alpha_PI_reference",
         "sp_alpha_residual_reference",
         "sp_prediction_label",
-        "sp_prediction_color"
+        "sp_prediction_color",
+        "sp_linetype_ref",
+        "sp_linetype_PI",
+        "sp_linetype_CI",
+        "sp_size_ref",
+        "sp_size_PI",
+        "sp_size_CI",
+        "sp_color_ref",
+        "sp_color_PI",
+        "sp_color_CI",
+        "sp_alpha_ref",
+        "sp_alpha_PI",
+        "sp_alpha_CI"
       )
     )
 
@@ -572,28 +584,28 @@ jasp_scatterplot_decorate <- function(myplot, options, r_value) {
 
   if (!is.null(myplot$layers$prediction_prediction_interval)) {
     myplot$layers$prediction_prediction_interval$aes_params$colour <- self$options$sp_color_PI
-    myplot$layers$prediction_prediction_interval$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_PI)/15
+    myplot$layers$prediction_prediction_interval$aes_params$alpha <- (1 - as.numeric(self$options$sp_alpha_PI))/15
     myplot$layers$prediction_prediction_interval$aes_params$linetype <- self$options$sp_linetype_PI
     myplot$layers$prediction_prediction_interval$aes_params$size <- as.numeric(self$options$sp_size_PI)/2
   }
 
   if (!is.null(myplot$layers$prediction_confidence_interval)) {
     myplot$layers$prediction_confidence_interval$aes_params$colour <- self$options$sp_color_CI
-    myplot$layers$prediction_confidence_interval$aes_params$alpha <- 1 - as.numeric(self$options$sp_alpha_CI)/15
+    myplot$layers$prediction_confidence_interval$aes_params$alpha <- (1 - as.numeric(self$options$sp_alpha_CI))/15
     myplot$layers$prediction_confidence_interval$aes_params$linetype <- self$options$sp_linetype_CI
     myplot$layers$prediction_confidence_interval$aes_params$size <- as.numeric(self$options$sp_size_CI)/2
   }
 
   if (!is.null(myplot$layers$prediction_vertical_line)) {
     myplot$layers$prediction_vertical_line$aes_params$colour <- self$options$sp_color_ref
-    myplot$layers$prediction_vertical_line$aes_params$alpha <- 1 - (as.numeric(self$options$sp_alpha_ref)/15)
+    myplot$layers$prediction_vertical_line$aes_params$alpha <- (1 - (as.numeric(self$options$sp_alpha_ref)))/15
     myplot$layers$prediction_vertical_line$aes_params$linetype <- self$options$sp_linetype_ref
     myplot$layers$prediction_vertical_line$aes_params$size <- as.numeric(self$options$sp_size_ref)/2
   }
 
   if (!is.null(myplot$layers$prediction_horizontal_line)) {
     myplot$layers$prediction_horizontal_line$aes_params$colour <- self$options$sp_color_ref
-    myplot$layers$prediction_horizontal_line$aes_params$alpha <- 1 - (as.numeric(self$options$sp_alpha_ref)/15)
+    myplot$layers$prediction_horizontal_line$aes_params$alpha <- (1 - (as.numeric(self$options$sp_alpha_ref)))/15
     myplot$layers$prediction_horizontal_line$aes_params$linetype <- self$options$sp_linetype_ref
     myplot$layers$prediction_horizontal_line$aes_params$size <- as.numeric(self$options$sp_size_ref)/2
   }
