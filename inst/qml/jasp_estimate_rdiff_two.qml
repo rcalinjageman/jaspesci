@@ -646,13 +646,13 @@ Form
     title: qsTr("Estimation figure options")
     simple_labels_enabled: false
     simple_labels_visible: false
-    difference_axis_grid_visible: false
+    difference_axis_grid_visible: true
     difference_axis_units_visible: false
     data_grid_visible: false
     distributions_grid_visible: false
     ymin_placeholderText: "-1"
     ymax_placeholderText: "1"
-    width_defaultValue: 300
+    width_defaultValue: 600
     height_defaultValue: 400
 
   }
@@ -662,53 +662,52 @@ Form
   {
     title: qsTr("Estimation figure aesthetics")
 
-    Esci.AestheticsSummary {
+    Esci.AestheticsSummaryByGroup {
+      Layout.columnSpan: 2
     }
 
-    Group
-    {
-    title: qsTr("CI")
-    columns: 2
-    Layout.columnSpan: 2
+
+    GridLayout {
+      id: aesthetics_summary_by_group
+      columns: 4
+
+      Label {
+        text: qsTr("CI")
+        Layout.columnSpan: 4
+      }
+
+      Label {
+        text: qsTr("Style")
+      }
 
       Esci.LineTypeSelect
       {
-        label: qsTr("Style")
-        name: "linetype_summary"
-        id: linetype_summary
+        name: "linetype_summary_reference"
+        id: linetype_summary_reference
       }
 
-      IntegerField
+      Esci.LineTypeSelect
       {
-        name: "size_interval"
-        label: qsTr("Thickness")
-        defaultValue: 3
-        min: 1
-        max: 10
+        name: "linetype_summary_comparison"
+        id: linetype_summary_comparison
       }
 
-      Esci.ColorSelect
+      Esci.LineTypeSelect
       {
-        name: "color_interval"
-        label: qsTr("Color")
-        startValue: 'black'
-        id: color_interval
+        name: "linetype_summary_difference"
+        id: linetype_summary_difference
       }
 
-      Esci.AlphaSelect
-      {
-        name: "alpha_interval"
-        label: qsTr("Transparency")
-      }
-    }  // end ci grid
 
+
+    }
 
 
   }
 
 
   Esci.HeOptions {
-    null_value_enabled: true
+    null_value_enabled: false
     null_boundary_max: 1
   }
 
