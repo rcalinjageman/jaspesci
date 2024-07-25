@@ -65,6 +65,7 @@ Form
   		AvailableVariablesList { name: "allVariablesList" }
   		AssignedVariablesList { name: "x"; title: qsTr("<i>X</i> Variable"); suggestedColumns: ["scale"]; singleVariable: true }
   		AssignedVariablesList { name: "y"; title: qsTr("<i>Y</i> Variable"); suggestedColumns: ["scale"]; singleVariable: true }
+  		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
   	}
 
   }
@@ -80,25 +81,93 @@ Form
 
       GridLayout {
       id: sgrid
-      columns: 1
+      columns: 3
+
+        Label {
+          text: qsTr("")
+        }
+
+        Label {
+          text: qsTr("<b>Reference group</b>")
+        }
+
+        Label {
+          text: qsTr("<b>Comparison group</b>")
+        }
+
+        Label {
+          text: qsTr("Name")
+        }
+
+        TextField
+        {
+          name: "reference_level_name"
+          id: reference_level_name
+          label: ""
+          placeholderText: "Reference level"
+          enabled: from_summary.checked
+        }
+
+
+        TextField
+        {
+          name: "comparison_level_name"
+          id: comparison_level_name
+          label: ""
+          placeholderText: "Comparison level"
+          enabled: from_summary.checked
+        }
+
+        Label {
+          text: qsTr("Correlation (<i>r</i>)")
+        }
 
         DoubleField {
-          name: "r"
-          label: qsTr("Correlation (<i>r</i>)")
+          name: "reference_r"
+          label: ""
           defaultValue: 0.5
           min: 0
           max: 1
           enabled: from_summary.checked
         }
 
+        DoubleField {
+          name: "comparison_r"
+          label: ""
+          defaultValue: 0.75
+          min: 0
+          max: 1
+          enabled: from_summary.checked
+        }
+
+
+        Label {
+          text: qsTr("Sample size (<i>N</i>)")
+        }
 
         DoubleField {
-          name: "n"
-          label: qsTr("Sample size (<i>N</i>)")
+          name: "reference_n"
+          label: ""
           defaultValue: 20
           min: 2
           enabled: from_summary.checked
         }
+
+
+        DoubleField {
+          name: "comparison_n"
+          label: ""
+          defaultValue: 20
+          min: 2
+          enabled: from_summary.checked
+        }
+
+      } // end of 3 column grid
+
+
+      GridLayout {
+      id: slabelgrid
+      columns: 1
 
         TextField
         {
@@ -109,13 +178,21 @@ Form
           enabled: from_summary.checked
         }
 
-
         TextField
         {
           name: "y_variable_name"
           id: y_variable_name
           label: "Y-variable name"
           placeholderText: "Y variable"
+          enabled: from_summary.checked
+        }
+
+        TextField
+        {
+          name: "grouping_variable_name"
+          id: grouping_variable_name
+          label: "Grouping variable name"
+          placeholderText: "Grouping variable"
           enabled: from_summary.checked
         }
 
@@ -156,17 +233,8 @@ Form
     visible: from_raw.checked
     Layout.columnSpan: 2
 
-    CheckBox
-	  {
-	    name: "do_regression";
-	    id: do_regression
-	    label: qsTr("Regression analysis")
-	    enabled: from_raw.checked
-      visible: from_raw.checked
-	   }
-
 	  GridLayout {
-	    columns: 3
+	    columns: 2
 
 	      CheckBox {
     	    name: "show_line";
@@ -184,40 +252,17 @@ Form
           visible: from_raw.checked
 	      }
 
-	      CheckBox {
-    	    name: "show_residuals";
-    	    id: show_residuals
-	        label: qsTr("Residuals")
-	        enabled: do_regression.checked
-          visible: from_raw.checked
-	      }
 	  }
 
-    CheckBox
-	  {
-	    name: "show_PI";
-	    id: show_PI
-	    label: qsTr("Prediction interval")
-	    enabled: do_regression.checked
-      visible: from_raw.checked
-	   }
 
-	   TextField {
-         name: "predict_from_x"
-         id: predict_from_x
-         label: qsTr("Enter <i>X</i> value to generate prediction (<i>&#374;</i>)")
-         placeholderText: "Enter an X value"
-   	     enabled: do_regression.checked
-         visible: from_raw.checked
-     }
-
-  }
+  } // end of regression
 
 
   Esci.ScatterplotOptions {
-    sp_other_options_grid_enabled: true
-    sp_other_options_grid_visible: true
+    sp_other_options_grid_enabled: false
+    sp_other_options_grid_visible: false
   }
+
 
     Section
   {
