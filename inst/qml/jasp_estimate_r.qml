@@ -552,7 +552,7 @@ Form
 
       IntegerField
       {
-        name: "sp_size_interval_reference"
+        name: "sp_size_summary_reference"
         defaultValue: 3
         min: 1
         max: 10
@@ -616,7 +616,7 @@ Form
       {
         name: "sp_alpha_summary_reference"
         id: sp_alpha_summary_reference
-        enabled: show_line.checked || show_line_CI.checked
+        enabled: show_line_CI.checked
         defaultValue: 75
       }
 
