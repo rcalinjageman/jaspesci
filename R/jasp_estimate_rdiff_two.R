@@ -1,20 +1,20 @@
 jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
-  return()
-
   # Handles
   from_raw <- options$switch == "from_raw"
   evaluate_h <- options$evaluate_hypotheses
 
   ready <- FALSE
   if (from_raw) {
-    ready <- (options$x != "") & (options$y != "")
+    ready <- (options$x != "") & (options$y != "") & (options$grouping_variable != "")
   } else {
     # Determine if summary data is ready
-    ready <- !is.null(options$r) & !is.null(options$n)
+    ready <- !is.null(options$comparison_r) & !is.null(options$comparison_n) & !is.null(options$reference_r) & !is.null(options$reference_n)
     if (ready) {
-      if ((options$r) <= -1 | options$r >= 1) { ready <- FALSE}
-      if (options$n <= 2) { ready <- FALSE}
+      if ((options$comparison_r) <= -1 | options$comparison_r >= 1) { ready <- FALSE}
+      if ((options$reference_r) <= -1 | options$reference_r >= 1) { ready <- FALSE}
+      if (options$comparison_n <= 2) { ready <- FALSE}
+      if (options$reference_n <= 2) { ready <- FALSE}
     }
   }
 
@@ -23,7 +23,7 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   if (ready) {
     if (from_raw) {
       # read dataset
-      dataset <- jasp_estimate_r_read_data(dataset, options)
+      dataset <- jasp_estimate_rdiff_two_read_data(dataset, options)
 
       # check for errors
       # At least 2 observations per variable
@@ -40,21 +40,28 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
   # Run the analysis
   if (ready) {
-    call <- esci::estimate_r
+    call <- esci::estimate_rdiff_two
     args <- list()
 
     if (from_raw) {
       args$data <- dataset
       args$x <- options$x
       args$y <- options$y
+      args$grouping_variable <- options$grouping_variable
 
     } else {
 
-      args$r <- options$r
-      args$n <- options$n
+      args$comparison_r <- options$comparison_r
+      args$comparison_n <- options$comparison_n
+      args$reference_r <- options$reference_r
+      args$reference_n <- options$reference_n
       args$x_variable_name <- jasp_text_fix(options, "x_variable_name", "X-variable")
       args$y_variable_name <- jasp_text_fix(options, "y_variable_name", "Y-variable")
-
+      args$grouping_variable_name <- jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
+      args$grouping_variable_levels <- c(
+        jasp_text_fix(options, "reference_level_name", "Reference level"),
+        jasp_text_fix(options, "comparison_level_name", "Comparison level")
+      )
     }
 
     args$conf_level <- options$conf_level
@@ -62,31 +69,14 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     estimate <- try(do.call(what = call, args = args))
 
     # Things to move into esci ----------------------
-    # sxy
-    if (!is.null(estimate$properties$lm)) {
-      estimate$es_r$syx <- summary(estimate$properties$lm)$sigma
-    }
-    #
     # Fill in MoE
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
-
-    # switch regression table to html
-    estimate$regression$component <- gsub(
-      "(a)",
-      "<i>a</i>",
-      estimate$regression$component
-    )
-    estimate$regression$component <- gsub(
-      "(b)",
-      "<i>b</i>",
-      estimate$regression$component
-    )
 
     # --------------------------------------
 
 
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
-      mytest <- esci::test_correlation(
+      mytest <- esci::test_rdiff(
         estimate,
         rope = c(options$null_value - options$null_boundary, options$null_value + options$null_boundary),
         output_html = TRUE
@@ -102,12 +92,15 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     options$effect_size <- "r"
     options$show_calculations <- FALSE
     options$assume_equal_variance <- TRUE
+
+    mylevels <- levels(dataset[[options$grouping_variable]])
+
     jasp_overview_prep(
       jaspResults,
       options,
       ready,
       estimate,
-      level = length(levels)
+      level = length(mylevels)
     )
 
     if (ready) {
@@ -135,18 +128,19 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
-  # r table
-  if(is.null(jaspResults[["regression"]]) & from_raw & options$do_regression) {
-    jasp_regression_prep(
+
+  # r_difference table
+  if(is.null(jaspResults[["es_r_difference"]])) {
+    jasp_es_r_difference_prep(
       jaspResults = jaspResults,
       options = options,
       ready = ready
     )
 
     if (ready) jasp_table_fill(
-      jaspResults[["regression"]],
+      jaspResults[["es_r_difference"]],
       estimate,
-      "regression"
+      "es_r_difference"
     )
   }
 
@@ -168,6 +162,8 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
+  return()
+
   # scatterplot
   if (is.null(jaspResults[["scatterPlot"]])) {
 
@@ -177,68 +173,7 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       height = options$sp_plot_height
     )
 
-    scatterplot$dependOn(
-      c(
-        "show_line",
-        "show_line_CI",
-        "show_PI",
-        "show_residuals",
-        "show_mean_lines",
-        "plot_as_z",
-        "show_r",
-        "predict_from_x",
-        "x",
-        "y",
-        "sp_plot_width",
-        "sp_plot_height",
-        "sp_ylab",
-        "sp_axis.text.y",
-        "sp_axis.title.y",
-        "sp_ymin",
-        "sp_ymax",
-        "sp_ybreaks",
-        "sp_xlab",
-        "sp_axis.text.x",
-        "sp_axis.title.x",
-        "sp_xmin",
-        "sp_xmax",
-        "sp_xbreaks",
-        "show_mean_lines",
-        "plot_as_z",
-        "show_r",
-        "sp_shape_raw_reference",
-        "sp_color_raw_reference",
-        "sp_fill_raw_reference",
-        "sp_size_raw_reference",
-        "sp_alpha_raw_reference",
-        "sp_linetype_summary_reference",
-        "sp_linetype_PI_reference",
-        "sp_linetype_residual_reference",
-        "sp_size_summary_reference",
-        "sp_size_PI_reference",
-        "sp_size_residual_reference",
-        "sp_color_summary_reference",
-        "sp_color_PI_reference",
-        "sp_color_residual_reference",
-        "sp_alpha_summary_reference",
-        "sp_alpha_PI_reference",
-        "sp_alpha_residual_reference",
-        "sp_prediction_label",
-        "sp_prediction_color",
-        "sp_linetype_ref",
-        "sp_linetype_PI",
-        "sp_linetype_CI",
-        "sp_size_ref",
-        "sp_size_PI",
-        "sp_size_CI",
-        "sp_color_ref",
-        "sp_color_PI",
-        "sp_color_CI",
-        "sp_alpha_ref",
-        "sp_alpha_PI",
-        "sp_alpha_CI"
-      )
-    )
+    scatterplot$dependOn(jasp_scatterplot_depends_on())
 
     jaspResults[["scatterPlot"]] <- scatterplot
 
@@ -312,7 +247,8 @@ jasp_estimate_rdiff_two_read_data <- function(dataset, options) {
   else
     return(
       .readDataSetToEnd(
-        columns.as.numeric = c(options$x, options$y)
+        columns.as.numeric = c(options$x, options$y),
+        columns.as.factor = options$grouping_variable
       )
     )
 }

@@ -270,89 +270,217 @@ Form
     enabled: from_raw.checked
     visible: from_raw.checked
 
-     GridLayout {
-      id: sp_raw_grid
-      columns: 1
-      Layout.columnSpan: 2
+
+      GridLayout {
+      id: grid
+      columns: 4
+
 
       Label {
-          text: qsTr("Raw data")
+        text: " "
+      }
+
+      Label {
+        text: qsTr("<b>Reference</b>")
+      }
+
+
+      Label {
+        text: qsTr("<b>Comparison</b>")
+      }
+
+
+      Label {
+        text: qsTr("<b>Unused</b>")
+      }
+
+      Label {
+        text: qsTr("<b>Raw data</b>")
+      }
+
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+
+      Label {
+        text: qsTr("Shape")
       }
 
       Esci.ShapeSelect
       {
         name: "sp_shape_raw_reference"
         id: sp_shape_raw_reference
-        label: qsTr("Shape")
         startValue: 'circle filled'
         enabled: from_raw.checked
+      }
+
+      Esci.ShapeSelect
+      {
+        name: "sp_shape_raw_comparison"
+        id: sp_shape_raw_comparison
+        startValue: 'circle filled'
+        enabled: from_raw.checked
+      }
+
+
+      Esci.ShapeSelect
+      {
+        name: "shape_raw_unused"
+        id: shape_raw_unused
+        startValue: 'circle filled'
+        enabled: from_raw.checked
+      }
+
+
+      Label {
+        text: qsTr("Size")
       }
 
       Esci.SizeSelect
       {
         name: "sp_size_raw_reference"
         id: sp_size_raw_reference
-        label: qsTr("Size")
         defaultValue: 3
         enabled: from_raw.checked
 
+      }
+
+      Esci.SizeSelect
+      {
+        name: "sp_size_raw_comparison"
+        id: sp_size_raw_comparison
+        defaultValue: 3
+        enabled: from_raw.checked
+
+      }
+
+      Esci.SizeSelect
+      {
+        name: "sp_size_raw_unused"
+        id: sp_size_raw_unused
+        defaultValue: 2
+        enabled: from_raw.checked
+
+      }
+
+      Label {
+        text: qsTr("Outline")
       }
 
       Esci.ColorSelect
       {
         name: "sp_color_raw_reference"
         id: sp_color_raw_reference
-        label: qsTr("Outline")
         startValue: "black"
         enabled: from_raw.checked
       }
 
       Esci.ColorSelect
       {
+        name: "sp_color_raw_comparison"
+        id: sp_color_raw_comparison
+        startValue: "black"
+        enabled: from_raw.checked
+      }
+
+      Esci.ColorSelect
+      {
+        name: "sp_color_raw_unused"
+        id: sp_color_raw_unused
+        startValue: "black"
+        enabled: from_raw.checked
+      }
+
+
+      Label {
+        text: qsTr("Fill")
+      }
+
+      Esci.ColorSelect
+      {
         name: "sp_fill_raw_reference"
         id: sp_fill_raw_reference
-        label: qsTr("Fill")
         startValue: "#008DF9"
         enabled: from_raw.checked
+      }
+
+      Esci.ColorSelect
+      {
+        name: "sp_fill_raw_comparison"
+        id: sp_fill_raw_comparison
+        startValue: "#009F81"
+        enabled: from_raw.checked
+      }
+
+      Esci.ColorSelect
+      {
+        name: "sp_fill_raw_unused"
+        id: sp_fill_raw_unused
+        startValue: "NA"
+        enabled: from_raw.checked
+      }
+
+
+      Label {
+        text: qsTr("Transparency")
       }
 
       Esci.AlphaSelect
       {
         name: "sp_alpha_raw_reference"
-        label: qsTr("Transparency")
         id: sp_alpha_raw_reference
         enabled: from_raw.checked
         defaultValue: 75
+
       }
 
+      Esci.AlphaSelect
+      {
+        name: "sp_alpha_raw_comparison"
+        id: sp_alpha_raw_comparison
+        enabled: from_raw.checked
+        defaultValue: 75
 
-    }
-
-    GridLayout {
-      id: sp_linetypes_grid
-      columns: 4
-      Layout.columnSpan: 2
-      enabled: do_regression.checked
-
-      Label {
-          text: ""
       }
 
-      Label {
-          text: qsTr("Regression")
-      }
+      Esci.AlphaSelect
+      {
+        name: "sp_alpha_raw_unused"
+        id: sp_alpha_raw_unused
+        enabled: from_raw.checked
+        defaultValue: 75
 
-      Label {
-          text: qsTr("Prediction")
       }
 
 
       Label {
-          text: qsTr("Residual")
+        text: qsTr("<b>Regression lines</b>")
       }
 
       Label {
-          text: "Style"
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+      Label {
+        text: " "
+      }
+
+
+      Label {
+        text: qsTr("Style")
       }
 
       Esci.LineTypeSelect
@@ -364,27 +492,24 @@ Form
 
       Esci.LineTypeSelect
       {
-        name: "sp_linetype_PI_reference"
-        id: sp_linetype_PI_reference
-        enabled: show_PI.checked
-        startValue: "dotted"
-      }
-
-      Esci.LineTypeSelect
-      {
-        name: "sp_linetype_residual_reference"
-        id: sp_linetype_residual_reference
-        enabled: show_residuals.checked
+        name: "sp_linetype_summary_comparison"
+        id: sp_linetype_summary_comparison
+        enabled: show_line.checked
       }
 
       Label {
-          text: "Thickness"
+        text: " "
+      }
+
+
+      Label {
+        text: qsTr("Thickness")
       }
 
       IntegerField
       {
         name: "sp_size_summary_reference"
-        defaultValue: 3
+        defaultValue: 2
         min: 1
         max: 10
         enabled: show_line.checked
@@ -392,26 +517,21 @@ Form
 
       IntegerField
       {
-        name: "sp_size_PI_reference"
+        name: "sp_size_summary_comparison"
         defaultValue: 2
         min: 1
         max: 10
-        enabled: show_PI.checked
-      }
-
-      IntegerField
-      {
-        name: "sp_size_residual_reference"
-        defaultValue: 1
-        min: 1
-        max: 10
-        enabled: show_residuals.checked
+        enabled: show_line.checked
       }
 
       Label {
-          text: "Color"
+        text: " "
       }
 
+
+      Label {
+        text: qsTr("Color")
+      }
 
       Esci.ColorSelect
       {
@@ -423,25 +543,20 @@ Form
 
       Esci.ColorSelect
       {
-        name: "sp_color_PI_reference"
-        id: sp_color_PI_reference
-        startValue: '#E20134'
-        enabled: show_PI.checked
+        name: "sp_color_summary_comparison"
+        id: sp_color_summary_comparison
+        startValue: '#009F81'
+        enabled: show_line.checked || show_line_CI.checked
       }
 
-      Esci.ColorSelect
-      {
-        name: "sp_color_residual_reference"
-        id: sp_color_residual_reference
-        startValue: '#E20134'
-        enabled: show_residuals.checked
+      Label {
+        text: " "
       }
 
 
       Label {
-          text: "Transparency"
+        text: qsTr("Transparency")
       }
-
 
       Esci.AlphaSelect
       {
@@ -453,192 +568,16 @@ Form
 
       Esci.AlphaSelect
       {
-        name: "sp_alpha_PI_reference"
-        id: sp_alpha_PI_reference
-        enabled: show_PI.checked
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "sp_alpha_residual_reference"
-        id: sp_alpha_residual_reference
-        enabled: show_residuals.checked
-      }
-
-
-    } // end linetypes grid of scatterplot aesthetics
-
-    GridLayout {
-      id: sp_predict_from_x_grid
-      columns: 1
-      Layout.columnSpan: 2
-
-      Label {
-          text: qsTr("Prediction from <i>X</i>")
-      }
-
-      IntegerField
-      {
-        name: "sp_prediction_label"
-        defaultValue: 5
-        label: qsTr("Label size")
-        min: 1
-        max: 10
-        enabled: from_raw.checked
-      }
-
-      Esci.ColorSelect
-      {
-        name: "sp_prediction_color"
-        id: sp_prediction_color
-        label: qsTr("Label color")
-        startValue: "#E20134"
-        enabled: from_raw.checked
-      }
-
-
-    }  // end predict from x grid
-
-    GridLayout {
-      id: sp_guidelines_grid
-      columns: 4
-      Layout.columnSpan: 2
-      enabled: do_regression.checked
-
-      Label {
-          text: ""
-      }
-
-      Label {
-          text: qsTr("Guidelines")
-      }
-
-      Label {
-          text: qsTr("PI")
-      }
-
-
-      Label {
-          text: qsTr("SI")
-      }
-
-      Label {
-          text: "Style"
-      }
-
-
-      Esci.LineTypeSelect
-      {
-        name: "sp_linetype_ref"
-        id: sp_linetype_ref
-        enabled: from_raw.checked
-        startValue: "dotted"
-      }
-
-      Esci.LineTypeSelect
-      {
-        name: "sp_linetype_PI"
-        id: sp_linetype_PI
-        enabled: show_PI.checked
-      }
-
-      Esci.LineTypeSelect
-      {
-        name: "sp_linetype_CI"
-        id: sp_linetype_CI
+        name: "sp_alpha_summary_comparison"
+        id: sp_alpha_summary_comparison
         enabled: show_line_CI.checked
+        defaultValue: 75
       }
 
-      Label {
-          text: "Thickness"
-      }
-
-      IntegerField
-      {
-        name: "sp_size_ref"
-        defaultValue: 1
-        min: 1
-        max: 10
-        enabled: from_raw.checked
-      }
-
-      IntegerField
-      {
-        name: "sp_size_PI"
-        defaultValue: 2
-        min: 1
-        max: 10
-        enabled: show_PI.checked
-      }
-
-      IntegerField
-      {
-        name: "sp_size_CI"
-        defaultValue: 4
-        min: 1
-        max: 10
-        enabled: show_line_CI
-      }
-
-      Label {
-          text: "Color"
-      }
+    } // end raw data
 
 
-      Esci.ColorSelect
-      {
-        name: "sp_color_ref"
-        id: sp_color_ref
-        startValue: 'gray60'
-        enabled: from_raw.checked
-      }
-
-      Esci.ColorSelect
-      {
-        name: "sp_color_PI"
-        id: sp_color_PI
-        startValue: '#E20134'
-        enabled: show_PI.checked
-      }
-
-      Esci.ColorSelect
-      {
-        name: "sp_color_CI"
-        id: sp_color_CI
-        startValue: '#008DF9'
-        enabled: show_line_CI.checked
-      }
-
-
-      Label {
-          text: "Transparency"
-      }
-
-
-      Esci.AlphaSelect
-      {
-        name: "sp_alpha_ref"
-        id: sp_alpha_ref
-        enabled: from_raw.checked
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "sp_alpha_PI"
-        id: sp_alpha_PI
-        enabled: show_PI.checked
-      }
-
-      Esci.AlphaSelect
-      {
-        name: "sp_alpha_CI"
-        id: sp_alpha_CI
-        enabled: show_line_CI.checked
-      }
-
-    }
-
-  }
+  } // end scatterplot aesthetics
 
 
 

@@ -104,8 +104,7 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options,
       ready,
-      estimate,
-      level = length(levels)
+      estimate
     )
 
     if (ready) {
@@ -175,68 +174,7 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       height = options$sp_plot_height
     )
 
-    scatterplot$dependOn(
-      c(
-        "show_line",
-        "show_line_CI",
-        "show_PI",
-        "show_residuals",
-        "show_mean_lines",
-        "plot_as_z",
-        "show_r",
-        "predict_from_x",
-        "x",
-        "y",
-        "sp_plot_width",
-        "sp_plot_height",
-        "sp_ylab",
-        "sp_axis.text.y",
-        "sp_axis.title.y",
-        "sp_ymin",
-        "sp_ymax",
-        "sp_ybreaks",
-        "sp_xlab",
-        "sp_axis.text.x",
-        "sp_axis.title.x",
-        "sp_xmin",
-        "sp_xmax",
-        "sp_xbreaks",
-        "show_mean_lines",
-        "plot_as_z",
-        "show_r",
-        "sp_shape_raw_reference",
-        "sp_color_raw_reference",
-        "sp_fill_raw_reference",
-        "sp_size_raw_reference",
-        "sp_alpha_raw_reference",
-        "sp_linetype_summary_reference",
-        "sp_linetype_PI_reference",
-        "sp_linetype_residual_reference",
-        "sp_size_summary_reference",
-        "sp_size_PI_reference",
-        "sp_size_residual_reference",
-        "sp_color_summary_reference",
-        "sp_color_PI_reference",
-        "sp_color_residual_reference",
-        "sp_alpha_summary_reference",
-        "sp_alpha_PI_reference",
-        "sp_alpha_residual_reference",
-        "sp_prediction_label",
-        "sp_prediction_color",
-        "sp_linetype_ref",
-        "sp_linetype_PI",
-        "sp_linetype_CI",
-        "sp_size_ref",
-        "sp_size_PI",
-        "sp_size_CI",
-        "sp_color_ref",
-        "sp_color_PI",
-        "sp_color_CI",
-        "sp_alpha_ref",
-        "sp_alpha_PI",
-        "sp_alpha_CI"
-      )
-    )
+    scatterplot$dependOn(jasp_scatterplot_depends_on())
 
     jaspResults[["scatterPlot"]] <- scatterplot
 

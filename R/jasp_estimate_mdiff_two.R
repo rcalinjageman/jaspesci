@@ -49,7 +49,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
 
     # More than 2 levels in grouping variable
-    levels <- levels(dataset[[options$grouping_variable]])
+    mylevels <- levels(dataset[[options$grouping_variable]])
 
     level_errors <- .hasErrors(
       dataset = dataset,
@@ -225,7 +225,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       options,
       ready,
       estimate,
-      level = length(levels)
+      level = length(mylevels)
     )
 
     if (ready) {
@@ -284,7 +284,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         options,
         ready,
         estimate,
-        levels
+        mylevels
       )
 
       to_fill <- if (is_mean) "es_mean_ratio" else "es_median_ratio"

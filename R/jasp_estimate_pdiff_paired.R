@@ -36,7 +36,7 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
 
     }
   } else {
-    levels <- 1
+    mylevels <- 1
   }
 
 
@@ -100,7 +100,7 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       options,
       ready,
       estimate,
-      level = length(levels)
+      level = length(mylevels)
     )
 
     if (ready) {
