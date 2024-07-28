@@ -19,7 +19,6 @@ import "./" as Esci
     property alias width_defaultValue: width.defaultValue
     property alias height_defaultValue: height.defaultValue
 
-
     GridLayout {
       id: dimensions_grid
       columns: 3

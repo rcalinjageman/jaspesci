@@ -13,6 +13,8 @@ import "./" as Esci
 
     property alias sp_other_options_grid_enabled: sp_other_options_grid.enabled
     property alias sp_other_options_grid_visible: sp_other_options_grid.visible
+    property alias histogram_grid_visible: histogram_grid.visible
+
 
 
     GridLayout {
@@ -44,6 +46,28 @@ import "./" as Esci
         max: 3000
       }
     }  // end dimensions grid
+
+    GridLayout {
+      id: histogram_grid
+      columns: 3
+      Layout.columnSpan: 2
+      visible: false
+
+        Label {
+          text: qsTr("Historgram")
+        }
+
+        IntegerField
+        {
+          name: "histogram_bins"
+          label: qsTr("No. bins")
+          defaultValue: 12
+          min: 2
+          max: 80
+        }
+
+
+    }  // end histogram
 
 
     GridLayout {
@@ -171,6 +195,40 @@ import "./" as Esci
           defaultValue: 15
           min: 2
           max: 80
+        }
+
+        Label {
+          text: " "
+        }
+
+      TextField
+        {
+          name: "sp_xmin"
+          id: xmin
+          label: qsTr("Min")
+          placeholderText: "auto"
+          fieldWidth: 60
+        }
+
+      TextField
+        {
+          name: "sp_xmax"
+          id: xmax
+          label: qsTr("Max")
+          placeholderText: "auto"
+          fieldWidth: 60
+        }
+
+        Label {
+          text: " "
+        }
+
+        TextField
+        {
+          name: "sp_xbreaks"
+          label: qsTr("Num. tick marks")
+          placeholderText: "auto"
+          fieldWidth: 60
         }
 
         Label {

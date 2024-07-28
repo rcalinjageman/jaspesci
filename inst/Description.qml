@@ -13,6 +13,13 @@ Description
 	icon		    : "esci_logo.svg"
 	license		  : "GPL (>= 2)"
 
+	Analysis
+	{
+		title:	qsTr("esci: Describe")
+		menu:	qsTr("Describe")
+		func:	"jasp_describe"
+	}
+
 	GroupTitle
 	{
 		title:	qsTr("Means and Medians")
