@@ -121,6 +121,7 @@ Form
     title: qsTr("Figure options")
     sp_other_options_grid_enabled: false
     sp_other_options_grid_visible: false
+    histogram_grid_visible: true
   }
 
 

@@ -259,7 +259,8 @@ jasp_histogram_create <- function(jaspResults, options, ready, estimate, plot_ty
       "fill_regular",
       "fill_highlighted",
       "color",
-      "marker_size"
+      "marker_size",
+      "histogram_bins"
     )
   )
 
@@ -275,7 +276,7 @@ jasp_histogram_create <- function(jaspResults, options, ready, estimate, plot_ty
     args$mark_sd <- options$mark_sd
     args$mark_quartiles <- options$mark_quartiles
     args$mark_z_lines <- options$mark_z_lines
-    args$mark_percentile <- jasp_numeric_fix(options, "mark_perentile", 0)
+    args$mark_percentile <- jasp_numeric_fix(options, "mark_percentile", 0)
     args$histogram_bins <- options$histogram_bins
 
     args$ylim <- c(
