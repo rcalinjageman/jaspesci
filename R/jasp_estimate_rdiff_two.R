@@ -162,8 +162,6 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
-  return()
-
   # scatterplot
   if (is.null(jaspResults[["scatterPlot"]])) {
 
@@ -195,7 +193,13 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         args = args
       )
 
-      myplot <- jasp_scatterplot_decorate(myplot, options, r_value = estimate$es_r$effect_size[[1]])
+      myplot <- jasp_scatterplot_decorate(
+        myplot,
+        options,
+        r_value = estimate$es_r$effect_size[[1]],
+        rdiff = TRUE,
+        scale_title = estimate$es_r$grouping_variable_name[[1]]
+      )
 
       jaspResults[["scatterPlot"]]$plotObject <- myplot
 
@@ -215,6 +219,11 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       args <- list()
       args$estimate <- estimate
       args$error_layout <- "none"
+      args$ylim <- c(
+        jasp_numeric_fix(options, "ymin", -1),
+        jasp_numeric_fix(options, "ymax", 1)
+      )
+      args$ybreaks <- jasp_numeric_fix(options, "ybreaks", NULL)
 
       if (evaluate_h) {
         args$rope <- c(
@@ -224,11 +233,11 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       }
 
       myplot <- do.call(
-        what = esci::plot_correlation,
+        what = esci::plot_rdiff,
         args = args
       )
 
-      myplot <- jasp_plot_correlation_decorate(myplot, options)
+      myplot <- jasp_plot_correlation_decorate(myplot, options, rdiff = TRUE)
 
       jaspResults[["mdiffPlot"]]$plotObject <- myplot
 
