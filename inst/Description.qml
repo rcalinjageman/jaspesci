@@ -39,6 +39,14 @@ Description
 		func:	"jasp_estimate_mdiff_two"
 	}
 
+	Analysis
+	{
+		title:	qsTr("esci Means and Medians: Paired")
+		menu:	qsTr("Paired")
+		func:	"jasp_estimate_mdiff_paired"
+	}
+
+
 	GroupTitle
 	{
 		title:	qsTr("Correlations")
