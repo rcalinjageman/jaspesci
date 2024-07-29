@@ -5,8 +5,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   evaluate_h <- options$evaluate_hypotheses
   is_interval <- if (options$null_boundary > 0) TRUE else FALSE
   neg_errors <- FALSE
-
-  mylevels <- c(options$reference_level_name, options$comparison_level_name)
+  is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
 
   ready <- FALSE
   if (from_raw) {
@@ -20,16 +19,14 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     options$show_ratio <- FALSE
   }
 
-  is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
 
-  if (ready & ! from_raw) {
+  if (ready & !from_raw) {
 
   }
 
   if (from_raw & ready) {
     # read dataset
     dataset <- jasp_estimate_mdiff_paired_read_data(dataset, options)
-
 
     # If show_ratio, no negative values
 
@@ -45,7 +42,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         error_text <- createJaspHtml(
           paste(
             neg_errors,
-            "The ratio between group effect size is appropriate only for true ratio scales where values < 0 are impossible.  One or more of your outcome variables includes at least one negative value, so the requested ratio effect size is not reported.",
+            "The ratio between group effect size is appropriate only for true ratio scales where values < 0 are impossible.  One or more of your measures includes at least one negative value, so the requested ratio effect size is not reported.",
             sep = "<BR>"
           ),
           title = "Warning!"
@@ -71,6 +68,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       args$reference_measure <- unname(self$options$reference_measure)
       args$comparison_measure <- unname(self$options$comparison_measure)
       args$save_raw_data <- TRUE
+
     } else {
 
       args$reference_mean <- self$options$reference_mean
@@ -78,13 +76,13 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       args$n <- self$options$n
       args$comparison_mean <- options$comparison_mean
       args$comparison_sd <- self$options$comparison_sd
-      args$correlation <- self$options$r
+      args$correlation <- jasp_numeric_fix(options, "r", 0)
       args$comparison_measure_name <- jasp_text_fix(
         options,
         "comparison_measure_name",
         "Comparison measure"
       )
-      args$comparison_measure_name <- jasp_text_fix(
+      args$reference_measure_name <- jasp_text_fix(
         options,
         "reference_measure_name",
         "Reference measure"
@@ -93,6 +91,15 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     }
 
     estimate <- try(do.call(what = call, args = args))
+
+    # debugtext <- createJaspHtml(text = paste(names(args), args, collapse = "<BR>"))
+    # debugtext$dependOn(c("reference_measure", "comparison_measure"))
+    # jaspResults[["debugtextr"]] <- debugtext
+    #
+    #
+    # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
+    # debugtext$dependOn(c("reference_measure", "comparison_measure"))
+    # jaspResults[["debugtext"]] <- debugtext
 
     # Some results tweaks - future updates to esci will do these calcs within esci rather than here
     # Add in MoE
@@ -105,15 +112,14 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     estimate$es_mean_difference$n_component <- 1/sqrt(estimate$es_mean_difference$df+1)
     estimate$es_mean_difference$s_component <- estimate$es_mean_difference$moe / estimate$es_mean_difference$t_multiplier / estimate$es_mean_difference$n_component
 
-    self$results$es_mean_difference$setNote(
-      key = "sdiff",
-      note = paste(
-        "<i>s</i><sub>diff</sub> = ",
-        format(estimate$es_mean_difference$s_component[[3]], 2),
-        sep = ""
-      )
-    )
-
+    # self$results$es_mean_difference$setNote(
+    #   key = "sdiff",
+    #   note = paste(
+    #     "<i>s</i><sub>diff</sub> = ",
+    #     format(estimate$es_mean_difference$s_component[[3]], 2),
+    #     sep = ""
+    #   )
+    # )
 
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
       mytest <- jasp_test_mdiff(
@@ -127,6 +133,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
 
   }
 
+  options$assume_equal_variance <- FALSE
+
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
     jasp_overview_prep(
@@ -134,7 +142,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       options,
       ready,
       estimate,
-      level = length(mylevels)
+      level = 2
     )
 
     if (ready) {
@@ -194,7 +202,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         options,
         ready,
         estimate,
-        mylevels
+        2
       )
 
       to_fill <- if (is_mean) "es_mean_ratio" else "es_median_ratio"
@@ -335,8 +343,7 @@ jasp_estimate_mdiff_paired_read_data <- function(dataset, options) {
   else
     return(
       .readDataSetToEnd(
-        columns.as.numeric = options$outcome_variable,
-        columns.as.factor = options$grouping_variable
+        columns.as.numeric = c(options$reference_measure, options$comparison_measure)
       )
     )
 }
