@@ -29,7 +29,6 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     dataset <- jasp_estimate_mdiff_paired_read_data(dataset, options)
 
     # If show_ratio, no negative values
-
     if (options$show_ratio) {
       neg_errors <- .hasErrors(
         dataset = dataset,
@@ -92,15 +91,6 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
 
     estimate <- try(do.call(what = call, args = args))
 
-    # debugtext <- createJaspHtml(text = paste(names(args), args, collapse = "<BR>"))
-    # debugtext$dependOn(c("reference_measure", "comparison_measure"))
-    # jaspResults[["debugtextr"]] <- debugtext
-    #
-    #
-    # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
-    # debugtext$dependOn(c("reference_measure", "comparison_measure"))
-    # jaspResults[["debugtext"]] <- debugtext
-
     # Some results tweaks - future updates to esci will do these calcs within esci rather than here
     # Add in MoE
     estimate$es_mean_difference$moe <- (estimate$es_mean_difference$UL - estimate$es_mean_difference$LL)/2
@@ -142,7 +132,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       options,
       ready,
       estimate,
-      level = 2
+      level = 1,
+      paired = TRUE
     )
 
     if (ready) {
@@ -154,7 +145,21 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     }
   }
 
-  return()
+  # r table
+  if(is.null(jaspResults[["es_r"]])) {
+    jasp_es_r_prep(
+      jaspResults = jaspResults,
+      options = options,
+      ready = ready
+    )
+
+    if (ready) jasp_table_fill(
+      jaspResults[["es_r"]],
+      estimate,
+      "es_r"
+    )
+  }
+
 
   # Define and fill out the m_diff table (mean or median)
   if (is.null(jaspResults[["es_m_differenceTable"]])) {
@@ -175,6 +180,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     )
 
   }
+
 
   # Define and fill the smd table
   if (is_mean & is.null(jaspResults[["smdTable"]]) ) {
@@ -234,6 +240,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
 
   }
 
+  return()
 
   # Now prep and fill the plot
   x <- 0

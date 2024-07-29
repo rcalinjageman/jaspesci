@@ -42,11 +42,11 @@ Form
   }
 
   function sdiff_adjust() {
-      sdiff.value = (sd1.value**2 + sd2.value**2 - 2*r.value*sd1.value*sd2.value)**0.5
+      sdiff.value = ((sd1.value**2 + sd2.value**2 - 2*r.value*sd1.value*sd2.value)**0.5).toFixed(2);
   }
 
   function r_adjust() {
-      r.value = (sdiff.value**2 - sd1.value**2 - sd2.value**2)/(-2*sd1.value*sd2.value)
+      r.value = ((sdiff.value**2 - sd1.value**2 - sd2.value**2)/(-2*sd1.value*sd2.value)).toFixed(2);
   }
 
 
@@ -232,7 +232,7 @@ Form
         id: sdiff
         enabled: enter_sdiff.checked
         Layout.columnSpan: 2
-        defaultValue: 1.6679
+        defaultValue: 1.67
           onFocusChanged: {
             r_adjust()
           }

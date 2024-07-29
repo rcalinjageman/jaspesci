@@ -27,13 +27,17 @@ jasp_mdiff_table_depends_on <- function() {
       "comparison_level_name",
       "reference_level_name",
       "outcome_variable_name",
-      "grouping_variable_name"
+      "grouping_variable_name",
+      "reference_measure",
+      "comparison_measure",
+      "reference_measure_name",
+      "comparison_measure_name"
     )
   )
 }
 
 # Prep an overview table
-jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, levels = 1) {
+jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, levels = 1, paired = FALSE) {
 
   # Handles
   from_raw <- FALSE
@@ -191,18 +195,21 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   } # end of show_details for raw data
 
 
-  overviewTable$addColumnInfo(
-    name = "n",
-    title = "<i>N</i>",
-    type = "integer"
-  )
-
-  if (from_raw) {
+  if (!paired) {
     overviewTable$addColumnInfo(
-      name = "missing",
-      title = "Missing",
+      name = "n",
+      title = "<i>N</i>",
       type = "integer"
     )
+
+    if (from_raw) {
+      overviewTable$addColumnInfo(
+        name = "missing",
+        title = "Missing",
+        type = "integer"
+      )
+    }
+
   }
 
 
@@ -256,7 +263,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
 
   }
 
-  if (options$effect_size == "mean_difference") {
+  if (options$effect_size == "mean_difference" & !paired) {
     if (options$assume_equal_variance) {
       overviewTable$addFootnote(
         "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
@@ -832,3 +839,4 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels =
   return()
 
 }
+
