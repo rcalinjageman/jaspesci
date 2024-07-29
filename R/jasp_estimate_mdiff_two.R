@@ -6,6 +6,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   is_interval <- if (options$null_boundary > 0) TRUE else FALSE
   neg_errors <- FALSE
 
+  mylevels <- c(options$reference_level_name, options$comparison_level_name)
 
   ready <- FALSE
   if (from_raw) {
@@ -21,6 +22,9 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
   is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
 
+  if (ready & ! from_raw) {
+
+  }
 
   if (from_raw & ready) {
     # read dataset
@@ -64,7 +68,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         "The grouping variable (",
         options$grouping_variable,
         ") had ",
-        length(levels),
+        length(mylevels),
         " levels.  Only the first 2 levels were used for effect-size calculations.",
         sep = ""
       )
@@ -108,7 +112,6 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     }
 
   }
-
 
   if (ready) {
     # Run the analysis
@@ -216,7 +219,6 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     estimate <- NULL
     estimate_big <- NULL
   }
-
 
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
