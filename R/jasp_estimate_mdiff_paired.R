@@ -150,7 +150,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     jasp_es_r_prep(
       jaspResults = jaspResults,
       options = options,
-      ready = ready
+      ready = ready,
+      paired = TRUE
     )
 
     if (ready) jasp_table_fill(

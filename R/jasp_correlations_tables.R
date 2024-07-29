@@ -122,7 +122,7 @@ jasp_scatterplot_depends_on <- function() {
   )
 }
 
-jasp_es_r_prep <- function(jaspResults, options, ready) {
+jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE) {
   # Handles
   from_raw <- options$switch == "from_raw"
 
@@ -135,6 +135,8 @@ jasp_es_r_prep <- function(jaspResults, options, ready) {
   else
     paste(gvn, "Effect", "</BR>")
 
+  if (paired) effect_title <- "Measures"
+
   table_title <- if (is.null(options$grouping_variable))
     "Linear correlation"
   else
@@ -145,19 +147,22 @@ jasp_es_r_prep <- function(jaspResults, options, ready) {
 
   overviewTable$dependOn(jasp_correlation_table_depends_on())
 
-  overviewTable$addColumnInfo(
-    name = "x_variable_name",
-    title = "<i>X</i> variable",
-    type = "string",
-    combine = TRUE
-  )
+  if (!paired) {
+    overviewTable$addColumnInfo(
+      name = "x_variable_name",
+      title = "<i>X</i> variable",
+      type = "string",
+      combine = TRUE
+    )
 
-  overviewTable$addColumnInfo(
-    name = "y_variable_name",
-    title = "<i>Y</i> variable",
-    type = "string",
-    combine = TRUE
-  )
+    overviewTable$addColumnInfo(
+      name = "y_variable_name",
+      title = "<i>Y</i> variable",
+      type = "string",
+      combine = TRUE
+    )
+
+  }
 
   overviewTable$addColumnInfo(
     name = "effect",
@@ -185,7 +190,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready) {
     overtitle = paste0(100 * options$conf_level, "% CI")
   )
 
-  if (from_raw &  is.null(options$grouping_variable)) {
+  if (from_raw &  is.null(options$grouping_variable) & !paired) {
     overviewTable$addColumnInfo(
       name = "sxy",
       title = "<i>s<sub>Y.X</sub></i>",
