@@ -371,15 +371,6 @@
       "RemoteRef": "HEAD",
       "RemoteSha": "e439c080e3841e0719c00ce35c376b34c833b546"
     },
-    "jaspesci": {
-      "Package": "jaspesci",
-      "Version": "0.1.0_Local_JASP",
-      "Source": "Local",
-      "RemoteType": "local",
-      "RemoteUrl": "C:/Users/rcalinjageman/Documents/GitHub/jaspesci",
-      "Cacheable": true,
-      "Hash": "44a5bf22aad8945816e407e7096b3ed7"
-    },
     "jmvcore": {
       "Package": "jmvcore",
       "Version": "2.4.7",

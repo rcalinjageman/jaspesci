@@ -18,6 +18,10 @@ import "./" as Esci
     property alias ymax_placeholderText: ymax.placeholderText
     property alias width_defaultValue: width.defaultValue
     property alias height_defaultValue: height.defaultValue
+    property alias error_nudge_defaultValue: error_nudge.defaultValue
+    property alias data_spread_defaultValue: data_spread.defaultValue
+    property alias error_scale_defaultValue: error_scale.defaultValue
+
 
     GridLayout {
       id: dimensions_grid
@@ -248,6 +252,7 @@ import "./" as Esci
         DoubleField
         {
           name: "error_scale"
+          id: error_scale
           label: qsTr("Width")
           defaultValue: 0.20
           min: 0
@@ -296,6 +301,7 @@ import "./" as Esci
     DoubleField
       {
         name: "data_spread"
+        id: data_spread
         label: qsTr("Spread")
         defaultValue: 0.25
         enabled: from_raw.checked
@@ -311,6 +317,7 @@ import "./" as Esci
     DoubleField
       {
         name: "error_nudge"
+        id: error_nudge
         label: qsTr("Offset from CI")
         defaultValue: 0.3
         enabled: from_raw.checked
