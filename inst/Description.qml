@@ -50,7 +50,7 @@ Description
 	{
 		title:	qsTr("esci Means and Medians: Independent Groups Contrast")
 		menu:	qsTr("Independent Groups Contrast")
-		func:	"jasp_estimate_ind_contrast"
+		func:	"jasp_estimate_mdiff_ind_contrast"
 	}
 
 	Analysis
