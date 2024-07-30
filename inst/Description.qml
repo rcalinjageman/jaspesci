@@ -46,6 +46,20 @@ Description
 		func:	"jasp_estimate_mdiff_paired"
 	}
 
+	Analysis
+	{
+		title:	qsTr("esci Means and Medians: Independent Groups Contrast")
+		menu:	qsTr("Independent Groups Contrast")
+		func:	"jasp_estimate_ind_contrast"
+	}
+
+	Analysis
+	{
+		title:	qsTr("esci Means and Medians: 2x2 Factorial")
+		menu:	qsTr("2x2 Factorial")
+		func:	"jasp_estimate_mdiff_2x2"
+	}
+
 
 	GroupTitle
 	{
