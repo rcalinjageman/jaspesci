@@ -301,8 +301,6 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     }
   }
 
-  return()
-
   # Define and fill out the m_diff table (mean or median)
   if (is.null(jaspResults[["es_m_differenceTable"]])) {
 
@@ -322,6 +320,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     )
 
   }
+
+  return()
 
   # Define and fill the smd table
   if (is_mean & is.null(jaspResults[["smdTable"]]) ) {

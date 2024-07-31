@@ -33,7 +33,7 @@ Form
   }
 
   function switch_adjust() {
-      if (from_summary.checked) {
+      if (from_summary.checked | mixed.checked) {
         effect_size.currentValue = "mean_difference";
       }
   }
@@ -56,6 +56,9 @@ Form
       value: "mixed";
       label: qsTr("Mixed (RCT)");
       id: mixed
+      onClicked: {
+         switch_adjust()
+      }
     }
   }  // end design selection
 
@@ -340,7 +343,7 @@ Form
       {
         name: "effect_size"
         label: qsTr("Effect size of interest")
-        enabled: from_raw.checked
+        enabled: from_raw.checked & fully_between.checked
         values:
           [
             { label: "Mean difference", value: "mean_difference"},

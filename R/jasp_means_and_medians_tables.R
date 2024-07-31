@@ -57,7 +57,8 @@ jasp_mdiff_table_depends_on <- function() {
       "outcome_variable_name_bs",
       "outcome_variable_level1",
       "outcome_variable_level2",
-      "repeated_measures_name"
+      "repeated_measures_name",
+      "design"
     )
   )
 }
@@ -648,9 +649,39 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
 # Prep a mdiff table
 jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NULL) {
   # Handles
-  from_raw <- options$switch == "from_raw"
+
+  from_raw <- FALSE
+  if (!is.null(options$switch)) {
+    from_raw <- options$switch == "from_raw"
+  }
+
   is_mean <- FALSE
-  if (options$effect_size == "mean_difference") is_mean <- TRUE
+  if (!is.null(options$effect_size)) {
+    is_mean <- options$effect_size == "mean_difference"
+  }
+
+  is_mixed <- FALSE
+  if (!is.null(options$design)) {
+    is_mixed <- options$design == "mixed"
+  }
+
+  show_details <- FALSE
+  if (!is.null(options$show_details)) {
+    show_details <- options$show_details
+  }
+
+  show_calculations <- FALSE
+  if (!is.null(options$show_calculations)) {
+    show_calculations <- options$show_calculations
+  }
+
+  assume_equal_variance <- FALSE
+  if (!is.null(options$assume_equal_variance)) {
+    assume_equal_variance <- options$assume_equal_variance | is_mixed
+  }
+
+  is_complex <- FALSE
+  if (!is.null(options$design)) is_complex <- TRUE
 
 
   overviewTable <- createJaspTable(
@@ -671,12 +702,18 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
     combine = TRUE
   )
 
-
-  effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+  if (is_complex) {
+    overviewTable$addColumnInfo(
+      name = "effect_type",
+      title = "Effect type",
+      type = "string",
+      combine = TRUE
+    )
+  }
 
   overviewTable$addColumnInfo(
-    name = "effect",
-    title = effect_title,
+    name = if (is_complex) "effects_complex" else "effect",
+    title = if (is_complex) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
     type = "string"
   )
 
@@ -701,7 +738,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   )
 
 
-  if (options$show_details & is_mean) {
+  if (show_details & is_mean) {
     overviewTable$addColumnInfo(
       name = "moe",
       title = "<i>MoE</i>",
@@ -709,7 +746,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
     )
   }
 
-  if (options$show_details) {
+  if (show_details) {
     overviewTable$addColumnInfo(
       name = "SE",
       title = "<i>SE</i>",
@@ -717,16 +754,16 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
     )
   }
 
-  if (options$show_details & is_mean) {
+  if (show_details & is_mean) {
     overviewTable$addColumnInfo(
       name = "df",
       title = "<i>df</i>",
-      type = if (options$assume_equal_variance) "integer" else "number"
+      type = if (assume_equal_variance) "integer" else "number"
     )
   }
 
 
-  if (show_calculations & is_mean & options$assume_equal_variance) {
+  if (show_calculations & is_mean & assume_equal_variance) {
     overviewTable$addColumnInfo(
       name = "t_multiplier",
       title = "<i>t</i>",
@@ -750,15 +787,30 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
 
   }
 
-  if (options$effect_size == "mean_difference") {
-    if (options$assume_equal_variance) {
+  if (is_complex & options$effect_size == "mean_difference" & show_details & assume_equal_variance) {
+    overviewTable$addColumnInfo(
+      name = "s_component",
+      title = "<i>s</i><sub>p</sub>",
+      type = "number"
+    )
+  }
+
+  if (options$effect_size == "mean_difference" & !is_mixed) {
+    if (assume_equal_variance) {
       overviewTable$addFootnote(
         "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
       )
     } else {
-      overviewTable$addFootnote(
-        "Variances are not assumed equal, and so the CI was calculated separately for each mean."
-      )
+      if (is_complex) {
+        overviewTable$addFootnote(
+          "Variances are not assumed equal, and so the Welch method was used to calculate each CI on a difference."
+        )
+      } else {
+        overviewTable$addFootnote(
+          "Variances are not assumed equal, and so the CI was calculated separately for each mean."
+        )
+
+      }
     }
 
   }
@@ -885,8 +937,8 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
   }
 
   mixed <- FALSE
-  if (!is.null(options$mixed)) {
-    mixed <- options$mixed
+  if (!is.null(options$design)) {
+    mixed <- options$design == "mixed"
   }
 
 
@@ -906,12 +958,33 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
     combine = TRUE
   )
 
-  overviewTable$addColumnInfo(
-    name = "grouping_variable_A_level",
-    title = options$grouping_variable,
-    type = "string",
-    combine = TRUE
-  )
+  A_name <- ""
+  if (mixed) {
+    A_name <- options$grouping_variable
+  } else {
+    A_name <- if (from_raw) options$grouping_variable_A else jasp_text_fix(options, "A_label", "Variable A")
+  }
+
+  B_name <- ""
+  if (mixed) {
+    B_name <- jasp_text_fix(options, "repeated_measures_name", "Time")
+  } else {
+    B_name <- if (from_raw) options$grouping_variable_B else jasp_text_fix(options, "B_label", "Variable B")
+  }
+
+    overviewTable$addColumnInfo(
+      name = "grouping_variable_A_level",
+      title = A_name,
+      type = "string",
+      combine = FALSE
+    )
+
+    overviewTable$addColumnInfo(
+      name = "grouping_variable_B_level",
+      title = B_name,
+      type = "string",
+      combine = FALSE
+    )
 
 
   if (options$effect_size %in% c("mean", "mean_difference", "r")) {
@@ -949,16 +1022,27 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       )
     }
 
-    overviewTable$addColumnInfo(
-      name = "median",
-      title = "<i>Mdn</i>",
-      type = "number"
-    )
+    if (from_raw) {
+      overviewTable$addColumnInfo(
+        name = "median",
+        title = "<i>Mdn</i>",
+        type = "number"
+      )
+
+    }
 
   }  # end of mean, mean difference
 
 
   if (options$effect_size %in% c("median", "median_difference", "r")) {
+
+    overviewTable$addColumnInfo(
+      name = "mean",
+      title = "<i>M</i>",
+      type = "number"
+    )
+
+
     overviewTable$addColumnInfo(
       name = "median",
       title = "<i>Mdn</i>",
@@ -978,7 +1062,6 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       overtitle = paste0(100 * options$conf_level, "% CI")
     )
 
-
     if (options$show_details) {
       overviewTable$addColumnInfo(
         name = "median_SE",
@@ -987,11 +1070,7 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       )
     }
 
-      overviewTable$addColumnInfo(
-        name = "mean",
-        title = "<i>M</i>",
-        type = "number"
-      )
+
   } # end of median, median difference
 
 
@@ -1070,18 +1149,6 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       )
     }
   }
-
-
-    # if (options$assume_equal_variance & !mixed) {
-    #   overviewTable$addFootnote(
-    #     "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
-    #   )
-    # } else {
-    #   overviewTable$addFootnote(
-    #     "Variances are not assumed equal, and so the CI was calculated separately for each mean."
-    #   )
-    # }
-    #
 
   overviewTable$showSpecifiedColumnsOnly <- TRUE
 
