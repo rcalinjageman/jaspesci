@@ -781,6 +781,8 @@ Form
 
 	Esci.HeOptions {
     null_value_enabled: false
+    rope_units_visible: evaluate_hypotheses_checked
+    hgrid_columns: 4
   }
 
 }
