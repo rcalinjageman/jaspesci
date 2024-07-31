@@ -117,6 +117,27 @@ Form
 
   }
 
+  Group {
+    title: qsTr("<b>Define contrast</b>")
+    Layout.columnSpan: 2
+
+     TextField
+      {
+        name: "reference_labels"
+        id: reference_labels
+        label: qsTr("Reference subset")
+      }
+
+     TextField
+      {
+        name: "comparison_labels"
+        id: comparison_labels
+        label: qsTr("Comparison subset")
+      }
+
+
+  }
+
 	Group
 	{
 		title: qsTr("<b>Analysis options</b>")

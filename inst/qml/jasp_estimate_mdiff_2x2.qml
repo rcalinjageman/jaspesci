@@ -187,12 +187,14 @@ Form
         name: "A1B1_sd"
         defaultValue: 2.1
         label: qsTr("<i>s</i>")
+        negativeValues: false
       }
 
       DoubleField
       {
         name: "A2B1_sd"
         defaultValue: 2.2
+        negativeValues: false
       }
 
       Label {
@@ -200,17 +202,19 @@ Form
       }
 
 
-      DoubleField
+      IntegerField
       {
         label: qsTr("<i>n</i>")
         name: "A1B1_n"
         defaultValue: 20
+        min: 2
       }
 
-      DoubleField
+      IntegerField
       {
         name: "A2B1_n"
         defaultValue: 20
+        min: 2
       }
 
 
@@ -243,12 +247,14 @@ Form
         name: "A1B2_sd"
         defaultValue: 2.3
         label: qsTr("<i>s</i>")
+        negativeValues: false
       }
 
       DoubleField
       {
         name: "A2B2_sd"
         defaultValue: 2.4
+        negativeValues: false
       }
 
       Label {
@@ -256,17 +262,19 @@ Form
       }
 
 
-      DoubleField
+      IntegerField
       {
         label: qsTr("<i>n</i>")
         name: "A1B2_n"
         defaultValue: 20
+        negativeValues: false
       }
 
-      DoubleField
+      IntegerField
       {
         name: "A2B2_n"
         defaultValue: 20
+        negativeValues: false
       }
 
 

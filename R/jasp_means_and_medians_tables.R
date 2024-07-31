@@ -31,7 +31,33 @@ jasp_mdiff_table_depends_on <- function() {
       "reference_measure",
       "comparison_measure",
       "reference_measure_name",
-      "comparison_measure_name"
+      "comparison_measure_name",
+      "fully_between",
+      "mixed",
+      "grouping_variable_A",
+      "grouping_variable_B",
+      "A1_label",
+      "A2_label",
+      "B1_label",
+      "B2_label",
+      "B_label",
+      "A_label",
+      "A1B1_mean",
+      "A1B2_mean",
+      "A2B1_mean",
+      "A2B2_mean",
+      "A1B1_sd",
+      "A1B2_sd",
+      "A2B1_sd",
+      "A2B2_sd",
+      "A1B1_n",
+      "A1B2_n",
+      "A2B1_n",
+      "A2B2_n",
+      "outcome_variable_name_bs",
+      "outcome_variable_level1",
+      "outcome_variable_level2",
+      "repeated_measures_name"
     )
   )
 }
@@ -44,6 +70,12 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   if (!is.null(options$switch)) {
     from_raw <- options$switch == "from_raw"
   }
+  show_calculations <- FALSE
+  if (!is.null(options$show_calculations)) {
+    show_calculations <- options$show_calculations
+  }
+
+
 
   # Title
   overviewTable <- createJaspTable(title = "Overview")
@@ -238,7 +270,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   }
 
 
-  if (options$show_calculations & options$effect_size %in% c("mean")) {
+  if (show_calculations & options$effect_size %in% c("mean")) {
 
     overviewTable$addColumnInfo(
       name = "t_multiplier",
@@ -694,7 +726,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   }
 
 
-  if (options$show_calculations & is_mean & options$assume_equal_variance) {
+  if (show_calculations & is_mean & options$assume_equal_variance) {
     overviewTable$addColumnInfo(
       name = "t_multiplier",
       title = "<i>t</i>",
@@ -834,6 +866,228 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels =
 
 
 
+
+
+  return()
+
+}
+
+
+
+
+# Prep an overview table
+jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = NULL) {
+
+  # Handles
+  from_raw <- FALSE
+  if (!is.null(options$switch)) {
+    from_raw <- options$switch == "from_raw"
+  }
+
+  mixed <- FALSE
+  if (!is.null(options$mixed)) {
+    mixed <- options$mixed
+  }
+
+
+  # Title
+  overviewTable <- createJaspTable(title = "Overview")
+
+  # Depends on
+  overviewTable$dependOn(
+    jasp_mdiff_table_depends_on()
+  )
+
+  # Columns
+  overviewTable$addColumnInfo(
+    name = "outcome_variable_name",
+    title = "Outcome variable",
+    type = "string",
+    combine = TRUE
+  )
+
+  overviewTable$addColumnInfo(
+    name = "grouping_variable_A_level",
+    title = options$grouping_variable,
+    type = "string",
+    combine = TRUE
+  )
+
+
+  if (options$effect_size %in% c("mean", "mean_difference", "r")) {
+    overviewTable$addColumnInfo(
+      name = "mean",
+      title = "<i>M</i>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "mean_LL",
+      title = "LL",
+      type = "number",
+      overtitle = paste0(100 * options$conf_level, "% CI")
+    )
+    overviewTable$addColumnInfo(
+      name = "mean_UL",
+      title = "UL",
+      type = "number",
+      overtitle = paste0(100 * options$conf_level, "% CI")
+    )
+
+
+    if (options$show_details) {
+      overviewTable$addColumnInfo(
+        name = "moe",
+        title = "<i>MoE</i>",
+        type = "number"
+      )
+
+      overviewTable$addColumnInfo(
+        name = "mean_SE",
+        title = "<i>SE</i><sub>Mean</sub>",
+        type = "number"
+      )
+    }
+
+    overviewTable$addColumnInfo(
+      name = "median",
+      title = "<i>Mdn</i>",
+      type = "number"
+    )
+
+  }  # end of mean, mean difference
+
+
+  if (options$effect_size %in% c("median", "median_difference", "r")) {
+    overviewTable$addColumnInfo(
+      name = "median",
+      title = "<i>Mdn</i>",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "median_LL",
+      title = "LL",
+      type = "number",
+      overtitle = paste0(100 * options$conf_level, "% CI")
+    )
+    overviewTable$addColumnInfo(
+      name = "median_UL",
+      title = "UL",
+      type = "number",
+      overtitle = paste0(100 * options$conf_level, "% CI")
+    )
+
+
+    if (options$show_details) {
+      overviewTable$addColumnInfo(
+        name = "median_SE",
+        title = "<i>SE</i><sub>Median</sub>",
+        type = "number"
+      )
+    }
+
+      overviewTable$addColumnInfo(
+        name = "mean",
+        title = "<i>M</i>",
+        type = "number"
+      )
+  } # end of median, median difference
+
+
+  overviewTable$addColumnInfo(
+    name = "sd",
+    title = "<i>s</i>",
+    type = "number"
+  )
+
+
+  if (options$show_details & from_raw) {
+    overviewTable$addColumnInfo(
+      name = "min",
+      title = "Minimum",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "max",
+      title = "Maximum",
+      type = "number"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "q1",
+      title = "25th",
+      type = "number",
+      overtitle = "Percentile"
+    )
+
+    overviewTable$addColumnInfo(
+      name = "q3",
+      title = "75th",
+      type = "number",
+      overtitle = "Percentile"
+    )
+
+  } # end of show_details for raw data
+
+
+    overviewTable$addColumnInfo(
+      name = "n",
+      title = "<i>N</i>",
+      type = "integer"
+    )
+
+    if (from_raw) {
+      overviewTable$addColumnInfo(
+        name = "missing",
+        title = "Missing",
+        type = "integer"
+      )
+    }
+
+
+  if (options$show_details & options$effect_size %in% c("mean", "mean_difference", "r")) {
+    mytype <- "integer"
+    if (!is.null(options$assume_equal_variance)) {
+      mytype <- if (options$assume_equal_variance) "integer" else "number"
+    }
+
+    overviewTable$addColumnInfo(
+      name = "df",
+      title = "<i>df</i>",
+      type = mytype
+    )
+
+  }
+
+  if (options$effect_size == "mean_difference") {
+    if (options$assume_equal_variance) {
+      overviewTable$addColumnInfo(
+        name = "s_pooled",
+        title = "<i>s</i><sub>p</sub>",
+        type = "number"
+      )
+    }
+  }
+
+
+    # if (options$assume_equal_variance & !mixed) {
+    #   overviewTable$addFootnote(
+    #     "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
+    #   )
+    # } else {
+    #   overviewTable$addFootnote(
+    #     "Variances are not assumed equal, and so the CI was calculated separately for each mean."
+    #   )
+    # }
+    #
+
+  overviewTable$showSpecifiedColumnsOnly <- TRUE
+
+  overviewTable$setExpectedSize(4)
+
+  jaspResults[["overviewTable"]] <- overviewTable
 
 
   return()

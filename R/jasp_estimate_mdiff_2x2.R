@@ -1,235 +1,295 @@
 jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
 
-  return()
+  self <- list()
+  self$options <- options
 
-  # Handles
+  # Handles ------------------------------------
   from_raw <- options$switch == "from_raw"
+  mixed <- (self$options$design == "mixed")
+  effect_size <- self$options$effect_size
+  assume_equal_variance <- self$options$assume_equal_variance
+  is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
+  tbl_overview <- "overview"
+
+
   evaluate_h <- options$evaluate_hypotheses
   is_interval <- if (options$null_boundary > 0) TRUE else FALSE
   neg_errors <- FALSE
 
-  mylevels <- c(options$reference_level_name, options$comparison_level_name)
-
+  # --------------------- ready ---------------------
   ready <- FALSE
-  if (from_raw) {
-    ready <- (length(options$outcome_variable) > 0) & (options$grouping_variable != "")
+
+  if (mixed) {
+    ready <- (options$outcome_variable_level1 != "") & (options$outcome_variable_level2 != "")
   } else {
-    # Need any summary data checks?  Maybe not
-    ready <- TRUE
-    # Over-ride effect size if summary data is being analyzed
-    options$effect_size <- "mean_difference"
-    # Also over-ride request to show ratio
-    options$show_ratio <- FALSE
+    if (from_raw) {
+      ready <- (options$grouping_variable_A != "") & (options$grouping_variable_B != "") & (options$outcome_variable != "")
+    } else {
+      # need any checks for summary data?
+      ready <- TRUE
+      options$effect_size <- "mean_difference"
+    }
   }
 
-  is_mean <- if (options$effect_size == "mean_difference") TRUE else FALSE
 
-  if (ready & ! from_raw) {
+  # -- read data and set errors ---------------------------------
+  if (mixed) {
+    if (ready) {
+      # read dataset
+      dataset <- jasp_estimate_mdiff_2x2_mixed_read_data(dataset, options)
 
-  }
+      # need to add error checks
 
-  if (from_raw & ready) {
-    # read dataset
-    dataset <- jasp_estimate_mdiff_two_read_data(dataset, options)
-
-
-    # check for errors
-    # At least 2 levels in grouping variable
-    .hasErrors(
-      dataset = dataset,
-      type = "factorLevels",
-      factorLevels.target  = options$grouping_variable,
-      factorLevels.amount  = "< 2",
-      exitAnalysisIfErrors = TRUE
-    )
-
-    # at least 2 observations in each level of each outcome variable
-    .hasErrors(
-      dataset = dataset,
-      type = c("observations", "variance", "infinity"),
-      all.grouping = options$grouping_variable,
-      all.target = options$grouping_variable,
-      observations.amount  = "< 3",
-      exitAnalysisIfErrors = TRUE
-    )
-
-
-    # More than 2 levels in grouping variable
-    mylevels <- levels(dataset[[options$grouping_variable]])
-
-    level_errors <- .hasErrors(
-      dataset = dataset,
-      type = "factorLevels",
-      factorLevels.target  = options$grouping_variable,
-      factorLevels.amount  = "> 2",
-      exitAnalysisIfErrors = FALSE
-    )
-
-    if (isa(level_errors, "list")) {
-      error_explain <- paste(
-        "The grouping variable (",
-        options$grouping_variable,
-        ") had ",
-        length(mylevels),
-        " levels.  Only the first 2 levels were used for effect-size calculations.",
-        sep = ""
-      )
-
-      lerror_text <- createJaspHtml(
-        paste(
-          level_errors,
-          error_explain,
-          sep = "<BR>"
-        ),
-        title = "Warning!"
-      )
-      # To do: why does depenOn throw an error?
-      lerror_text$dependOn(c("outcome_variable", "grouping_variable"))
-      jaspResults[["level_errors"]] <- lerror_text
     }
 
+  } else {
+    if (from_raw) {
+      if (ready) {
+        # read dataset
+        dataset <- jasp_estimate_mdiff_2x2_between_read_data(dataset, options)
 
-    # If show_ratio, no negative values
-
-    if (options$show_ratio) {
-      neg_errors <- .hasErrors(
-        dataset = dataset,
-        type = c("negativeValues"),
-        all.target = options$outcome_variable,
-        exitAnalysisIfErrors = FALSE
-      )
-
-      if (isa(neg_errors, "list")) {
-        error_text <- createJaspHtml(
-          paste(
-            neg_errors,
-            "The ratio between group effect size is appropriate only for true ratio scales where values < 0 are impossible.  One or more of your outcome variables includes at least one negative value, so the requested ratio effect size is not reported.",
-            sep = "<BR>"
-          ),
-          title = "Warning!"
-        )
-        error_text$dependOn(c("outcome_variable", "grouping_variable", "show_ratio"))
-        jaspResults[["neg_errors"]] <- error_text
+        # need to add error checks
+      }
+    } else {
+      if (ready) {
+        # summary data, so no need to read data
+        # add error checks?
       }
     }
-
   }
+
+
+  # run analysis ------------------------------
 
   if (ready) {
     # Run the analysis
     args <- list()
-    self <- list()
-    self$options <- options
 
-    call <- esci::estimate_mdiff_two
-    args$conf_level <- self$options$conf_level
-    args$assume_equal_variance <- self$options$assume_equal_variance
-
-    if (from_raw) {
+    if (mixed) {
+      call <- esci::estimate_mdiff_2x2_mixed
       args$data <- dataset
-      args$outcome_variable <- unname(self$options$outcome_variable)
-      args$grouping_variable <- unname(self$options$grouping_variable)
-      args$grouping_variable_name <- unname(self$options$grouping_variable)
-      args$switch_comparison_order <- self$options$switch_comparison_order
-      args$save_raw_data <- TRUE
-    } else {
-
-      args$reference_mean <- self$options$reference_mean
-      args$reference_sd <- self$options$reference_sd
-      args$reference_n <- self$options$reference_n
-      args$comparison_mean <- options$comparison_mean
-      args$comparison_sd <- self$options$comparison_sd
-      args$comparison_n <- self$options$comparison_n
-
+      args$conf_level <- self$options$conf_level
+      args$grouping_variable <- self$options$grouping_variable
+      args$outcome_variable_level1 <- self$options$outcome_variable_level1
+      args$outcome_variable_level2 <- self$options$outcome_variable_level2
       args$outcome_variable_name <- jasp_text_fix(
         options,
         "outcome_variable_name",
-        "Outcome variable"
+        "My outcome variable"
       )
-
-      args$grouping_variable_name <- jasp_text_fix(
+      args$repeated_measures_name <- jasp_text_fix(
         options,
-        "grouping_variable_name",
-        "Grouping variable"
+        "repeated_measures_name",
+        "Time"
       )
+    } else {
 
-      args$grouping_variable_levels <- c(
-        jasp_text_fix(
-          options,
-          "reference_level_name",
-          "Reference group"
-        ),
-        jasp_text_fix(
-          options,
-          "comparison_level_name",
-          "Comparison group"
+      if (from_raw) {
+        call <- esci::estimate_mdiff_2x2_between
+        args$data <- dataset
+        args$assume_equal_variance <- self$options$assume_equal_variance
+        args$conf_level <- self$options$conf_level
+        args$grouping_variable_A <- self$options$grouping_variable_A
+        args$grouping_variable_B <- self$options$grouping_variable_B
+        args$outcome_variable <- self$options$outcome_variable
+
+      } else {
+        call <- esci::estimate_mdiff_2x2_between
+
+        args$assume_equal_variance <- self$options$assume_equal_variance
+        args$conf_level <- self$options$conf_level
+
+        args$means <- c(
+          options$A1B1_mean,
+          options$A1B2_mean,
+          options$A2B1_mean,
+          options$A2B2_mean
         )
-      )
+
+        args$sds <- c(
+          options$A1B1_sd,
+          options$A1B2_sd,
+          options$A2B1_sd,
+          options$A2B2_sd
+        )
+
+        args$ns <- c(
+          options$A1B1_n,
+          options$A1B2_n,
+          options$A2B1_n,
+          options$A2B2_n
+        )
+
+        args$grouping_variable_A_levels <- c(
+          jasp_text_fix(options, "A1_label", "A1 level"),
+          jasp_text_fix(options, "A2_label", "A2 level")
+        )
+
+        args$grouping_variable_B_levels <- c(
+          jasp_text_fix(options, "B1_label", "B1 level"),
+          jasp_text_fix(options, "B2_label", "B2 level")
+        )
+
+        args$grouping_variable_A_name <- jasp_text_fix(
+          options,
+          "A_label",
+          "Variable A"
+        )
+
+        args$grouping_variable_B_name <- jasp_text_fix(
+          options,
+          "B_label",
+          "Variable B"
+        )
+
+        args$outcome_variable_name <- jasp_text_fix(
+          options,
+          "outcome_variable_name_bs",
+          "My outcome variable"
+        )
+
+      }
 
     }
+
+    # debugtext <- createJaspHtml(text = paste(names(args), args, collapse = "<BR>"))
+    # debugtext$dependOn(jasp_mdiff_table_depends_on())
+    # jaspResults[["debugtext"]] <- debugtext
 
     estimate <- try(do.call(what = call, args = args))
 
+    # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
+    # debugtext$dependOn(jasp_mdiff_table_depends_on())
+    # jaspResults[["debugtextestimate"]] <- debugtext
 
-    # Some results tweaks - future updates to esci will do these calcs within esci rather than here
+
+
+    # --- fix stuff ----------------------------------
+    # Fixed that should be incorporated into esci
     # Add in MoE
     estimate$es_mean_difference$moe <- (estimate$es_mean_difference$UL - estimate$es_mean_difference$LL)/2
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
+    estimate$overview$s_pooled <- estimate$es_smd$denominator[[1]]
+    estimate$es_mean_difference$s_component <- estimate$es_smd$denominator[[1]]
 
-    # Add calculation details
-    alpha <- 1 - self$options$conf_level
-    estimate$es_mean_difference$t_multiplier <- stats::qt(1-alpha/2, estimate$es_mean_difference$df)
+    estimate$es_mean_difference$effect_type <- paste(
+      "<b>",
+      estimate$es_mean_difference$effect_type,
+      "</b>"
+    )
 
-    # Fix sp and other calculation components
-    for (x in 1:nrow(estimate$es_smd)) {
-      estimate$overview[estimate$overview$outcome_variable_name == estimate$es_smd$outcome_variable_name[[x]], "s_pooled"] <- estimate$es_smd$denominator[[x]]
-      estimate$es_mean_difference$s_component[c(x*3-2, x*3-1, x*3-0)] <- estimate$es_smd$denominator[[x]]
+    estimate$es_mean_difference$effects_complex[c(3, 6, 9, 12, 15)] <- paste(
+      "<b>",
+      estimate$es_mean_difference$effects_complex[c(3, 6, 9, 12, 15)],
+      "</b>"
+    )
+
+    if (!is.null(estimate$es_median_difference)) {
+      estimate$es_median_difference$effect_type <- paste(
+        "<b>",
+        estimate$es_median_difference$effect_type,
+        "</b>"
+      )
+
+      estimate$es_median_difference$effects_complex[c(3, 6, 9, 12, 15)] <- paste(
+        "<b>",
+        estimate$es_median_difference$effects_complex[c(3, 6, 9, 12, 15)],
+        "</b>"
+      )
+
     }
-    estimate$es_mean_difference$n_component <- estimate$es_mean_difference$SE / estimate$es_mean_difference$s_component
 
-
-    estimate_big <- estimate
-    estimate$raw_data <- NULL
-    if (from_raw) {
-      for (myvariable in options$outcome_variable) {
-        estimate[[myvariable]] <- NULL
+    if (effect_size == "mean_difference" & !mixed) {
+      mysep <- if (is.null(estimate$overview_properties$message_html)) NULL else "<BR>"
+      if (!is.null(tbl_overview) & !is.null(assume_equal_variance)) {
+        if (assume_equal_variance) {
+          estimate$overview_properties$message_html <- paste(
+            estimate$overview_properties$message_html,
+            mysep,
+            "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
+          )
+        } else {
+          estimate$overview_properties$message_html <- paste(
+            estimate$overview_properties$message_html,
+            mysep,
+            "Variances are not assumed equal, and so the CI was calculated separately for each mean."
+          )
+        }
       }
-    } else {
-
-      ov_name <- jasp_text_fix(
-        options,
-        "outcome_variable_name",
-        "Outcome variable"
-      )
-
-      estimate[[ov_name]] <- estimate
-      options$outcome_variable <- ov_name
     }
 
 
+    # --- hypothesis eval -----------------------------
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
-      mytest <- jasp_test_mdiff(
-        options,
-        estimate
-      )
-    } else {
-      mytest <- NULL
+
+      effect_size = self$options$effect_size
+      if (effect_size == "mean_difference") effect_size <- "mean"
+      if (effect_size == "median_difference") effect_size <- "median"
+
+      rope_upper <- self$options$null_boundary
+      rope_units <- "raw"
+      try(rope_units <- self$options$rope_units)
+
+      estimate$point_null <- NULL
+      estimate$interval_null <- NULL
+
+      for (myestimate in estimate) {
+        if(is(myestimate, "esci_estimate")) {
+
+          test_results <- test_mdiff(
+            myestimate,
+            effect_size = effect_size,
+            rope = c(rope_upper * -1, rope_upper),
+            rope_units = rope_units,
+            output_html = TRUE
+          )
+
+          estimate$point_null <- rbind(
+            estimate$point_null,
+            test_results$point_null
+          )
+
+          estimate$interval_null <- rbind(
+            estimate$interval_null,
+            test_results$interval_null
+          )
+
+        }
+      }
+
+
+      if (!is.null(estimate$point_null)) {
+        estimate$point_null$conclusion[[5]] <- gsub(
+          pattern = "diff",
+          replacement = "diffdiff",
+          x = estimate$point_null$conclusion[[5]]
+        )
+      }
+      if (!is.null(estimate$interval_null)) {
+        estimate$interval_null$conclusion[[5]] <- gsub(
+          pattern = "diff",
+          replacement = "diffdiff",
+          x = estimate$interval_null$conclusion[[5]]
+        )
+      }
+
+      estimate$point_null$effect_type <- estimate$es_smd$effect_type
+      estimate$point_null$effects_complex <- estimate$es_smd$effects_complex
+      estimate$interval_null$effect_type <- estimate$es_smd$effect_type
+      estimate$interval_null$effects_complex <- estimate$es_smd$effects_complex
+
     }
 
-
-  } else {
-    estimate <- NULL
-    estimate_big <- NULL
   }
+
+  # ------------ outputs ---------------------------------
 
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
-    jasp_overview_prep(
+    jasp_overview_complex_prep(
       jaspResults,
       options,
-      ready,
-      estimate,
-      level = length(mylevels)
+      ready
     )
 
     if (ready) {
@@ -241,6 +301,7 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     }
   }
 
+  return()
 
   # Define and fill out the m_diff table (mean or median)
   if (is.null(jaspResults[["es_m_differenceTable"]])) {
@@ -423,14 +484,28 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
 
 
 
-jasp_estimate_mdiff_2x2_read_data <- function(dataset, options) {
+jasp_estimate_mdiff_2x2_between_read_data <- function(dataset, options) {
   if (!is.null(dataset))
     return(dataset)
   else
     return(
       .readDataSetToEnd(
         columns.as.numeric = options$outcome_variable,
-        columns.as.factor = options$grouping_variable
+        columns.as.factor = c(options$grouping_variable_A, options$grouping_variable_B)
+      )
+    )
+}
+
+
+
+jasp_estimate_mdiff_2x2_mixed_read_data <- function(dataset, options) {
+  if (!is.null(dataset))
+    return(dataset)
+  else
+    return(
+      .readDataSetToEnd(
+        columns.as.numeric = c(options$outcome_variable_level1, options$outcome_variable_level2),
+        columns.as.factor = c(options$grouping_variable)
       )
     )
 }
