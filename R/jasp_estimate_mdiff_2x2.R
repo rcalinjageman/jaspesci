@@ -20,7 +20,7 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
   ready <- FALSE
 
   if (mixed) {
-    ready <- (options$outcome_variable_level1 != "") & (options$outcome_variable_level2 != "")
+    ready <- (options$outcome_variable_level1 != "") & (options$outcome_variable_level2 != "") & (options$grouping_variable != "")
   } else {
     if (from_raw) {
       ready <- (options$grouping_variable_A != "") & (options$grouping_variable_B != "") & (options$outcome_variable != "")
@@ -236,7 +236,7 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       for (myestimate in estimate) {
         if(is(myestimate, "esci_estimate")) {
 
-          test_results <- test_mdiff(
+          test_results <- esci::test_mdiff(
             myestimate,
             effect_size = effect_size,
             rope = c(rope_upper * -1, rope_upper),
@@ -278,6 +278,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       estimate$interval_null$effect_type <- estimate$es_smd$effect_type
       estimate$interval_null$effects_complex <- estimate$es_smd$effects_complex
 
+      estimate$to_fill <- if (rope_upper > 0) estimate$interval_null else estimate$point_null
+
     }
 
   }
@@ -308,7 +310,7 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options,
       ready,
-      estimate
+      if (ready) estimate else NULL
     )
 
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
@@ -321,15 +323,13 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
 
   }
 
-  return()
-
   # Define and fill the smd table
-  if (is_mean & is.null(jaspResults[["smdTable"]]) ) {
+  if (is_mean & !mixed & is.null(jaspResults[["smdTable"]]) ) {
     jasp_smd_prep(
       jaspResults,
       options,
       ready,
-      estimate,
+      if (ready) estimate else NULL,
       one_group = FALSE
     )
 
@@ -339,28 +339,6 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       "es_smd"
     )
 
-  }
-
-  # Define and fill out the m_diff table (mean or median)
-  if (options$show_ratio & from_raw & is.null(jaspResults[["es_m_ratioTable"]])) {
-    if (isa(neg_errors, "logical")) {
-      jasp_es_m_ratio_prep(
-        jaspResults,
-        options,
-        ready,
-        estimate,
-        mylevels
-      )
-
-      to_fill <- if (is_mean) "es_mean_ratio" else "es_median_ratio"
-
-      if (ready) jasp_table_fill(
-        jaspResults[["es_m_ratioTable"]],
-        estimate,
-        to_fill
-      )
-
-    }
   }
 
 
@@ -375,12 +353,13 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
-      mytest,
+      estimate,
       "to_fill"
     )
 
   }
 
+  return()
 
   # Now prep and fill the plot
   x <- 0

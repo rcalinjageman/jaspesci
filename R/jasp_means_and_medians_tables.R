@@ -333,7 +333,39 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
 jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_group = TRUE) {
   # Handles
   has_estimate <- !is.null(estimate)
-  from_raw <- options$switch == "from_raw"
+
+  from_raw <- FALSE
+  if (!is.null(options$switch)) {
+    from_raw <- options$switch == "from_raw"
+  }
+
+  is_mean <- FALSE
+  if (!is.null(options$effect_size)) {
+    is_mean <- options$effect_size == "mean_difference"
+  }
+
+  is_mixed <- FALSE
+  if (!is.null(options$design)) {
+    is_mixed <- options$design == "mixed"
+  }
+
+  show_details <- FALSE
+  if (!is.null(options$show_details)) {
+    show_details <- options$show_details
+  }
+
+  show_calculations <- FALSE
+  if (!is.null(options$show_calculations)) {
+    show_calculations <- options$show_calculations
+  }
+
+  assume_equal_variance <- FALSE
+  if (!is.null(options$assume_equal_variance)) {
+    assume_equal_variance <- options$assume_equal_variance | is_mixed
+  }
+
+  is_complex <- FALSE
+  if (!is.null(options$design)) is_complex <- TRUE
 
 
   # Title
@@ -360,13 +392,22 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
 
   }
 
-  if (one_group) effect_title <- "Effect" else effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+
+  if (is_complex) {
+    overviewTable$addColumnInfo(
+      name = "effect_type",
+      title = "Effect type",
+      type = "string",
+      combine = TRUE
+    )
+  }
 
   overviewTable$addColumnInfo(
-    name = "effect",
-    title = effect_title,
+    name = if (is_complex) "effects_complex" else "effect",
+    title = if (is_complex | one_group) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
     type = "string"
   )
+
 
   if (one_group) {
     overviewTable$addColumnInfo(
@@ -483,12 +524,60 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
 # Prep a hypothesis evaluation table
 jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   # Handles
-  is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference", "proportion_difference")) TRUE else FALSE
-  is_mean <- if (options$effect_size %in% c("mean_difference", "mean")) TRUE else FALSE
-  is_pdiff <- if (options$effect_size %in% c("pdiff")) TRUE else FALSE
-  is_r <- if (options$effect_size %in% c("r", "rdiff")) TRUE else FALSE
-  is_interval <- if (options$null_boundary > 0) TRUE else FALSE
-  from_raw <- options$switch == "from_raw"
+
+  is_difference <- FALSE
+  if (!is.null(options$effect_size)) {
+    is_difference <- if (options$effect_size %in% c("mean_difference", "median_difference", "proportion_difference")) TRUE else FALSE
+  }
+
+  is_interval <- FALSE
+  if (!is.null(options$null_boundary)) {
+    is_interval <- if (options$null_boundary > 0) TRUE else FALSE
+  }
+
+  is_r <- FALSE
+  if (!is.null(options$effect_size)) {
+    is_r <- if (options$effect_size %in% c("r", "rdiff")) TRUE else FALSE
+  }
+
+  is_pdiff <- FALSE
+  if (!is.null(options$effect_size)) {
+    is_pdiff <- if (options$effect_size %in% c("pdiff")) TRUE else FALSE
+  }
+
+  from_raw <- FALSE
+  if (!is.null(options$switch)) {
+    from_raw <- options$switch == "from_raw"
+  }
+
+  is_mean <- FALSE
+  if (!is.null(options$effect_size)) {
+    is_mean <- if (options$effect_size %in% c("mean_difference", "mean")) TRUE else FALSE
+  }
+
+  is_mixed <- FALSE
+  if (!is.null(options$design)) {
+    is_mixed <- options$design == "mixed"
+  }
+
+  show_details <- FALSE
+  if (!is.null(options$show_details)) {
+    show_details <- options$show_details
+  }
+
+  show_calculations <- FALSE
+  if (!is.null(options$show_calculations)) {
+    show_calculations <- options$show_calculations
+  }
+
+  assume_equal_variance <- FALSE
+  if (!is.null(options$assume_equal_variance)) {
+    assume_equal_variance <- options$assume_equal_variance | is_mixed
+  }
+
+  is_complex <- FALSE
+  if (!is.null(options$design)) is_complex <- TRUE
+
 
   # Title
   overviewTable <- createJaspTable(title = "Hypothesis Evaluation")
@@ -515,12 +604,27 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
     )
   }
 
+
+  if (is_complex) {
+    overviewTable$addColumnInfo(
+      name = "effect_type",
+      title = "Effect type",
+      type = "string",
+      combine = TRUE
+    )
+  }
+
+  effect_column <- "effect"
+  if (is_complex) effect_column <- "effects_complex"
+  if (options$effect_size == "proportion_difference")  effect_column <- "effect_plus"
+
   overviewTable$addColumnInfo(
-    name = if (options$effect_size == "proportion_difference") "effect_plus" else "effect",
-    title = "Effect",
+    name = effect_column,
+    title = if (is_complex) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
     type = "string",
     combine = FALSE
   )
+
 
   if (is_interval) {
     overviewTable$addColumnInfo(
@@ -787,7 +891,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
 
   }
 
-  if (is_complex & options$effect_size == "mean_difference" & show_details & assume_equal_variance) {
+  if (is_complex & options$effect_size == "mean_difference" & show_details & assume_equal_variance & !is_mixed) {
     overviewTable$addColumnInfo(
       name = "s_component",
       title = "<i>s</i><sub>p</sub>",

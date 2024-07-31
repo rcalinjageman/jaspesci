@@ -14,6 +14,10 @@ import "./" as Esci
     property alias null_value_negativeValues: null_value.negativeValues
     property alias null_boundary_max: null_boundary.max
     property alias alpha_label_text: alpha_label.text
+    property alias rope_units_enabled: rope_units.enabled
+    property alias rope_units_visible: rope_units.visible
+    property alias hgrid_columns: hgrid.columns
+    property alias evaluate_hypotheses_checked: evaluate_hypotheses.checked
 
     Group
     {
@@ -57,12 +61,34 @@ import "./" as Esci
         visible: evaluate_hypotheses.checked
       }
 
+
+  		DropDown
+      {
+        name: "rope_units"
+        enabled: evaluate_hypotheses.checked
+        visible: false
+        values:
+          [
+            { label: "Original units", value: "raw"},
+            { label: "Standard deviations", value: "sd"}
+          ]
+        id: rope_units
+      }
+
       Label {
         text: "at alpha = .05"
         id: alpha_label
         enabled: evaluate_hypotheses.checked
         visible: evaluate_hypotheses.checked
       }
+
+
+
+    }  // end HE grid
+
+     Group
+    {
+      Layout.columnSpan: 2
 
       Esci.ColorSelect
       {
@@ -74,8 +100,7 @@ import "./" as Esci
         id: null_color
       }
 
-
-    }  // end HE grid
+    }
 
 
   }  // end HE section
