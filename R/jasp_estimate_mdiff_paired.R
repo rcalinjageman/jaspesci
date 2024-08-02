@@ -131,7 +131,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       jaspResults,
       options,
       ready,
-      estimate,
+      if (ready) estimate else NULL,
       level = 1,
       paired = TRUE
     )
@@ -159,6 +159,10 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       estimate,
       "es_r"
     )
+
+    jaspResults[["es_r"]]$dependOn(
+      jasp_mdiff_table_depends_on()
+    )
   }
 
 
@@ -169,7 +173,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       jaspResults,
       options,
       ready,
-      estimate
+      if (ready) estimate else NULL
     )
 
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
@@ -178,6 +182,14 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       jaspResults[["es_m_differenceTable"]],
       estimate,
       to_fill
+    )
+
+    if (ready) jaspResults[["es_m_differenceTable"]]$addFootnote(
+      paste(
+        "<i>s</i><sub>diff</sub> = ",
+        format(estimate$es_mean_difference$s_component[[3]], 2),
+        sep = ""
+      )
     )
 
   }
@@ -189,7 +201,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       jaspResults,
       options,
       ready,
-      estimate,
+      if (ready) estimate else NULL,
       one_group = FALSE
     )
 
@@ -208,7 +220,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         jaspResults,
         options,
         ready,
-        estimate,
+        if (ready) estimate else NULL,
         2
       )
 

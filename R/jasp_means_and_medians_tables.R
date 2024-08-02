@@ -367,6 +367,11 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
   is_complex <- FALSE
   if (!is.null(options$design)) is_complex <- TRUE
 
+  is_paired <- FALSE
+  if (is.null(options$assume_equal_variabce)) {
+    is_paired <- TRUE
+  }
+
 
   # Title
   overviewTable <- createJaspTable(title = "Standardized Mean Difference")
@@ -382,7 +387,7 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
     )
   )
 
-  if (!one_group) {
+  if (!one_group & !is_paired) {
     overviewTable$addColumnInfo(
       name = "outcome_variable_name",
       title = "Outcome variable",
@@ -787,6 +792,10 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   is_complex <- FALSE
   if (!is.null(options$design)) is_complex <- TRUE
 
+  is_paired <- FALSE
+  if (is.null(options$assume_equal_variabce)) {
+    is_paired <- TRUE
+  }
 
   overviewTable <- createJaspTable(
     title = if (is_mean) "Mean Difference" else "Median Difference"
@@ -799,12 +808,15 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
     )
   )
 
-  overviewTable$addColumnInfo(
-    name = "outcome_variable_name",
-    title = "Outcome variable",
-    type = "string",
-    combine = TRUE
-  )
+  if (!is_paired) {
+    overviewTable$addColumnInfo(
+      name = "outcome_variable_name",
+      title = "Outcome variable",
+      type = "string",
+      combine = TRUE
+    )
+
+  }
 
   if (is_complex) {
     overviewTable$addColumnInfo(
@@ -899,7 +911,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
     )
   }
 
-  if (options$effect_size == "mean_difference" & !is_mixed) {
+  if (options$effect_size == "mean_difference" & !is_mixed & !is_paired) {
     if (assume_equal_variance) {
       overviewTable$addFootnote(
         "Variances are assumed equal, so <i>s</i><sub>p</sub> was used to calculate each CI."
@@ -944,6 +956,11 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels =
   is_mean <- FALSE
   if (options$effect_size == "mean_difference") is_mean <- TRUE
 
+  is_paired <- FALSE
+  if (is.null(options$assume_equal_variabce)) {
+    is_paired <- TRUE
+  }
+
   overviewTable <- createJaspTable(
     title = if (is_mean) "Ratio of Means" else "Ratio of Medians"
   )
@@ -955,13 +972,15 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels =
     )
   )
 
+  if (!is_paired) {
+    overviewTable$addColumnInfo(
+      name = "outcome_variable_name",
+      title = "Outcome variable",
+      type = "string",
+      combine = TRUE
+    )
 
-  overviewTable$addColumnInfo(
-    name = "outcome_variable_name",
-    title = "Outcome variable",
-    type = "string",
-    combine = TRUE
-  )
+  }
 
 
   effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
