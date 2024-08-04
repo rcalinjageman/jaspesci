@@ -28,10 +28,11 @@ Form
 	property int framework:	Common.Type.Framework.Classical
 
 	property alias sdiff_text: sdiff.text
+	property alias conf_level_value: conf_level.value
 
 
 	function alpha_adjust() {
-    alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+    alpha_label_text = "At alpha = " + Number(1 - (conf_level_value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
   }
 
   function switch_adjust() {
@@ -299,10 +300,9 @@ Form
   Esci.FigureOptions {
     width_defaultValue: 600
     height_defaultValue: 400
-  }
 
 
-    Section
+        Section
   {
     title: qsTr("Aesthetics")
 
@@ -830,9 +830,12 @@ Form
   } // end aesthetics
 
 
+  }
 
 	Esci.HeOptions {
     null_value_enabled: false
+    hgrid_columns: 4
+    rope_units_visible: evaluate_hypotheses_checked
   }
 
 }

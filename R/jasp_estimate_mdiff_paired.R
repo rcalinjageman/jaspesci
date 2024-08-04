@@ -102,15 +102,6 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     estimate$es_mean_difference$n_component <- 1/sqrt(estimate$es_mean_difference$df+1)
     estimate$es_mean_difference$s_component <- estimate$es_mean_difference$moe / estimate$es_mean_difference$t_multiplier / estimate$es_mean_difference$n_component
 
-    # self$results$es_mean_difference$setNote(
-    #   key = "sdiff",
-    #   note = paste(
-    #     "<i>s</i><sub>diff</sub> = ",
-    #     format(estimate$es_mean_difference$s_component[[3]], 2),
-    #     sep = ""
-    #   )
-    # )
-
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
       mytest <- jasp_test_mdiff(
         options,
@@ -192,6 +183,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       )
     )
 
+
   }
 
 
@@ -253,22 +245,14 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
 
   }
 
-  return()
-
   # Now prep and fill the plot
-  x <- 0
-  for (my_variable in options$outcome_variable) {
-    x <- x + 1
-    my_variable <- options$outcome_variable[[x]]
-
-
-    if (is.null(jaspResults[[my_variable]])) {
+  if (is.null(jaspResults[["mdiffPlot"]])) {
       jasp_plot_m_prep(
         jaspResults,
         options,
         ready,
-        my_variable = my_variable,
-        add_citation = if (x == 1) TRUE else FALSE
+        my_variable = "mdiffPlot",
+        add_citation = TRUE
       )
 
       if (ready) {
@@ -277,15 +261,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         if (effect_size == "median_difference") effect_size <- "median"
 
         args <- list()
-        if (from_raw) {
-          if (length(options$outcome_variable) == 1) {
-            args$estimate <- estimate_big
-          } else {
-            args$estimate <- estimate_big[[my_variable]]
-          }
-        } else {
-          args$estimate <- estimate[[my_variable]]
-        }
+        args$estimate <- estimate
         args$effect_size <- effect_size
         args$data_layout <- options$data_layout
         args$data_spread <- options$data_spread
@@ -328,6 +304,9 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         args$difference_axis_space <- 0.5
         args$simple_contrast_labels <- self$options$simple_contrast_labels
 
+        args$rope_units <- "raw"
+        try(args$rope_units <- self$options$rope_units, silent = TRUE)
+
         if (evaluate_h) {
           args$rope <- c(
             options$null_value - options$null_boundary,
@@ -335,7 +314,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
           )
         }
 
-         myplot <- do.call(
+        myplot <- do.call(
           what = esci::plot_mdiff,
           args = args
         )
@@ -343,14 +322,11 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         #apply aesthetics
         myplot <- jasp_plot_mdiff_decorate(myplot, options)
 
-        jaspResults[[my_variable]]$plotObject <- myplot
-
+        jaspResults[["mdiffPlot"]]$plotObject <- myplot
 
       }  # end plot creation
 
-
-    } # end check if plot is null
-  } # end loop through outcome variables
+  } # end plot prep
 
   return()
 }
