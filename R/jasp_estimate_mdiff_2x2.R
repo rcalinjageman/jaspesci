@@ -359,39 +359,48 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
 
   }
 
-  return()
+  # Now prep and fill the plots
 
-  # Now prep and fill the plot
+  plot_names <- c(
+    "main_effect_A",
+    "main_effect_B",
+    "interaction"
+  )
+
   x <- 0
-  for (my_variable in options$outcome_variable) {
+  for (this_plot in plot_names) {
     x <- x + 1
-    my_variable <- options$outcome_variable[[x]]
+
+    gvA <- if (is.null(estimate)) "Variable A" else estimate$properties$grouping_variable_A_name
+
+    gvB <- if (is.null(estimate)) "Variable B" else estimate$properties$grouping_variable_B_name
 
 
-    if (is.null(jaspResults[[my_variable]])) {
+    which_title <- switch(
+      this_plot,
+      "main_effect_A" = paste("Main Effect of", gvA),
+      "main_effect_B" = paste("Main Effect of", gvB),
+      "interaction" = paste("Interaction of", gvA, "and", gvB)
+    )
+
+
+    if (is.null(jaspResults[[this_plot]])) {
       jasp_plot_m_prep(
         jaspResults,
         options,
         ready,
-        my_variable = my_variable,
-        add_citation = if (x == 1) TRUE else FALSE
+        my_variable = this_plot,
+        add_citation = if (x == 1) TRUE else FALSE,
+        my_title = which_title
       )
 
       if (ready) {
-        effect_size = options$effect_size
-        if (effect_size == "mean_difference") effect_size <- "mean"
-        if (effect_size == "median_difference") effect_size <- "median"
+
+        effect_size <- "mean"
+        if (from_raw & !mixed & options$effect_size == "median_difference") effect_size <- "median"
 
         args <- list()
-        if (from_raw) {
-          if (length(options$outcome_variable) == 1) {
-            args$estimate <- estimate_big
-          } else {
-            args$estimate <- estimate_big[[my_variable]]
-          }
-        } else {
-          args$estimate <- estimate[[my_variable]]
-        }
+        args$estimate <- estimate[[this_plot]]
         args$effect_size <- effect_size
         args$data_layout <- options$data_layout
         args$data_spread <- options$data_spread
@@ -439,6 +448,9 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
             options$null_value - options$null_boundary,
             options$null_value + options$null_boundary
           )
+
+          args$rope_units <- "raw"
+          try(args$rope_units <- self$options$rope_units, silent = TRUE)
         }
 
          myplot <- do.call(
@@ -449,7 +461,40 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
         #apply aesthetics
         myplot <- jasp_plot_mdiff_decorate(myplot, options)
 
-        jaspResults[[my_variable]]$plotObject <- myplot
+         mylabs <- paste(
+           estimate$overview$grouping_variable_B_level,
+           " - ",
+           estimate$overview$grouping_variable_A_level,
+           sep = ""
+         )
+
+
+         if (this_plot != "interaction") {
+           mylabs <- c(
+             mylabs,
+             paste(" \n", myplot$scales$scales[[2]]$labels[5:7],  sep = "")
+           )
+         } else {
+           mylabs <- c(
+             mylabs,
+             "Difference of\ndifferences"
+             #myplot$scales$scales[[2]]$labels[5:5]
+           )
+
+           if (!is.null(myplot$layers["simple_effect_points"])) {
+             try(myplot$layers[["simple_effect_points"]]$aes_params$fill <- "white")
+             try(myplot$layers[["simple_effect_points"]]$aes_params$shape <- 23)
+             try(myplot$layers[["simple_effect_points"]]$aes_params$size <- as.numeric(options$size_summary_reference) +1 )
+           }
+           if (!is.null(myplot$layers$simple_effect_lines)) {
+             try(myplot$layers$simple_effect_lines$aes_params$size <- as.numeric(options$size_interval_reference))
+           }
+         }
+
+         myplot$scales$scales[[2]]$labels <- mylabs
+         myplot <- myplot + ggplot2::guides(x = ggh4x::guide_axis_nested(delim = " - "))
+
+        jaspResults[[this_plot]]$plotObject <- myplot
 
 
       }  # end plot creation

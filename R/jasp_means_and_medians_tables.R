@@ -368,7 +368,7 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
   if (!is.null(options$design)) is_complex <- TRUE
 
   is_paired <- FALSE
-  if (is.null(options$assume_equal_variabce)) {
+  if (is.null(options$assume_equal_variance)) {
     is_paired <- TRUE
   }
 
@@ -793,7 +793,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   if (!is.null(options$design)) is_complex <- TRUE
 
   is_paired <- FALSE
-  if (is.null(options$assume_equal_variabce)) {
+  if (is.null(options$assume_equal_variance)) {
     is_paired <- TRUE
   }
 

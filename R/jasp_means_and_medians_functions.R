@@ -31,10 +31,12 @@ jasp_test_mdiff <- function(options, estimate) {
 
 
 
-jasp_plot_m_prep <- function(jaspResults, options, ready, my_variable = "mdiffPlot", add_citation = FALSE) {
+jasp_plot_m_prep <- function(jaspResults, options, ready, my_variable = "mdiffPlot", add_citation = FALSE, my_title = NULL) {
 
-  my_title <- if (my_variable == "mdiffPlot") "Estimation Figure" else paste("Estimation Figure", my_variable, sep = " - ")
-  if (my_variable == "scatterPlot") my_title <- "Scatterplot"
+  if (is.null(my_title)) {
+    my_title <- if (my_variable == "mdiffPlot") "Estimation Figure" else paste("Estimation Figure", my_variable, sep = " - ")
+    if (my_variable == "scatterPlot") my_title <- "Scatterplot"
+  }
 
   mdiffPlot <- createJaspPlot(
     title = my_title,
