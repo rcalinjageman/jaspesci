@@ -371,9 +371,9 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
   for (this_plot in plot_names) {
     x <- x + 1
 
-    gvA <- if (is.null(estimate)) "Variable A" else estimate$properties$grouping_variable_A_name
+    gvA <- if (!ready) "Variable A" else estimate$properties$grouping_variable_A_name
 
-    gvB <- if (is.null(estimate)) "Variable B" else estimate$properties$grouping_variable_B_name
+    gvB <- if (!ready) "Variable B" else estimate$properties$grouping_variable_B_name
 
 
     which_title <- switch(
@@ -503,7 +503,133 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     } # end check if plot is null
   } # end loop through outcome variables
 
-  return()
+
+  if (options$show_interaction_plot & is.null(jaspResults[["interaction_plot"]])) {
+
+    mdiffPlot <- createJaspPlot(
+      title = "Figure Emphasizing Interaction",
+      width = options$width,
+      height = options$height
+    )
+
+    mdiffPlot$dependOn(
+      c(
+        jasp_mdiff_table_depends_on(),
+        jasp_plot_depend_on(),
+        "show_CI",
+        "show_interaction_plot"
+      )
+    )
+
+    jaspResults[["interaction_plot"]] <- mdiffPlot
+
+      if (ready) {
+
+        self <- list()
+        self$options <- options
+
+        effect_size <- "mean"
+        if (from_raw & !mixed & options$effect_size == "median_difference") effect_size <- "median"
+
+        myplot <- esci::plot_interaction(
+          estimate,
+          effect_size = effect_size,
+          show_CI = options$show_CI,
+          line_count = 125,
+          line_alpha = 0.03
+        )
+
+        ylim <- c(NA, NA)
+
+        if (!(options$ymin %in% c("auto", "Auto", "AUTO", ""))) {
+          try(ylim[[1]] <- as.numeric(options$ymin))
+        }
+
+        if (!(options$ymax %in% c("auto", "Auto", "AUTO", ""))) {
+          try(ylim[[2]] <- as.numeric(options$ymax))
+        }
+
+        ybreaks <- NULL
+        if (!(options$ybreaks %in% c("auto", "Auto", "AUTO", ""))) {
+          try(ybreaks <- as.numeric(options$ybreaks))
+          if (is.na(ybreaks)) ybreaks <- NULL
+        }
+
+        myplot <- myplot + ggplot2::scale_y_continuous(
+          limits = ylim,
+          n.breaks = ybreaks
+        )
+
+        myplot <- myplot + ggplot2::theme(
+          axis.text.y = ggtext::element_markdown(size = options$axis.text.y),
+          axis.title.y = ggtext::element_markdown(size = options$axis.title.y),
+          axis.text.x = ggtext::element_markdown(size = options$axis.text.x),
+          axis.title.x = ggtext::element_markdown(size = options$axis.title.x),
+          legend.title = ggtext::element_markdown(size = options$axis.title.x),
+          legend.text = ggtext::element_markdown(size = options$axis.text.x)
+        )
+
+        # Aesthetics
+        myplot <- myplot + ggplot2::scale_shape_manual(
+          values = c(
+            self$options$shape_summary_reference,
+            self$options$shape_summary_comparison
+          )
+        )
+
+        myplot <- myplot + ggplot2::scale_color_manual(
+          values = c(
+            self$options$color_summary_reference,
+            self$options$color_summary_comparison
+          )
+        )
+
+        myplot <- myplot + ggplot2::scale_fill_manual(
+          values = c(
+            self$options$fill_summary_reference,
+            self$options$fill_summary_comparison
+          )
+        )
+
+        myplot <- myplot + ggplot2::scale_size_manual(
+          values = c(
+            as.integer(self$options$size_summary_reference),
+            as.integer(self$options$size_summary_comparison)
+          )
+        )
+
+        myplot <- myplot + ggplot2::scale_alpha_manual(
+          values = c(
+            1 - as.numeric(self$options$alpha_summary_reference),
+            1 - as.numeric(self$options$alpha_summary_comparison)
+          )
+        )
+
+        myplot <- myplot + ggplot2::scale_linetype_manual(
+          values = c(
+            self$options$linetype_summary_reference,
+            self$options$linetype_summary_comparison
+          )
+        )
+
+        # Axis options
+        if (!(options$ylab %in% c("auto", "Auto", "AUTO", ""))) {
+          myplot <- myplot + ggplot2::ylab(options$ylab)
+        }
+
+        if (!(options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
+          myplot <- myplot + ggplot2::xlab(options$xlab)
+        }
+
+
+        myplot$layers[["simple_effect_lines"]]$aes_params$linewidth <- as.numeric(self$options$size_interval_reference)/3
+
+        jaspResults[["interaction_plot"]]$plotObject <- myplot
+
+      }
+
+    }
+
 }
 
 

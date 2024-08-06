@@ -390,6 +390,7 @@ Form
 	  CheckBox
 	  {
 	    name: "show_interaction_plot";
+	    id: show_interaction_plot
 	    label: qsTr("Figure to emphasize interaction");
 	   }
 
@@ -397,6 +398,7 @@ Form
 	    name: "show_CI";
 	    id: show_CI
 	    label: qsTr("CI for each simple effect")
+	    enabled: show_interaction_plot.checked
     }
 	}
 
@@ -408,10 +410,10 @@ Form
    error_nudge_defaultValue: 0.5
    data_spread_defaultValue: 0.2
    error_scale_defaultValue: 0.25
-  }
 
+     Esci.AestheticsAll {
 
-  Esci.AestheticsAll {
+    }
 
   }
 

@@ -30,6 +30,16 @@ jasp_test_mdiff <- function(options, estimate) {
 }
 
 
+jasp_plot_depend_on <- function() {
+  mytypes <- c("shape", "size", "color", "fill", "alpha", "linetype")
+  myobjs <- c("summary", "raw", "interval", "error")
+  mycontrast <- c("reference", "comparison", "difference", "unused")
+
+  mydepends <- apply(expand.grid(mytypes, myobjs, mycontrast), 1, paste, collapse="_")
+
+  return(mydepends)
+}
+
 
 jasp_plot_m_prep <- function(jaspResults, options, ready, my_variable = "mdiffPlot", add_citation = FALSE, my_title = NULL) {
 
