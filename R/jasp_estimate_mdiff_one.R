@@ -42,7 +42,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     if (from_raw) {
       estimate <- esci::estimate_mdiff_one(
         data = dataset,
-        outcome_variable = encodeColNames(options$outcome_variable),
+        outcome_variable = options$outcome_variable,
         reference_mean = null_value,
         conf_level = options$conf_level,
         save_raw_data = TRUE

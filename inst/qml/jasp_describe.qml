@@ -122,8 +122,8 @@ Form
     sp_other_options_grid_enabled: false
     sp_other_options_grid_visible: false
     histogram_grid_visible: true
-  }
-
+    sp_plot_width_defaultValue: 500
+    sp_plot_height_defaultValue: 400
 
 
     Section
@@ -186,6 +186,16 @@ Form
 
   } // end aesthetics
 
+
+  }
+
+		Esci.ConfLevel
+		  {
+		    name: "conf_level"
+		    id: conf_level
+		    enabled: false
+		    visible: false
+		  }
 
 
 }

@@ -168,11 +168,8 @@ Form
     simple_labels_enabled: false
     simple_labels_visible: false
     difference_axis_grid_visible: false
-  }
 
-
-
-    Section
+        Section
   {
     title: qsTr("Aesthetics")
 
@@ -297,6 +294,9 @@ Form
     }
 
   } // end aesthetics
+
+
+  }
 
 
 

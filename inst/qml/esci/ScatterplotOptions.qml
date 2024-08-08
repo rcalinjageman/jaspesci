@@ -14,6 +14,8 @@ import "./" as Esci
     property alias sp_other_options_grid_enabled: sp_other_options_grid.enabled
     property alias sp_other_options_grid_visible: sp_other_options_grid.visible
     property alias histogram_grid_visible: histogram_grid.visible
+    property alias sp_plot_width_defaultValue: sp_plot_width.defaultValue
+    property alias sp_plot_height_defaultValue: sp_plot_height.defaultValue
 
 
 

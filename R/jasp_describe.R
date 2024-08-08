@@ -260,7 +260,15 @@ jasp_histogram_create <- function(jaspResults, options, ready, estimate, plot_ty
       "fill_highlighted",
       "color",
       "marker_size",
-      "histogram_bins"
+      "histogram_bins",
+      "sp_plot_width",
+      "sp_plot_height",
+      "sp_ylab",
+      "sp_axis.text.y",
+      "sp_axis.title.y",
+      "sp_xlab",
+      "sp_axis.text.x",
+      "sp_axis.title.x"
     )
   )
 

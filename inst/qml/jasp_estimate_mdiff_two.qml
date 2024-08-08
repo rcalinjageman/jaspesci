@@ -266,10 +266,7 @@ Form
 
 
   Esci.FigureOptions {
-  }
-
-
-    Section
+          Section
   {
     title: qsTr("Aesthetics")
 
@@ -777,6 +774,7 @@ Form
 
   } // end aesthetics
 
+  }
 
 
 	Esci.HeOptions {

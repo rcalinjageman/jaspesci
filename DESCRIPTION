@@ -13,9 +13,7 @@ Imports:
   jaspBase,
   jaspGraphs,
   esci,
-  glue,
-  ggdist,
-  dplyr
+  glue
 Suggests:
   testthat
 Remotes:
