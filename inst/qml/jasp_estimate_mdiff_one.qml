@@ -28,7 +28,7 @@ Form
 	property int framework:	Common.Type.Framework.Classical
 
 	function alpha_adjust() {
-    alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+	  myHeOptions.currentConfLevel = conf_level.value
   }
 
   function switch_adjust() {
@@ -145,6 +145,7 @@ Form
         id: effect_size
         enabled: from_raw.checked
       }
+
 	}
 
 	Group
@@ -301,6 +302,8 @@ Form
 
 
   Esci.HeOptions {
+    id: myHeOptions
+
   }
 
 }

@@ -19,6 +19,9 @@ import "./" as Esci
     property alias hgrid_columns: hgrid.columns
     property alias evaluate_hypotheses_checked: evaluate_hypotheses.checked
 
+    property var currentConfLevel
+    onCurrentConfLevelChanged: alpha_label.text = "At alpha = " + Number(1 - (currentConfLevel/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+
     Group
     {
       Layout.columnSpan: 2

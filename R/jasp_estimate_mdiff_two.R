@@ -167,7 +167,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     }
 
     estimate <- try(do.call(what = call, args = args))
-
+    estimate_big <- estimate
 
     # Some results tweaks - future updates to esci will do these calcs within esci rather than here
     # Add in MoE
@@ -186,7 +186,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     estimate$es_mean_difference$n_component <- estimate$es_mean_difference$SE / estimate$es_mean_difference$s_component
 
 
-    estimate_big <- estimate
+
     estimate$raw_data <- NULL
     if (from_raw) {
       for (myvariable in options$outcome_variable) {
@@ -402,7 +402,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
           try(args$rope_units <- self$options$rope_units, silent = TRUE)
         }
 
-         myplot <- do.call(
+        myplot <- do.call(
           what = esci::plot_mdiff,
           args = args
         )
@@ -465,15 +465,15 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
     if (interval_null) {
       try(myplot$layers[["null_interval"]]$aes_params$fill <- self$options$null_color, silent = TRUE)
 
-      try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_interval_difference)/divider+1, silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_difference), silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_interval_difference, silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
-
       if (plot_median) {
         try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_summary_difference, silent = TRUE)
-        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summarydifference)/divider*1.3, silent = TRUE)
+        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summary_difference)/divider*1.3, silent = TRUE)
         try(myplot$layers[["ta_CI"]]$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_difference), silent = TRUE)
+        try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
+      } else {
+        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_interval_difference)/divider+1, silent = TRUE)
+        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_difference), silent = TRUE)
+        try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_interval_difference, silent = TRUE)
         try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
       }
 
