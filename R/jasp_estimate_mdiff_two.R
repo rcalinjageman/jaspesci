@@ -397,6 +397,9 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
             options$null_value - options$null_boundary,
             options$null_value + options$null_boundary
           )
+
+          args$rope_units <- "raw"
+          try(args$rope_units <- self$options$rope_units, silent = TRUE)
         }
 
          myplot <- do.call(
@@ -434,14 +437,14 @@ jasp_estimate_mdiff_two_read_data <- function(dataset, options) {
 }
 
 
-jasp_plot_mdiff_decorate <- function(myplot, options) {
+jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
 
   # make compatible with jamovi code
   self <- list()
   self$options <- options
 
   effect_size <- "mean"
-  from_raw <- TRUE  # (self$options$switch == "from_raw")
+  from_raw <- (self$options$switch == "from_raw")
   plot_median <- FALSE
   if (from_raw) {
     try(plot_median <- (self$options$effect_size == "median_difference"), silent = TRUE)
@@ -451,9 +454,10 @@ jasp_plot_mdiff_decorate <- function(myplot, options) {
   divider <- 1
   if (effect_size == "median") divider <- 4
 
-  interval_null <- FALSE
+  interval_null <- self$options$null_boundary > 0
   htest <- FALSE
   try(htest <- self$options$evaluate_hypotheses, silent = TRUE)
+  htest <- htest & has_contrast
 
 
   if (htest) {
@@ -462,14 +466,14 @@ jasp_plot_mdiff_decorate <- function(myplot, options) {
       try(myplot$layers[["null_interval"]]$aes_params$fill <- self$options$null_color, silent = TRUE)
 
       try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_interval_difference)/divider+1, silent = TRUE)
-      try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(self$options$alpha_interval_difference), silent = TRUE)
+      try(myplot$layers[["ta_CI"]]$aes_params$alpha <- 1 - as.numeric(self$options$alpha_interval_difference), silent = TRUE)
       try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_interval_difference, silent = TRUE)
       try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
 
       if (plot_median) {
         try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_summary_difference, silent = TRUE)
         try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summarydifference)/divider*1.3, silent = TRUE)
-        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(self$options$alpha_summary_difference), silent = TRUE)
+        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary_difference), silent = TRUE)
         try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$self$options$linetype_summary_difference, silent = TRUE)
       }
 
@@ -515,20 +519,20 @@ jasp_plot_mdiff_decorate <- function(myplot, options) {
   fill_summary_unused <- "black"
   size_raw_unused <- 1
   size_summary_unused <- 1
-  alpha_raw_unused <- 1
+  alpha_raw_unused <- 0
   alpha_summary_unused <- 1
   alpha_error_reference <- 1
   linetype_summary_unused <- "solid"
   linetype_summary_reference <- "solid"
   color_interval_unused <- "black"
   color_interval_reference <- "black"
-  alpha_interval_unused <- 1
-  alpha_interval_reference <- 1
+  alpha_interval_unused <- 0
+  alpha_interval_reference <- 0
   size_interval_unused <- 1
   size_interval_reference <- 1
   fill_error_unused <- "black"
   fill_error_reference <- "black"
-  alpha_error_unused <- 1
+  alpha_error_unused <- 0
 
   try(shape_raw_difference <- self$options$shape_raw_difference, silent = TRUE)
   try(color_raw_difference <- self$options$color_raw_difference, silent = TRUE)

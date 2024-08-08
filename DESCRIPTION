@@ -13,6 +13,7 @@ Imports:
   jaspBase,
   jaspGraphs,
   esci,
+  glue,
   ggdist,
   dplyr
 Suggests:

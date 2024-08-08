@@ -58,7 +58,14 @@ jasp_mdiff_table_depends_on <- function() {
       "outcome_variable_level1",
       "outcome_variable_level2",
       "repeated_measures_name",
-      "design"
+      "design",
+      "comparison_labels",
+      "reference_labels",
+      "means",
+      "sds",
+      "ns",
+      "from_raw",
+      "from_summary"
     )
   )
 }
@@ -261,7 +268,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   }
 
   if (options$effect_size == "mean_difference") {
-    if (options$assume_equal_variance) {
+    if (options$assume_equal_variance & is.null(options$reference_labels)) {
       overviewTable$addColumnInfo(
         name = "s_pooled",
         title = "<i>s</i><sub>p</sub>",
@@ -333,6 +340,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
 jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_group = TRUE) {
   # Handles
   has_estimate <- !is.null(estimate)
+  if (has_estimate) has_estimate <- !is.null(estimate$es_smd_properties)
 
   from_raw <- FALSE
   if (!is.null(options$switch)) {

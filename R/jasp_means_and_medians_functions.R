@@ -121,3 +121,96 @@ jasp_plot_m_prep <- function(jaspResults, options, ready, my_variable = "mdiffPl
   return()
 
 }
+
+
+# This helper function checks if a contrast is valid
+jamovi_check_contrast <- function(
+    labels,
+    valid_levels,
+    level_source,
+    group_type,
+    error_string = NULL,
+    sequential = FALSE
+) {
+
+  run_analysis <- TRUE
+
+  if(nchar(labels)>=1 & labels != ' ') {
+    # Verify list of reference groups
+    # Split by comma, then trim ws while also
+    #  reducing the list returned by split to a vector
+    refgs <- strsplit(
+      as.character(labels), ","
+    )
+    refgs <- trimws(refgs[[1]], which = "both")
+
+
+    # Now cycle through each item in the list to check it
+    #   is a valid factor within the grouping variable
+
+    for (tlevel in refgs) {
+      if (!tlevel %in% valid_levels) {
+        error_string <- paste(error_string, glue::glue(
+          "<b>{group_type} error</b>:
+The group {tlevel} does not exist in {level_source}.
+Group labels in {level_source} are: {paste(valid_levels, collapse = ', ')}.
+Use commas to separate labels.
+"
+        )
+        )
+        return(list(
+          labels = NULL,
+          run_analysis = FALSE,
+          error_string = error_string
+        )
+        )
+      }
+    }
+  } else {
+    if (sequential) {
+      error_string <- paste(error_string, glue::glue(
+        "
+<b>{group_type} subset</b>:
+Do the same for this subset.  No group can belong to both subsets.
+"
+      ))
+    } else {
+      error_string <- paste(error_string, glue::glue(
+        "
+<b>{group_type} subset</b>:
+Type one or more group labels, separated by commas,
+to form the {group_type} subset.
+Group labels in {level_source} are: {paste(valid_levels, collapse = ', ')}.
+"
+      ))
+    }
+    return(list(
+      label = NULL,
+      run_analysis = FALSE,
+      error_string = error_string
+    )
+    )
+  }
+
+
+  return(list(
+    label = refgs,
+    run_analysis = TRUE,
+    error_string = error_string
+  )
+  )
+}
+
+
+
+
+jamovi_create_contrast <- function(reference, comparison) {
+  ref_n <- length(reference)
+  comp_n <- length(comparison)
+  ref_vector <- rep(-1/ref_n, times = ref_n)
+  comp_vector <- rep(1/comp_n, times = comp_n)
+  contrast <- c(ref_vector, comp_vector)
+  names(contrast) <- c(reference, comparison)
+  return(contrast)
+}
+
