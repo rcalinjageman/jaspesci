@@ -32,7 +32,7 @@ Form
 
 
 	function alpha_adjust() {
-    alpha_label_text = "At alpha = " + Number(1 - (conf_level_value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+	  myHeOptions.currentConfLevel = conf_level.value
   }
 
   function switch_adjust() {
@@ -833,6 +833,7 @@ Form
   }
 
 	Esci.HeOptions {
+    id: myHeOptions
     null_value_enabled: false
     hgrid_columns: 4
     rope_units_visible: evaluate_hypotheses_checked

@@ -29,7 +29,7 @@ Form
 	property alias conf_level_value: conf_level.value
 
 	function alpha_adjust() {
-    alpha_label_text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+	  myHeOptions.currentConfLevel = conf_level.value
   }
 
 
@@ -266,10 +266,6 @@ Form
     ymin_placeholderText: "auto"
     ymax_placeholderText: "auto"
 
-
-  }
-
-
     Section
   {
     title: qsTr("Aesthetics")
@@ -317,8 +313,12 @@ Form
 
   }
 
+  }
+
+
 
   Esci.HeOptions {
+    id: myHeOptions
     null_value_enabled: false
     null_boundary_max: 1
   }

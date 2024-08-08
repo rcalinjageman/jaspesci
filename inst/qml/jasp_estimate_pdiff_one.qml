@@ -28,7 +28,7 @@ Form
 	property int framework:	Common.Type.Framework.Classical
 
 	function alpha_adjust() {
-    alpha_label.text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+	  myHeOptions.currentConfLevel = conf_level.value
   }
 
   function not_case_label_adjust() {
@@ -176,10 +176,8 @@ Form
     distributions_grid_visible: false
     ymin_placeholderText: "0"
     ymax_placeholderText: "1"
-  }
 
-
-    Section
+        Section
   {
     title: qsTr("Aesthetics")
 
@@ -207,8 +205,12 @@ Form
 
   }
 
+  }
+
+
 
   Esci.HeOptions {
+    id: myHeOptions
     null_value_min: 0
     null_value_max: 1
     null_value_negativeValues: false

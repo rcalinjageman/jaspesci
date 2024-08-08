@@ -29,9 +29,8 @@ Form
 	property alias conf_level_value: conf_level.value
 
 	function alpha_adjust() {
-    alpha_label_text = "At alpha = " + Number(1 - (conf_level.value/100)).toLocaleString(Qt.locale("de_DE"), 'f', 4)
+	  myHeOptions.currentConfLevel = conf_level.value
   }
-
 
   RadioButtonGroup {
     columns: 2
@@ -217,7 +216,6 @@ Form
   Esci.ScatterplotOptions {
     sp_other_options_grid_enabled: true
     sp_other_options_grid_visible: true
-  }
 
     Section
   {
@@ -596,6 +594,8 @@ Form
   }
 
 
+  }
+
 
   Esci.FigureOptions {
     title: qsTr("Estimation figure options")
@@ -609,9 +609,6 @@ Form
     ymax_placeholderText: "1"
     width_defaultValue: 300
     height_defaultValue: 400
-
-  }
-
 
     Section
   {
@@ -661,8 +658,12 @@ Form
 
   }
 
+  }
+
+
 
   Esci.HeOptions {
+    id: myHeOptions
     null_value_enabled: true
     null_boundary_max: 1
   }

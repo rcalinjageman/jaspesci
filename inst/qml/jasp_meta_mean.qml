@@ -177,11 +177,13 @@ Form
 
   Esci.MetaFigureOptions {
 
+    Esci.MetaAesthetics {
+
+    }
+
   }
 
 
-  Esci.MetaAesthetics {
 
-  }
 
 }  // form
