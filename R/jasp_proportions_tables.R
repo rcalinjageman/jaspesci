@@ -322,3 +322,181 @@ jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, tab
 
 }
 
+
+jamovi_contingency_table <- function(self, estimate, jaspResults) {
+  # Create a contingency table for Chi Square
+
+  # Setup based on options for chi_table_option
+  print_observed <- switch(
+    self$options$chi_table_option,
+    "observed" = TRUE,
+    "expected" = FALSE,
+    "both" = TRUE
+  )
+
+  print_expected <- switch(
+    self$options$chi_table_option,
+    "observed" = FALSE,
+    "expected" = TRUE,
+    "both" = TRUE
+  )
+
+  buffer <- if (print_observed & print_expected) "<BR>" else NULL
+
+  observed_prefix <- if (print_observed) NULL else NULL
+  observed_suffix <- if (print_observed) NULL else NULL
+  expected_prefix <- if (print_expected) "(<i>" else NULL
+  expected_suffix <- if (print_expected) "</i>)" else NULL
+  total_prefix <- "<center><B>"
+  total_suffix <- "</B></center>"
+
+  # Handle on the table and the observed and expected tables
+  tbl <- createJaspTable(title = "Chi-Square Contingency Table")
+
+  tbl$dependOn(
+    c(
+      jasp_pdiff_table_depends_on(),
+      "show_chi_square",
+      "chi_table_option"
+    )
+  )
+
+  observed <- estimate$properties$chi_square$observed
+  expected <- estimate$properties$chi_square$expected
+
+  cdims <- dim(observed)
+  crows <- cdims[[1]]
+  ccolumns <- cdims[[2]]
+
+
+  # First, create a column for each level of the grouping variable
+  for(x in 1:ccolumns) {
+    tbl$addColumnInfo(
+      name = colnames(observed)[[x]],
+      title = colnames(observed)[[x]],
+      type = "string",
+      overtitle = estimate$properties$grouping_variable_name
+    )
+  }
+
+  # Add an extra column for totals
+  tbl$addColumnInfo(
+    name = "esci_Totals",
+    title = "Total",
+    type = "string"
+  )
+
+  # Now set each row
+  for(x in 1:crows) {
+
+    observed_values <- if (print_observed) format(observed[x, ], digits = 1) else NULL
+    expected_values <- if (print_expected) format(expected[x, ], digits = 2) else NULL
+
+    cell_values <- paste(
+      "<center>",
+      observed_prefix,
+      observed_values,
+      observed_suffix,
+      buffer,
+      expected_prefix,
+      expected_values,
+      expected_suffix,
+      "</center>",
+      sep = ""
+    )
+
+    cell_values <- c(
+      row.names(observed)[[x]],
+      cell_values,
+      paste(
+        total_prefix,
+        sum(observed[x, ]),
+        total_suffix,
+        sep = ""
+      )
+    )
+
+    names(cell_values) <- c(
+      "outcome_variable_level",
+      colnames(observed),
+      "esci_Totals"
+    )
+
+    tbl$addRows(
+      as.list(cell_values)
+    )
+  }
+
+  # Add begin and ending group formats for main cells to mark totals
+  # tbl$addFormat(rowNo = 1, col = 1, jmvcore::Cell.BEGIN_GROUP)
+  # tbl$addFormat(rowNo = x-1, col = 1, jmvcore::Cell.END_GROUP)
+  # tbl$addFormat(rowNo = x, col = 1, jmvcore::Cell.BEGIN_GROUP)
+
+
+  # Add the totals row
+  total_values <- colSums(observed)
+  total_values <- c(
+    "Total",
+    paste(
+      total_prefix,
+      total_values,
+      total_suffix,
+      sep = ""
+    ),
+    paste(
+      total_prefix,
+      sum(observed),
+      total_suffix
+    )
+  )
+
+  names(total_values) <- c(
+    "outcome_variable_level",
+    colnames(observed),
+    "esci_Totals"
+  )
+
+
+  tbl$addRows(
+    as.list(total_values)
+  )
+
+  # Set a note with the chi square results
+  mynote <- glue::glue(
+    "&#120536;<sup>2</sup>({format(estimate$properties$chi_square$parameter, digits = 2)}) = {format(estimate$properties$chi_square$statistic, digits = 2)}, <i>p</i> = {esci_pvalr(estimate$properties$chi_square$p.value)}.  Continuity correction has *not* been applied."
+  )
+
+  tbl$addFootnote(mynote)
+
+  # Finally, rename title for outcome variable
+  # tbl$getColumn("outcome_variable_level")$setTitle(estimate$properties$outcome_variable_name)
+
+  jaspResults[["chi_square"]] <- tbl
+
+
+  return(TRUE)
+
+}
+
+
+
+
+esci_pvalr <- function(pvals, sig.limit = .001, digits = 3, html = FALSE) {
+
+  roundr <- function(x, digits = 1) {
+    res <- sprintf(paste0('%.', digits, 'f'), x)
+    zzz <- paste0('0.', paste(rep('0', digits), collapse = ''))
+    res[res == paste0('-', zzz)] <- zzz
+    res
+  }
+
+  sapply(pvals, function(x, sig.limit) {
+    if (x < sig.limit)
+      if (html)
+        return(sprintf('&lt; %s', format(sig.limit))) else
+          return(sprintf('< %s', format(sig.limit)))
+    if (x > .1)
+      return(roundr(x, digits = 2)) else
+        return(roundr(x, digits = digits))
+  }, sig.limit = sig.limit)
+}

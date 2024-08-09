@@ -188,6 +188,14 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     )
   }
 
+  # chi square table
+  if (options$show_chi_square & ready & is.null(jaspResults[["chi_square"]])  ) {
+    self <- list()
+    self$options <- options
+    jamovi_contingency_table(self, estimate, jaspResults)
+
+  }
+
 
   # correlation table
   if(options$show_phi & is.null(jaspResults[["es_phi"]])) {
