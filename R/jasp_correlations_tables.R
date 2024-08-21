@@ -137,7 +137,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE) {
 
   if (paired) effect_title <- "Measures"
 
-  table_title <- if (is.null(options$grouping_variable))
+  table_title <- if (is.null(options$grouping_variable) & !paired)
     "Linear correlation"
   else
     "Correlation Between Paired Measures"

@@ -37,39 +37,39 @@ Form
       		  name: "reference_cases";
       		  id: reference_cases
       		  label: qsTr("Case counts in reference group");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "reference_ns";
       		  title: qsTr("Sample sizes in reference group");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "comparison_cases";
       		  id: comparison_cases
       		  label: qsTr("Case counts in comparison group");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "comparison_ns";
       		  title: qsTr("Sample sizes in comparison group");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "labels";
       		  title: qsTr("Study labels (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "moderator";
       		  id: moderator;
       		  title: qsTr("Moderator (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       	}

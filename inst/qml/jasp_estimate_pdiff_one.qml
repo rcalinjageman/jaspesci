@@ -67,7 +67,7 @@ Form
   	{
   		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
   		AvailableVariablesList { name: "allVariablesList" }
-  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["nominal"] }
+  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); allowedColumns: ["nominal"] }
   	}
 
   }

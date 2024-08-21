@@ -71,13 +71,13 @@ Form
       		  name: "means";
       		  id: means
       		  label: qsTr("Means");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "sds";
       		  title: qsTr("Standard deviations");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		  enabled: from_raw.checked
       		  visible: from_raw.checked
@@ -85,20 +85,20 @@ Form
       		AssignedVariablesList {
       		  name: "ns";
       		  title: qsTr("Sample sizes");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "labels";
       		  title: qsTr("Study labels (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "moderator";
       		  id: moderator;
       		  title: qsTr("Moderator (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       	} // variable selection group

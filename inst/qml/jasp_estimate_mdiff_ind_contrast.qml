@@ -72,8 +72,8 @@ Form
     	{
     		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
     		AvailableVariablesList { name: "allVariablesList" }
-    		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable(s)"); suggestedColumns: ["scale"] }
-    		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
+    		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable(s)"); allowedColumns: ["scale"] }
+    		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); allowedColumns: ["nominal"]; singleVariable: true }
     	}
 
   }
@@ -88,10 +88,10 @@ Form
     VariablesForm {
       preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
       AvailableVariablesList { name: "allVariablesList_summary" }
-      AssignedVariablesList { name: "grouping_variable_levels"; title: qsTr("Grouping variable levels"); suggestedColumns: ["nominal"]; singleVariable: true }
-      AssignedVariablesList { name: "means"; title: qsTr("Group means"); suggestedColumns: ["scale"]; singleVariable: true }
-      AssignedVariablesList { name: "sds"; title: qsTr("Group standard deviations"); suggestedColumns: ["scale"]; singleVariable: true }
-      AssignedVariablesList { name: "ns"; title: qsTr("Group samplpe sizes"); suggestedColumns: ["scale"]; singleVariable: true }
+      AssignedVariablesList { name: "grouping_variable_levels"; title: qsTr("Grouping variable levels"); allowedColumns: ["nominal"]; singleVariable: true }
+      AssignedVariablesList { name: "means"; title: qsTr("Group means"); allowedColumns: ["scale"]; singleVariable: true }
+      AssignedVariablesList { name: "sds"; title: qsTr("Group standard deviations"); allowedColumns: ["scale"]; singleVariable: true }
+      AssignedVariablesList { name: "ns"; title: qsTr("Group samplpe sizes"); allowedColumns: ["scale"]; singleVariable: true }
     }
 
 

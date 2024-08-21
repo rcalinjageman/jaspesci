@@ -63,9 +63,9 @@ Form
   	{
   		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
   		AvailableVariablesList { name: "allVariablesList" }
-  		AssignedVariablesList { name: "x"; title: qsTr("<i>X</i> Variable"); suggestedColumns: ["scale"]; singleVariable: true }
-  		AssignedVariablesList { name: "y"; title: qsTr("<i>Y</i> Variable"); suggestedColumns: ["scale"]; singleVariable: true }
-  		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
+  		AssignedVariablesList { name: "x"; title: qsTr("<i>X</i> Variable"); allowedColumns: ["scale"]; singleVariable: true }
+  		AssignedVariablesList { name: "y"; title: qsTr("<i>Y</i> Variable"); allowedColumns: ["scale"]; singleVariable: true }
+  		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); allowedColumns: ["nominal"]; singleVariable: true }
   	}
 
   }

@@ -97,9 +97,9 @@ Form
     	{
     		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
     		AvailableVariablesList { name: "allVariablesList_between" }
-    		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); suggestedColumns: ["scale"]; singleVariable: true }
-    		AssignedVariablesList { name: "grouping_variable_A"; title: qsTr("Grouping variable A"); suggestedColumns: ["nominal"]; singleVariable: true }
-    		AssignedVariablesList { name: "grouping_variable_B"; title: qsTr("Grouping variable B"); suggestedColumns: ["nominal"]; singleVariable: true }
+    		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); allowedColumns: ["scale"]; singleVariable: true }
+    		AssignedVariablesList { name: "grouping_variable_A"; title: qsTr("Grouping variable A"); allowedColumns: ["nominal"]; singleVariable: true }
+    		AssignedVariablesList { name: "grouping_variable_B"; title: qsTr("Grouping variable B"); allowedColumns: ["nominal"]; singleVariable: true }
 
     	}
 
@@ -305,9 +305,9 @@ Form
     	{
     		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
     		AvailableVariablesList { name: "allVariablesList" }
-    		AssignedVariablesList { name: "outcome_variable_level1"; title: qsTr("First repeated measure"); suggestedColumns: ["scale"]; singleVariable: true }
-    		AssignedVariablesList { name: "outcome_variable_level2"; title: qsTr("Second repeated measure"); suggestedColumns: ["scale"]; singleVariable: true }
-    		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); suggestedColumns: ["nominal"]; singleVariable: true }
+    		AssignedVariablesList { name: "outcome_variable_level1"; title: qsTr("First repeated measure"); allowedColumns: ["scale"]; singleVariable: true }
+    		AssignedVariablesList { name: "outcome_variable_level2"; title: qsTr("Second repeated measure"); allowedColumns: ["scale"]; singleVariable: true }
+    		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); allowedColumns: ["nominal"]; singleVariable: true }
     	}
 
 

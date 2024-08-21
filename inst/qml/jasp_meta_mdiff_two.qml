@@ -71,13 +71,13 @@ Form
       		  name: "reference_means";
       		  id: reference_means
       		  label: qsTr("Reference means (<i>M</i><sub>reference</sub>)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "reference_sds";
       		  title: qsTr("Reference standard deviations (<i>s</i><sub>reference</sub>)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		  enabled: from_raw.checked
       		  visible: from_raw.checked
@@ -85,14 +85,14 @@ Form
       		AssignedVariablesList {
       		  name: "reference_ns";
       		  title: qsTr("Reference sample sizes (<i>N</i><sub>reference</sub>)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "comparison_means";
       		  id: comparison_means
       		  label: qsTr("Comparison means (<i>M</i><sub>comparison</sub>)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		  enabled: from_raw.checked
       		  visible: from_raw.checked
@@ -100,7 +100,7 @@ Form
       		AssignedVariablesList {
       		  name: "comparison_sds";
       		  title: qsTr("Comparison standard deviations (<i>s</i><sub>comparison</sub>)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		  enabled: from_raw.checked
       		  visible: from_raw.checked
@@ -108,26 +108,26 @@ Form
       		AssignedVariablesList {
       		  name: "comparison_ns";
       		  title: qsTr("Comparison sample sizes (<i>N</i><sub>comparison</sub>)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "r";
       		  title: qsTr("<i>r</i> (Optional; leave blank for between-subjects)");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "labels";
       		  title: qsTr("Study labels (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "moderator";
       		  id: moderator;
       		  title: qsTr("Moderator (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       	}

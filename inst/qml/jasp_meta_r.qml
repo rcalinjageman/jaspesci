@@ -37,26 +37,26 @@ Form
       		  name: "rs";
       		  id: rs
       		  label: qsTr("<i>r</i> values");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "ns";
       		  title: qsTr("Sample sizes");
-      		  suggestedColumns: ["scale"];
+      		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "labels";
       		  title: qsTr("Study labels (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "moderator";
       		  id: moderator;
       		  title: qsTr("Moderator (optional");
-      		  suggestedColumns: ["nominal"];
+      		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       	}

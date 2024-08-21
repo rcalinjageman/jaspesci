@@ -116,7 +116,6 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
 
   options$assume_equal_variance <- FALSE
 
-  cposition <- 1
 
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
@@ -129,8 +128,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       paired = TRUE
     )
 
-    jaspResults[["overviewTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["overviewTable"]]$position <- 1
 
     if (ready) {
       jasp_table_fill(
@@ -141,6 +139,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     }
   }
 
+
+
   # r table
   if(is.null(jaspResults[["es_r"]])) {
     jasp_es_r_prep(
@@ -150,8 +150,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       paired = TRUE
     )
 
-    jaspResults[["es_r"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["es_r"]]$position <- 20
+
 
     if (ready) jasp_table_fill(
       jaspResults[["es_r"]],
@@ -165,6 +165,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   }
 
 
+
   # Define and fill out the m_diff table (mean or median)
   if (is.null(jaspResults[["es_m_differenceTable"]])) {
 
@@ -172,11 +173,11 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       jaspResults,
       options,
       ready,
-      if (ready) estimate else NULL
+      if (ready) estimate else NULL,
+      paired = TRUE
     )
 
-    jaspResults[["es_m_differenceTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["es_m_differenceTable"]]$position <- 30
 
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
 
@@ -208,8 +209,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       one_group = FALSE
     )
 
-    jaspResults[["smdTable"]]$position <- cposition
-    cposition <- cposition + 1
+
+    jaspResults[["smdTable"]]$position <- 40
 
     if (ready) jasp_table_fill(
       jaspResults[["smdTable"]],
@@ -218,6 +219,8 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     )
 
   }
+
+
 
   # Define and fill out the m_diff table (mean or median)
   if (options$show_ratio & from_raw & is.null(jaspResults[["es_m_ratioTable"]])) {
@@ -230,8 +233,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         2
       )
 
-      jaspResults[["es_m_ratioTable"]]$position <- cposition
-      cposition <- cposition + 1
+      jaspResults[["es_m_ratioTable"]]$position <- 50
 
       to_fill <- if (is_mean) "es_mean_ratio" else "es_median_ratio"
 
@@ -254,8 +256,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       mytest
     )
 
-    jaspResults[["heTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["heTable"]]$position <- 60
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -275,8 +276,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
         add_citation = TRUE
       )
 
-    jaspResults[["mdiffPlot"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["mdiffPlot"]]$position <- 70
 
       if (ready) {
         effect_size = options$effect_size

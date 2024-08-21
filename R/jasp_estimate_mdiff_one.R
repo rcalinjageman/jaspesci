@@ -104,8 +104,6 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     estimate_big <- NULL
   }
 
-  cposition <- 1
-
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
     jasp_overview_prep(
@@ -116,8 +114,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       level = 1
     )
 
-    jaspResults[["overviewTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["overviewTable"]]$position <- 1
 
     if (ready) {
       jasp_table_fill(
@@ -129,6 +126,26 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     }
   }
 
+
+  # Smd table
+  if(evaluate_h & options$effect_size == "mean" & is.null(jaspResults[["smdTable"]])) {
+    jasp_smd_prep(
+      jaspResults,
+      options,
+      ready,
+      estimate
+    )
+
+    jaspResults[["smdTable"]]$position <- 10
+
+    if (ready) jasp_table_fill(
+      jaspResults[["smdTable"]],
+      estimate,
+      "es_smd"
+    )
+
+  }
+
   # Hypothesis evaluation table and smd table
   if(evaluate_h & is.null(jaspResults[["heTable"]])) {
     jasp_he_prep(
@@ -138,9 +155,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       mytest
     )
 
-    jaspResults[["heTable"]]$position <- cposition
-    cposition <- cposition + 1
-
+    jaspResults[["heTable"]]$position <- 20
 
     if (ready) {
       jasp_table_fill(
@@ -152,28 +167,8 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
   }
 
-  # Smd table
-  if(evaluate_h & options$effect_size == "mean" & is.null(jaspResults[["smdTable"]])) {
-    jasp_smd_prep(
-      jaspResults,
-      options,
-      ready,
-      estimate
-    )
-
-    jaspResults[["smdTable"]]$position <- cposition
-    cposition <- cposition + 1
-
-    if (ready) jasp_table_fill(
-      jaspResults[["smdTable"]],
-      estimate,
-      "es_smd"
-    )
-
-  }
-
-
   # Figure
+  cposition <- 30
   if (is.null(jaspResults[["mdiffPlot"]])) {
     jasp_plot_m_prep(
       jaspResults,

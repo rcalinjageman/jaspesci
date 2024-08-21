@@ -764,7 +764,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
 
 
 # Prep a mdiff table
-jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NULL) {
+jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NULL, paired = FALSE) {
   # Handles
 
   from_raw <- FALSE
@@ -800,10 +800,10 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   is_complex <- FALSE
   if (!is.null(options$design)) is_complex <- TRUE
 
-  is_paired <- FALSE
-  if (is.null(options$assume_equal_variance)) {
-    is_paired <- TRUE
-  }
+  is_paired <- paired
+  # if (is.null(options$assume_equal_variance)) {
+  #   is_paired <- TRUE
+  # }
 
   overviewTable <- createJaspTable(
     title = if (is_mean) "Mean Difference" else "Median Difference"

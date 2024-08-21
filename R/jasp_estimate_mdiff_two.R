@@ -220,7 +220,6 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     estimate_big <- NULL
   }
 
-  cposition <- 1
 
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
@@ -232,8 +231,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       level = length(mylevels)
     )
 
-    jaspResults[["overviewTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["overviewTable"]]$position <- 1
 
     if (ready) {
       jasp_table_fill(
@@ -243,6 +241,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       )
     }
   }
+
 
 
   # Define and fill out the m_diff table (mean or median)
@@ -255,8 +254,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       estimate
     )
 
-    jaspResults[["es_m_differenceTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["es_m_differenceTable"]]$position <- 20
 
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
 
@@ -268,6 +266,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
   }
 
+
   # Define and fill the smd table
   if (is_mean & is.null(jaspResults[["smdTable"]]) ) {
     jasp_smd_prep(
@@ -278,8 +277,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       one_group = FALSE
     )
 
-    jaspResults[["smdTable"]]$position <- cposition
-    cposition <- cposition + 1
+    jaspResults[["smdTable"]]$position <- 30
 
     if (ready) jasp_table_fill(
       jaspResults[["smdTable"]],
@@ -300,9 +298,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         mylevels
       )
 
-      jaspResults[["es_m_ratioTable"]]$position <- cposition
-      cposition <- cposition + 1
-
+      jaspResults[["es_m_ratioTable"]]$position <- 40
 
       to_fill <- if (is_mean) "es_mean_ratio" else "es_median_ratio"
 
@@ -325,9 +321,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       mytest
     )
 
-    jaspResults[["heTable"]]$position <- cposition
-    cposition <- cposition + 1
-
+    jaspResults[["heTable"]]$position <- 50
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -354,9 +348,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         add_citation = if (x == 1) TRUE else FALSE
       )
 
-      jaspResults[[my_variable]]$position <- cposition
-      cposition <- cposition + 1
-
+      jaspResults[[my_variable]]$position <- 60 + x
 
       if (ready) {
         effect_size = options$effect_size

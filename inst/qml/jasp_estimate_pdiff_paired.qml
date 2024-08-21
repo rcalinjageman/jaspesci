@@ -63,8 +63,8 @@ Form
   	{
   		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
   		AvailableVariablesList { name: "allVariablesList" }
-  		AssignedVariablesList { name: "reference_measure"; title: qsTr("Reference measure"); suggestedColumns: ["nominal"]; singleVariable: true }
-  		AssignedVariablesList { name: "comparison_measure"; title: qsTr("Comparison measure"); suggestedColumns: ["nominal"]; singleVariable: true }
+  		AssignedVariablesList { name: "reference_measure"; title: qsTr("Reference measure"); allowedColumns: ["nominal"]; singleVariable: true }
+  		AssignedVariablesList { name: "comparison_measure"; title: qsTr("Comparison measure"); allowedColumns: ["nominal"]; singleVariable: true }
   	}
 
   }

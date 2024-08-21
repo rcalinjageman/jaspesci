@@ -83,8 +83,8 @@ Form
     	{
     		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
     		AvailableVariablesList { name: "allVariablesList" }
-    		AssignedVariablesList { name: "reference_measure"; title: qsTr("Reference variable"); suggestedColumns: ["scale"]; singleVariable: true }
-    		AssignedVariablesList { name: "comparison_measure"; title: qsTr("Comparison variable"); suggestedColumns: ["scale"]; singleVariable: true }
+    		AssignedVariablesList { name: "reference_measure"; title: qsTr("Reference variable"); allowedColumns: ["scale"]; singleVariable: true }
+    		AssignedVariablesList { name: "comparison_measure"; title: qsTr("Comparison variable"); allowedColumns: ["scale"]; singleVariable: true }
     	}
 
   }
@@ -286,7 +286,7 @@ Form
 	  {
 	    name: "show_calculations";
 	    label: qsTr("Calculation components");
-	    enabled: effect_size.currentValue == "mean_difference" & assume_equal_variance.checked
+	    enabled: effect_size.currentValue == "mean_difference"
 	   }
 	  CheckBox {
 	    name: "show_ratio";
@@ -300,6 +300,9 @@ Form
   Esci.FigureOptions {
     width_defaultValue: 600
     height_defaultValue: 400
+    error_nudge_defaultValue: 0.5
+    data_spread_defaultValue: 0.2
+    error_scale_defaultValue: 0.25
 
 
         Section
@@ -761,7 +764,7 @@ Form
       {
         name: "color_raw_difference"
         id: color_raw_difference
-        startValue: "black"
+        startValue: "#E20134"
         enabled: from_raw.checked
       }
 
