@@ -104,6 +104,7 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
     estimate_big <- NULL
   }
 
+  cposition <- 1
 
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
@@ -115,12 +116,16 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       level = 1
     )
 
+    jaspResults[["overviewTable"]]$position <- cposition
+    cposition <- cposition + 1
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
         estimate,
         "overview"
       )
+
     }
   }
 
@@ -133,11 +138,17 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       mytest
     )
 
-    if (ready) jasp_table_fill(
-      jaspResults[["heTable"]],
-      mytest,
-      "to_fill"
-    )
+    jaspResults[["heTable"]]$position <- cposition
+    cposition <- cposition + 1
+
+
+    if (ready) {
+      jasp_table_fill(
+        jaspResults[["heTable"]],
+        mytest,
+        "to_fill"
+      )
+    }
 
   }
 
@@ -149,6 +160,9 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       estimate
     )
+
+    jaspResults[["smdTable"]]$position <- cposition
+    cposition <- cposition + 1
 
     if (ready) jasp_table_fill(
       jaspResults[["smdTable"]],
@@ -167,6 +181,9 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       add_citation = TRUE
     )
+
+    jaspResults[["mdiffPlot"]]$position <- cposition
+    cposition <- cposition + 1
 
     if (ready) {
       args <- list()

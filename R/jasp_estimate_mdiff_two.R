@@ -220,6 +220,8 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     estimate_big <- NULL
   }
 
+  cposition <- 1
+
   # Overview
   if (is.null(jaspResults[["overviewTable"]])) {
     jasp_overview_prep(
@@ -229,6 +231,9 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       estimate,
       level = length(mylevels)
     )
+
+    jaspResults[["overviewTable"]]$position <- cposition
+    cposition <- cposition + 1
 
     if (ready) {
       jasp_table_fill(
@@ -250,6 +255,9 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       estimate
     )
 
+    jaspResults[["es_m_differenceTable"]]$position <- cposition
+    cposition <- cposition + 1
+
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
 
     if (ready) jasp_table_fill(
@@ -270,6 +278,9 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       one_group = FALSE
     )
 
+    jaspResults[["smdTable"]]$position <- cposition
+    cposition <- cposition + 1
+
     if (ready) jasp_table_fill(
       jaspResults[["smdTable"]],
       estimate,
@@ -288,6 +299,10 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         estimate,
         mylevels
       )
+
+      jaspResults[["es_m_ratioTable"]]$position <- cposition
+      cposition <- cposition + 1
+
 
       to_fill <- if (is_mean) "es_mean_ratio" else "es_median_ratio"
 
@@ -309,6 +324,10 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       mytest
     )
+
+    jaspResults[["heTable"]]$position <- cposition
+    cposition <- cposition + 1
+
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -334,6 +353,10 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         my_variable = my_variable,
         add_citation = if (x == 1) TRUE else FALSE
       )
+
+      jaspResults[[my_variable]]$position <- cposition
+      cposition <- cposition + 1
+
 
       if (ready) {
         effect_size = options$effect_size

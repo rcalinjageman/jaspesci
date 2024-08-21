@@ -88,6 +88,7 @@ jasp_describe_prep <- function(jaspResults, options, ready) {
 
   # Title
   overviewTable <- createJaspTable(title = "Overview")
+  overviewTable$position <- 1
 
   # Depends on
   overviewTable$dependOn(
@@ -239,6 +240,8 @@ jasp_histogram_create <- function(jaspResults, options, ready, estimate, plot_ty
     width = options$sp_plot_width,
     height = options$sp_plot_height * h_multiplier
   )
+
+  scatterplot$position <- if (plot_type == "histogram") 2 else 3
 
   scatterplot$dependOn(
     c(
