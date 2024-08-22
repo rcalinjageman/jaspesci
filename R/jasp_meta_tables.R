@@ -327,6 +327,8 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
 
   jaspResults[["meta_raw_dataTable"]] <- overviewTable
 
+  jaspResults[["meta_raw_dataTable"]]$position <- 10
+
   return()
 
 }
@@ -472,6 +474,7 @@ jasp_es_meta_data_prep <- function(jaspResults, options, ready, estimate = NULL)
     overviewTable$setExpectedSize(nrow(estimate$es_meta))
 
   jaspResults[["es_metaTable"]] <- overviewTable
+  jaspResults[["es_metaTable"]]$position <- 20
 
 
   return()
@@ -534,6 +537,7 @@ jasp_es_heterogeneity_data_prep <- function(jaspResults, options, ready, levels 
   if (ready) overviewTable$setExpectedSize(levels)
 
   jaspResults[["es_heterogeneityTable"]] <- overviewTable
+  jaspResults[["es_heterogeneityTable"]]$position <- 30
 
 
   return()
@@ -624,6 +628,8 @@ jasp_es_meta_difference_prep <- function(jaspResults, options, ready, estimate) 
     overviewTable$setExpectedSize(nrow(estimate$es_meta_difference))
 
   jaspResults[["es_meta_differenceTable"]] <- overviewTable
+
+  jaspResults[["es_meta_differenceTable"]]$position <- 40
 
 
   return()

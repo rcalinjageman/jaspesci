@@ -118,6 +118,8 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       level = 1
     )
 
+    jaspResults[["overviewTable"]]$position <- 1
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
@@ -136,6 +138,8 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       mytest
     )
+
+    jaspResults[["heTable"]]$position <- 10
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -183,6 +187,7 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
         myplot <- jasp_plot_proportion_decorate(myplot, options)
 
         jaspResults[[my_variable]]$plotObject <- myplot
+        jaspResults[[my_variable]]$position <- 20
 
       }  # end plot creation
 

@@ -294,6 +294,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       ready
     )
 
+    jaspResults[["overviewTable"]]$position <- 1
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
@@ -312,6 +314,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       if (ready) estimate else NULL
     )
+
+    jaspResults[["es_m_differenceTable"]]$position <- 10
 
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
 
@@ -333,6 +337,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       one_group = FALSE
     )
 
+    jaspResults[["smdTable"]]$position <- 20
+
     if (ready) jasp_table_fill(
       jaspResults[["smdTable"]],
       estimate,
@@ -350,6 +356,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       mytest
     )
+
+    jaspResults[["heTable"]]$position <- 30
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -393,6 +401,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
         add_citation = if (x == 1) TRUE else FALSE,
         my_title = which_title
       )
+
+      jaspResults[[this_plot]]$position <- 40 + x
 
       if (ready) {
 
@@ -522,6 +532,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     )
 
     jaspResults[["interaction_plot"]] <- mdiffPlot
+
+    jaspResults[["interaction_plot"]]$position <- 50
 
       if (ready) {
 

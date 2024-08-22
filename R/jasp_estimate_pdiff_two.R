@@ -141,6 +141,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       level = length(mylevels)
     )
 
+    jaspResults[["overviewTable"]]$position <- 10
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
@@ -161,6 +163,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       effect_label = "<i>P</i>"
     )
 
+    jaspResults[["es_proportion_difference"]]$position <- 20
+
     if (ready) jasp_table_fill(
       jaspResults[["es_proportion_difference"]],
       estimate,
@@ -180,6 +184,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       effect_label = "<i>OR</i>"
     )
 
+    jaspResults[["es_odds_ratio"]]$position <- 30
 
     if (ready) jasp_table_fill(
       jaspResults[["es_odds_ratio"]],
@@ -193,6 +198,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     self <- list()
     self$options <- options
     jamovi_contingency_table(self, estimate, jaspResults)
+
+    jaspResults[["chi_square"]]$position <- 40
 
   }
 
@@ -208,6 +215,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       effect_label = "&#981;"
     )
 
+    jaspResults[["es_phi"]]$position <- 50
 
     if (ready) jasp_table_fill(
       jaspResults[["es_phi"]],
@@ -229,6 +237,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       mytest
     )
 
+    jaspResults[["heTable"]]$position <- 60
+
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
       mytest,
@@ -239,7 +249,9 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
   # Figure
   # Now prep and fill the plot
+  x <- 0
   for (my_variable in options$outcome_variable) {
+    x <- x + 1
 
     # debugtext <- createJaspHtml(text = paste(my_variable, " - </BR>"))
     # debugtext$dependOn(c("outcome_variable", "count_NA"))
@@ -254,6 +266,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         my_variable = my_variable,
         add_citation = FALSE
       )
+
+      jaspResults[[my_variable]]$position <- 70+x
 
       if (ready) {
         args <- list()

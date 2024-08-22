@@ -107,6 +107,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       estimate
     )
 
+    jaspResults[["overviewTable"]]$position <- 1
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
@@ -125,6 +127,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       ready = ready
     )
 
+    jaspResults[["es_r"]]$position <- 10
+
     if (ready) jasp_table_fill(
       jaspResults[["es_r"]],
       estimate,
@@ -139,6 +143,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       options = options,
       ready = ready
     )
+
+    jaspResults[["regression"]]$position <- 20
 
     if (ready) jasp_table_fill(
       jaspResults[["regression"]],
@@ -157,6 +163,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       mytest
     )
+
+    jaspResults[["heTable"]]$position <- 30
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -200,6 +208,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
 
       jaspResults[["scatterPlot"]]$plotObject <- myplot
 
+      jaspResults[["scatterPlot"]]$position <- 40
+
     }  # end scatterplot creation
   } # end scatterplot
 
@@ -232,6 +242,7 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       myplot <- jasp_plot_correlation_decorate(myplot, options)
 
       jaspResults[["mdiffPlot"]]$plotObject <- myplot
+      jaspResults[["mdiffPlot"]]$position <- 50
 
     }  # end estimationplot creation
   } # end estimation plot

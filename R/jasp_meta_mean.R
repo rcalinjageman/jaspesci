@@ -236,6 +236,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
       myplot <- jasp_forest_plot_decorate(myplot, options, xlab_replace, has_moderator, es_meta_difference)
 
       jaspResults[["forest_plot"]]$plotObject <- myplot
+      jaspResults[["forest_plot"]]$position <- 50
 
     }
   }

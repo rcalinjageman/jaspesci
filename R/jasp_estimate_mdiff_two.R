@@ -84,6 +84,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       # To do: why does depenOn throw an error?
       lerror_text$dependOn(c("outcome_variable", "grouping_variable"))
       jaspResults[["level_errors"]] <- lerror_text
+      jaspResults[["level_errors"]]$position <- -5
     }
 
 
@@ -423,7 +424,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         )
 
         #apply aesthetics
-        myplot <- jasp_plot_mdiff_decorate(myplot, options)
+        myplot <- jasp_plot_mdiff_decorate(myplot, options, FALSE)
 
         jaspResults[[my_variable]]$plotObject <- myplot
 
@@ -549,8 +550,9 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
   fill_error_reference <- "black"
   alpha_error_unused <- 0
 
+
   try(shape_raw_difference <- self$options$shape_raw_difference, silent = TRUE)
-  try(color_raw_difference <- self$options$color_raw_difference, silent = TRUE)
+  try(shape_raw_difference <- self$options$color_raw_difference, silent = TRUE)
   try(fill_raw_difference <- self$options$fill_raw_difference, silent = TRUE)
   try(size_raw_difference <- as.integer(self$options$size_raw_difference), silent = TRUE)
   try(alpha_raw_difference <- as.numeric(self$options$alpha_raw_difference), silent = TRUE)
@@ -591,11 +593,11 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_raw" = shape_raw_reference,
       "Comparison_raw" = self$options$shape_raw_comparison,
       "Difference_raw" = shape_raw_difference,
-      "Unused_raw" = shape_raw_unused,
+      "Unused_raw" = clean_aes(self, "shape_raw_unused", "circle"),
       "Reference_summary" = self$options$shape_summary_reference,
       "Comparison_summary" = self$options$shape_summary_comparison,
       "Difference_summary" = self$options$shape_summary_difference,
-      "Unused_summary" = shape_summary_unused
+      "Unused_summary" = clean_aes(self, "shape_summary_unused", "circle")
     )
   )
 
@@ -604,11 +606,11 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_raw" = color_raw_reference,
       "Comparison_raw" = self$options$color_raw_comparison,
       "Difference_raw" = color_raw_difference,
-      "Unused_raw" = color_raw_unused,
+      "Unused_raw" = clean_aes(self, "color_raw_unused", "black"),
       "Reference_summary" = self$options$color_summary_reference,
       "Comparison_summary" = self$options$color_summary_comparison,
       "Difference_summary" = self$options$color_summary_difference,
-      "Unused_summary" = color_summary_unused
+      "Unused_summary" = clean_aes(self, "color_summary_unused", "black")
     ),
     aesthetics = c("color", "point_color")
   )
@@ -618,11 +620,11 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_raw" = fill_raw_reference,
       "Comparison_raw" = self$options$fill_raw_comparison,
       "Difference_raw" = fill_raw_difference,
-      "Unused_raw" = fill_raw_unused,
+      "Unused_raw" = clean_aes(self, "fill_raw_unused", "black"),
       "Reference_summary" = self$options$fill_summary_reference,
       "Comparison_summary" = self$options$fill_summary_comparison,
       "Difference_summary" = self$options$fill_summary_difference,
-      "Unused_summary" = fill_summary_unused
+      "Unused_summary" = clean_aes(self, "fill_summary_unused", "black")
     ),
     aesthetics = c("fill", "point_fill")
   )
@@ -637,11 +639,11 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_raw" = size_raw_reference,
       "Comparison_raw" = as.integer(self$options$size_raw_comparison),
       "Difference_raw" = size_raw_difference,
-      "Unused_raw" = size_raw_unused,
+      "Unused_raw" = as.numeric(clean_aes(self, "size_raw_unused", 1)),
       "Reference_summary" = as.integer(self$options$size_summary_reference)/divider,
       "Comparison_summary" = as.integer(self$options$size_summary_comparison)/divider,
       "Difference_summary" = as.integer(self$options$size_summary_difference)/divider,
-      "Unused_summary" = size_summary_unused/divider
+      "Unused_summary" = as.numeric(clean_aes(self, "size_summary_unused", 1))/divider
     ))
   )
 
@@ -652,11 +654,11 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_raw" = 1 - alpha_raw_reference,
       "Comparison_raw" = 1 - as.numeric(self$options$alpha_raw_comparison),
       "Difference_raw" = 1 - alpha_raw_difference,
-      "Unused_raw" = 1 - alpha_raw_unused,
+      "Unused_raw" = 1 - as.numeric(clean_aes(self, "alpha_raw_unused", 0)),
       "Reference_summary" = 1 - as.numeric(self$options$alpha_summary_reference),
       "Comparison_summary" = 1 - as.numeric(self$options$alpha_summary_comparison),
       "Difference_summary" = 1 - as.numeric(self$options$alpha_summary_difference),
-      "Unused_summary" = 1 - alpha_summary_unused
+      "Unused_summary" = 1 - as.numeric(clean_aes(self, "alpha_summary_unused", 0))
     ))
   )
 
@@ -666,7 +668,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_summary" = linetype_summary_reference,
       "Comparison_summary" = self$options$linetype_summary_comparison,
       "Difference_summary" = self$options$linetype_summary_difference,
-      "Unused_summary" = linetype_summary_unused
+      "Unused_summary" = clean_aes(self, "linetype_summary_unused", "solid")
     )
   )
   myplot <- myplot + ggplot2::scale_color_manual(
@@ -674,7 +676,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_summary" = color_interval_reference,
       "Comparison_summary" = self$options$color_interval_comparison,
       "Difference_summary" = self$options$color_interval_difference,
-      "Unused_summary" = color_interval_unused
+      "Unused_summary" = clean_aes(self, "color_interval_unused", "black")
     ),
     aesthetics = "interval_color"
   )
@@ -685,7 +687,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_summary" = 1 - as.numeric(alpha_interval_reference),
       "Comparison_summary" = 1 - as.numeric(self$options$alpha_interval_comparison),
       "Difference_summary" = 1 - as.numeric(self$options$alpha_interval_difference),
-      "Unused_summary" = 1 - alpha_interval_unused
+      "Unused_summary" = 1 - as.numeric(clean_aes(self, "alpha_interval_unused", 0))
     ))
   )
   myplot <- myplot + ggplot2::discrete_scale(
@@ -695,7 +697,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_summary" = as.integer(size_interval_reference),
       "Comparison_summary" = as.integer(self$options$size_interval_comparison),
       "Difference_summary" = as.integer(self$options$size_interval_difference),
-      "Unused_summary" = size_interval_unused
+      "Unused_summary" = as.numeric(clean_aes(self, "size_interval_unused", 1))
     ))
   )
 
@@ -705,7 +707,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_summary" = fill_error_reference,
       "Comparison_summary" = self$options$fill_error_comparison,
       "Difference_summary" = self$options$fill_error_difference,
-      "Unused_summary" = fill_error_unused
+      "Unused_summary" = clean_aes(self, "fill_error_unused", "black")
     ),
     aesthetics = "slab_fill"
   )
@@ -716,10 +718,31 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
       "Reference_summary" = 1 - as.numeric(alpha_error_reference),
       "Comparison_summary" = 1 - as.numeric(self$options$alpha_error_comparison),
       "Difference_summary" = 1 - as.numeric(self$options$alpha_error_difference),
-      "Unused_summary" = 1 - alpha_error_unused
+      "Unused_summary" = 1 - as.numeric(clean_aes(self, "alpha_error_unused", 0))
     ))
   )
 
 
   return(myplot)
+}
+
+
+clean_aes <- function(self, aes_name, default_value, to_numeric = FALSE, to_integer = FALSE) {
+  myval <- NULL
+  if (to_numeric) {
+    try(myval <- as.numeric(self$options[[aes_name]]), silent = TRUE)
+  } else {
+    if (to_integer) {
+      try(myval <- as.integer(self$options[[aes_name]]), silent = TRUE)
+    } else {
+      try(myval <- self$options[[aes_name]], silent = TRUE)
+    }
+  }
+
+  if (!is.null(myval)) {
+    if (myval == "") myval <- NULL
+    if (myval == " ") myval <- NULL
+  }
+
+  return( if (is.null(myval)) default_value else myval)
 }

@@ -73,6 +73,7 @@ jasp_estimate_mdiff_ind_contrast <- function(jaspResults, dataset = NULL, option
       )
       r_error$dependOn(c("grouping_variable", "grouping_variable_levels", "reference_labels", "comparison_labels"))
       jaspResults[["reference_error"]] <- r_error
+      jaspResults[["reference_error"]]$position <- -10
     } else {
       jaspResults[["reference_error"]] <- NULL
     }
@@ -93,6 +94,7 @@ jasp_estimate_mdiff_ind_contrast <- function(jaspResults, dataset = NULL, option
       )
       c_error$dependOn(c("grouping_variable", "grouping_variable_levels", "reference_labels", "comparison_labels"))
       jaspResults[["comparison_error"]] <- c_error
+      jaspResults[["comparison_error"]]$position <- -5
     } else {
       jaspResults[["comparison_error"]] <- NULL
     }
@@ -109,6 +111,7 @@ jasp_estimate_mdiff_ind_contrast <- function(jaspResults, dataset = NULL, option
       )
       o_error$dependOn(c("grouping_variable", "grouping_variable_levels", "reference_labels", "comparison_labels"))
       jaspResults[["o_error"]] <- o_error
+      jaspResults[["o_error"]]$position <- 0
     } else {
       jaspResults[["o_error"]] <- NULL
     }
@@ -239,6 +242,8 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
       level = 2
     )
 
+    jaspResults[["overviewTable"]]$position <- 1
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
@@ -258,6 +263,8 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
       ready,
       if (ready) estimate else NULL
     )
+
+    jaspResults[["es_m_differenceTable"]]$position <- 10
 
     to_fill <- if (is_mean) "es_mean_difference_adjusted" else "es_median_difference"
 
@@ -281,6 +288,8 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
       one_group = FALSE
     )
 
+    jaspResults[["smdTable"]]$position <- 20
+
     if (ready & !is.null(contrast)) {
       jasp_table_fill(
         jaspResults[["smdTable"]],
@@ -298,6 +307,8 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
       ready,
       mytest
     )
+
+    jaspResults[["heTable"]]$position <- 30
 
     if (ready & !is.null(contrast)) {
       jasp_table_fill(
@@ -321,6 +332,8 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
         my_variable = my_variable,
         add_citation = if (x == 1) TRUE else FALSE
       )
+
+      jaspResults[[my_variable]]$position <- 40+x
 
       if (ready) {
         effect_size = options$effect_size

@@ -103,6 +103,8 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       level = length(mylevels)
     )
 
+    jaspResults[["overviewTable"]]$position <- 1
+
     if (ready) {
       jasp_table_fill(
         jaspResults[["overviewTable"]],
@@ -121,6 +123,9 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       ready = ready
     )
 
+    jaspResults[["es_r"]]$position <- 10
+
+
     if (ready) jasp_table_fill(
       jaspResults[["es_r"]],
       estimate,
@@ -136,6 +141,9 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       options = options,
       ready = ready
     )
+
+    jaspResults[["es_r_difference"]]$position <- 20
+
 
     if (ready) jasp_table_fill(
       jaspResults[["es_r_difference"]],
@@ -154,6 +162,9 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       ready,
       mytest
     )
+
+    jaspResults[["heTable"]]$position <- 30
+
 
     if (ready) jasp_table_fill(
       jaspResults[["heTable"]],
@@ -174,6 +185,7 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     scatterplot$dependOn(jasp_scatterplot_depends_on())
 
     jaspResults[["scatterPlot"]] <- scatterplot
+    jaspResults[["scatterPlot"]]$position <- 40
 
     if (ready) {
       args <- list()
@@ -240,6 +252,7 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       myplot <- jasp_plot_correlation_decorate(myplot, options, rdiff = TRUE)
 
       jaspResults[["mdiffPlot"]]$plotObject <- myplot
+      jaspResults[["mdiffPlot"]]$position <- 50
 
     }  # end estimationplot creation
   } # end estimation plot
