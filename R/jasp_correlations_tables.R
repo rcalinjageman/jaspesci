@@ -122,7 +122,7 @@ jasp_scatterplot_depends_on <- function() {
   )
 }
 
-jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE) {
+jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE, difference = FALSE) {
   # Handles
   from_raw <- options$switch == "from_raw"
 
@@ -150,14 +150,14 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE) {
   if (!paired) {
     overviewTable$addColumnInfo(
       name = "x_variable_name",
-      title = "<i>X</i> variable",
+      title = "<i>X</i>-variable name",
       type = "string",
       combine = TRUE
     )
 
     overviewTable$addColumnInfo(
       name = "y_variable_name",
-      title = "<i>Y</i> variable",
+      title = "<i>Y</i>-variable name",
       type = "string",
       combine = TRUE
     )
@@ -192,7 +192,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE) {
 
   if (from_raw &  is.null(options$grouping_variable) & !paired) {
     overviewTable$addColumnInfo(
-      name = "sxy",
+      name = "syx",
       title = "<i>s<sub>Y.X</sub></i>",
       type = "number"
     )
@@ -210,7 +210,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE) {
 
   overviewTable$addColumnInfo(
     name = "n",
-    title = "<i>N</i><sub>pairs</sub>",
+    title = if (difference) "<i>N</i><sub>pairs</sub>" else "<i>n</i><sub>pairs</sub>",
     type = "integer"
   )
 
@@ -308,14 +308,14 @@ jasp_es_r_difference_prep <- function(jaspResults, options, ready) {
 
   overviewTable$addColumnInfo(
     name = "x_variable_name",
-    title = "<i>X</i> variable",
+    title = "<i>X</i>-variable name",
     type = "string",
     combine = TRUE
   )
 
   overviewTable$addColumnInfo(
     name = "y_variable_name",
-    title = "<i>Y</i> variable",
+    title = "<i>Y</i>-variable name",
     type = "string",
     combine = TRUE
   )
@@ -349,7 +349,7 @@ jasp_es_r_difference_prep <- function(jaspResults, options, ready) {
 
   overviewTable$addColumnInfo(
     name = "n",
-    title = "<i>N</i><sub>pairs</sub>",
+    title = "<i>n</i><sub>pairs</sub>",
     type = "integer"
   )
 

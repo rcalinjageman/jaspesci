@@ -130,6 +130,8 @@ jasp_meta_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     # Fix notes, also need to move to within esci
     estimate <- jasp_meta_notes(options, estimate)
 
+    if (from_raw & self$options$reported_effect_size == "mean_difference") estimate$properties$effect_size_name_html <- "<i>M</i><sub>diff</sub>"
+
   } else {
     estimate <- NULL
   }

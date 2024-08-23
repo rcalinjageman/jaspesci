@@ -255,6 +255,7 @@ import "./" as Esci
           id: error_scale
           label: qsTr("Width")
           defaultValue: 0.20
+          enabled: effect_size.currentValue == "mean_difference"
           min: 0
           max: 5
         }
@@ -271,6 +272,7 @@ import "./" as Esci
         {
         name: "error_layout"
         id: error_layout
+        enabled: effect_size.currentValue == "mean_difference"
         }
 
         Label {

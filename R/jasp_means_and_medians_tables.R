@@ -165,18 +165,24 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
       type = "number"
     )
 
-    overviewTable$addColumnInfo(
-      name = "median_LL",
-      title = "LL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-    )
-    overviewTable$addColumnInfo(
-      name = "median_UL",
-      title = "UL",
-      type = "number",
-      overtitle = paste0(100 * options$conf_level, "% CI")
-    )
+    show_ci <- TRUE
+    if (options$effect_size == "r" & !options$show_details) show_ci <- FALSE
+
+    if (show_ci) {
+      overviewTable$addColumnInfo(
+        name = "median_LL",
+        title = "LL",
+        type = "number",
+        overtitle = paste0(100 * options$conf_level, "% CI")
+      )
+      overviewTable$addColumnInfo(
+        name = "median_UL",
+        title = "UL",
+        type = "number",
+        overtitle = paste0(100 * options$conf_level, "% CI")
+      )
+
+    }
 
 
     if (options$show_details) {
@@ -608,7 +614,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
   )
 
   # Columns
-  if (is_difference) {
+  if (is_difference | is_r) {
     overviewTable$addColumnInfo(
       name = "outcome_variable_name",
       title = "Outcome variable",

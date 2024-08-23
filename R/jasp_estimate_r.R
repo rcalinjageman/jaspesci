@@ -124,7 +124,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
     jasp_es_r_prep(
       jaspResults = jaspResults,
       options = options,
-      ready = ready
+      ready = ready,
+      difference = TRUE
     )
 
     jaspResults[["es_r"]]$position <- 10

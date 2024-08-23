@@ -500,6 +500,7 @@ Form
       {
         name: "linetype_summary_reference"
         id: linetype_summary_reference
+
       }
 
       Esci.LineTypeSelect
@@ -525,6 +526,7 @@ Form
         defaultValue: 3
         min: 1
         max: 10
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
       IntegerField
@@ -533,6 +535,7 @@ Form
         defaultValue: 3
         min: 1
         max: 10
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
       IntegerField
@@ -541,6 +544,7 @@ Form
         defaultValue: 3
         min: 1
         max: 10
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
 
@@ -553,6 +557,7 @@ Form
         name: "color_interval_reference"
         id: color_interval_reference
         startValue: 'black'
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
       Esci.ColorSelect
@@ -560,6 +565,7 @@ Form
         name: "color_interval_comparison"
         id: color_interval_comparison
         startValue: 'black'
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
       Esci.ColorSelect
@@ -567,6 +573,7 @@ Form
         name: "color_interval_difference"
         id: color_inteval_difference
         startValue: 'black'
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
 
@@ -578,6 +585,7 @@ Form
       {
         name: "alpha_interval_reference"
         id: alpha_interval_reference
+        enabled: effect_size.currentValue == "mean_difference"
 
       }
 
@@ -585,6 +593,7 @@ Form
       {
         name: "alpha_interval_comparison"
         id: alpha_interval_comparison
+        enabled: effect_size.currentValue == "mean_difference"
 
       }
 
@@ -592,6 +601,7 @@ Form
       {
         name: "alpha_interval_difference"
         id: alpha_interval_difference
+        enabled: effect_size.currentValue == "mean_difference"
 
       }
 
@@ -620,6 +630,7 @@ Form
         name: "fill_error_reference"
         id: fill_error_reference
         startValue: "gray75"
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
       Esci.ColorSelect
@@ -627,6 +638,7 @@ Form
         name: "fill_error_comparison"
         id: fill_error_comparison
         startValue: "gray75"
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
       Esci.ColorSelect
@@ -634,6 +646,7 @@ Form
         name: "fill_error_difference"
         id: fill_error_difference
         startValue: 'gray75'
+        enabled: effect_size.currentValue == "mean_difference"
       }
 
 
@@ -645,6 +658,7 @@ Form
       {
         name: "alpha_error_reference"
         id: alpha_error_reference
+        enabled: effect_size.currentValue == "mean_difference"
 
       }
 
@@ -652,6 +666,7 @@ Form
       {
         name: "alpha_error_comparison"
         id: alpha_error_comparison
+        enabled: effect_size.currentValue == "mean_difference"
 
       }
 
@@ -659,6 +674,7 @@ Form
       {
         name: "alpha_error_difference"
         id: alpha_error_difference
+        enabled: effect_size.currentValue == "mean_difference"
 
       }
 
