@@ -50,7 +50,7 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
 
     if (from_raw) {
       args$data <- dataset
-      args$outcome_variable <- encodeColNames(options$outcome_variable)
+      args$outcome_variable <- options$outcome_variable
     } else {
       outcome_variable_name <- "Outcome variable"
       if (!is.null(options$outcome_variable_name)) {
@@ -72,11 +72,15 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
       )
     }
 
-    # debugtext <- createJaspHtml(text = paste(args, collapse = "<BR>"))
-    # debugtext$dependOn(c("outcome_variable", "count_NA"))
-    # jaspResults[["debugtext"]] <- debugtext
+  # debugtext <- createJaspHtml(text = paste(names(args), args, collapse = "<BR>"))
+  # debugtext$dependOn(c("outcome_variable", "count_NA"))
+  # jaspResults[["debugtext"]] <- debugtext
 
     estimate <- try(do.call(what = call, args = args))
+
+    # debugtext <- createJaspHtml(text = paste(names(estimate), estimate, collapse = "<BR>"))
+    # debugtext$dependOn(c("outcome_variable", "count_NA"))
+    # jaspResults[["estimatetext"]] <- debugtext
 
     if (!from_raw) {
       ov_name <- jasp_text_fix(
@@ -92,10 +96,6 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
         estimate[[options$outcome_variable[[1]]]] <- estimate
       }
     }
-
-    # debugtext <- createJaspHtml(text = paste(estimate, collapse = "<BR>"))
-    # debugtext$dependOn(c("outcome_variable", "count_NA"))
-    # jaspResults[["debugtext"]] <- debugtext
 
 
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {

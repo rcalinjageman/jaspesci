@@ -16,7 +16,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     }
   }
 
-
+  mylevels <- 1
   # check for errors
   if (ready) {
     if (from_raw) {
@@ -73,8 +73,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
 
     if (from_raw) {
       args$data <- dataset
-      args$outcome_variable <- encodeColNames(options$outcome_variable)
-      args$grouping_variable <- encodeColNames(options$grouping_variable)
+      args$outcome_variable <- options$outcome_variable
+      args$grouping_variable <- options$grouping_variable
       args$count_NA <- options$count_NA
 
     } else {
@@ -96,6 +96,15 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     }
 
     estimate <- try(do.call(what = call, args = args))
+
+    # debugtext <- createJaspHtml(text = paste(names(args), args, collapse = "<BR>"))
+    # debugtext$dependOn(c("reference_measure", "comparison_measure"))
+    # jaspResults[["debugtext"]] <- debugtext
+    #
+    # debugtext <- createJaspHtml(text = paste(names(estimate), estimate, collapse = "<BR>"))
+    # debugtext$dependOn(c("reference_measure", "comparison_measure"))
+    # jaspResults[["moredebugtext"]] <- debugtext
+
 
     if (!from_raw) {
       ov_name <- jasp_text_fix(

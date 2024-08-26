@@ -225,7 +225,7 @@ jasp_es_proportion_difference_prep <- function(jaspResults, options, ready) {
 
 
 
-jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, table_title, effect_label = "<i>P</i>") {
+jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, table_title, effect_label = "<i>P</i>", show_outcome_variable = TRUE) {
   # Handles
   from_raw <- options$switch == "from_raw"
 
@@ -240,7 +240,7 @@ jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, tab
     )
   )
 
-  if (table_name != "es_phi") {
+  if (table_name != "es_phi" & show_outcome_variable) {
     overviewTable$addColumnInfo(
       name = "outcome_variable_name",
       title = "Outcome variable",
@@ -341,14 +341,14 @@ jamovi_contingency_table <- function(self, estimate, jaspResults) {
     "both" = TRUE
   )
 
-  buffer <- if (print_observed & print_expected) "<BR>" else NULL
+  buffer <- if (print_observed & print_expected) "<hr>" else NULL
 
   observed_prefix <- if (print_observed) NULL else NULL
   observed_suffix <- if (print_observed) NULL else NULL
   expected_prefix <- if (print_expected) "(<i>" else NULL
   expected_suffix <- if (print_expected) "</i>)" else NULL
-  total_prefix <- "<center><B>"
-  total_suffix <- "</B></center>"
+  total_prefix <- "<b>"
+  total_suffix <- "</b>"
 
   # Handle on the table and the observed and expected tables
   tbl <- createJaspTable(title = "Chi-Square Contingency Table")
@@ -393,7 +393,7 @@ jamovi_contingency_table <- function(self, estimate, jaspResults) {
     expected_values <- if (print_expected) format(expected[x, ], digits = 2) else NULL
 
     cell_values <- paste(
-      "<center>",
+      "",
       observed_prefix,
       observed_values,
       observed_suffix,
@@ -401,7 +401,7 @@ jamovi_contingency_table <- function(self, estimate, jaspResults) {
       expected_prefix,
       expected_values,
       expected_suffix,
-      "</center>",
+      "",
       sep = ""
     )
 

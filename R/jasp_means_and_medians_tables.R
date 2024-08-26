@@ -541,7 +541,7 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
 
 
 # Prep a hypothesis evaluation table
-jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
+jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcome_variable = TRUE) {
   # Handles
 
   is_difference <- FALSE
@@ -561,7 +561,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
 
   is_pdiff <- FALSE
   if (!is.null(options$effect_size)) {
-    is_pdiff <- if (options$effect_size %in% c("pdiff")) TRUE else FALSE
+    is_pdiff <- if (options$effect_size %in% c("pdiff", "proportion_difference")) TRUE else FALSE
   }
 
   from_raw <- FALSE
@@ -615,12 +615,15 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
 
   # Columns
   if (is_difference | is_r) {
-    overviewTable$addColumnInfo(
-      name = "outcome_variable_name",
-      title = "Outcome variable",
-      type = "string",
-      combine = FALSE
-    )
+    if (show_outcome_variable) {
+      overviewTable$addColumnInfo(
+        name = "outcome_variable_name",
+        title = "Outcome variable",
+        type = "string",
+        combine = FALSE
+      )
+
+    }
   }
 
 
@@ -635,7 +638,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL) {
 
   effect_column <- "effect"
   if (is_complex) effect_column <- "effects_complex"
-  if (options$effect_size == "proportion_difference")  effect_column <- "effect_plus"
+  if (is_pdiff)  effect_column <- "effect_plus"
 
   overviewTable$addColumnInfo(
     name = effect_column,

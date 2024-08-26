@@ -23,17 +23,7 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       # read dataset
       dataset <- jasp_estimate_pdiff_paired_read_data(dataset, options)
 
-      # check for errors
-      # At least 2 levels in grouping variable
-      .hasErrors(
-        dataset = dataset,
-        type = "factorLevels",
-        factorLevels.target  = options$grouping_variable,
-        factorLevels.amount  = "< 2",
-        exitAnalysisIfErrors = TRUE
-      )
-
-
+      mylevels <- levels(dataset[[options$comparison_measure]])
     }
   } else {
     mylevels <- 1
@@ -100,7 +90,7 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       options,
       ready,
       estimate,
-      level = length(mylevels)
+      level = 1
     )
 
     jaspResults[["overviewTable"]]$position <- 1
@@ -125,7 +115,8 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       ready = ready,
       table_name = "es_proportion_difference",
       table_title = "Proportion Difference",
-      effect_label = "<i>P</i>"
+      effect_label = "<i>P</i>",
+      show_outcome_variable = FALSE
     )
 
     jaspResults[["es_proportion_difference"]]$position <- 20
@@ -146,7 +137,8 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       jaspResults,
       options,
       ready,
-      mytest
+      mytest,
+      show_outcome_variable = FALSE
     )
 
     jaspResults[["heTable"]]$position <- 30
