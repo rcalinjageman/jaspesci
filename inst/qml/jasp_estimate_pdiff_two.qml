@@ -208,7 +208,7 @@ Form
 	  CheckBox
 	  {
 	    name: "show_phi";
-	    label: qsTr("Correlation (&#981;)");
+	    label: qsTr("Correlation (phi  &#981;)");
 	   }
 
 
