@@ -56,7 +56,7 @@ import "./" as Esci
       visible: false
 
         Label {
-          text: qsTr("Historgram")
+          text: qsTr("Histogram")
         }
 
         IntegerField

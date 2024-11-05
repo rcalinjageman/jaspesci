@@ -208,11 +208,11 @@ Form
 	  CheckBox
 	  {
 	    name: "show_phi";
-	    label: qsTr("Correlation (\u03D5)");
+	    label: qsTr("Correlation (ϕ)");
 	   }
 
 
-      GridLayout {
+      GridLayout {esc
       id: show_chi_square_grid
       columns: 4
     	 	CheckBox
