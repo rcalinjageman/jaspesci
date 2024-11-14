@@ -279,22 +279,22 @@ Form
       }
 
       Label {
-        text: "Reference"
+        text: "<u>Reference</u>"
       }
 
 
       Label {
-        text: "Comparison"
+        text: "<u>Comparison</u>"
       }
 
 
       Label {
-        text: "Difference"
+        text: "<u>Difference</u>"
       }
 
 
       Label {
-        text: "Summary"
+        text: "<b>Summary</b>"
       }
 
       Label {
@@ -437,7 +437,7 @@ Form
       }
 
       Label {
-        text: qsTr("CI")
+        text: qsTr("<b>CI</b>")
       }
 
       Label {
@@ -556,7 +556,7 @@ Form
       }
 
       Label {
-        text: qsTr("Error distribution")
+        text: qsTr("<b>Error distribution</b>")
       }
 
       Label {
@@ -624,7 +624,7 @@ Form
 
 
       Label {
-        text: "Raw data"
+        text: "<b>Raw data</b>"
       }
 
       Label {

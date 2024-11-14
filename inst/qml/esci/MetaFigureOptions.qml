@@ -5,14 +5,14 @@ import "./" as Esci
 
   Section
   {
-    title: qsTr("Figure Options")
+    title: qsTr("Figure options")
 
      GridLayout {
       id: fgrid
       columns: 3
 
      Label {
-        text: qsTr("Dimensions")
+        text: qsTr("<b>Dimensions</b>")
       }
 
     IntegerField
@@ -34,7 +34,7 @@ import "./" as Esci
       }
 
      Label {
-        text: qsTr("<i>Y</i> axis")
+        text: qsTr("<b><i>Y</i> axis</b>")
       }
 
       DoubleField
@@ -70,7 +70,7 @@ import "./" as Esci
 
 
        Label {
-        text: qsTr("<i>X</i> axis")
+        text: qsTr("<b><i>X</i> axis</b>")
       }
 
       TextField {
@@ -138,7 +138,7 @@ import "./" as Esci
   	}
 
   	      Label {
-        text: qsTr("Difference axis")
+        text: qsTr("<b>Difference axis</b>")
       }
 
 
@@ -188,7 +188,7 @@ import "./" as Esci
       }
 
       Label {
-        text: qsTr("Sample-size scaling")
+        text: qsTr("<b>Sample-size scaling</b>")
       }
 
        DoubleField {

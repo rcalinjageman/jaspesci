@@ -25,7 +25,7 @@ import "./" as Esci
       Layout.columnSpan: 2
 
       Label {
-        text: qsTr("Dimensions")
+        text: qsTr("<b>Dimensions</b>")
       }
 
       IntegerField
@@ -56,7 +56,7 @@ import "./" as Esci
       visible: false
 
         Label {
-          text: qsTr("Histogram")
+          text: qsTr("<b>Histogram</b>")
         }
 
         IntegerField
@@ -79,7 +79,7 @@ import "./" as Esci
 
 
         Label {
-          text: qsTr("<i>Y</i> axis")
+          text: qsTr("<b><i>Y</i> axis</b>")
         }
 
         TextField
@@ -163,7 +163,7 @@ import "./" as Esci
 
 
         Label {
-          text: qsTr("<i>X</i> axis")
+          text: qsTr("<b><i>X</i> axis</b>")
         }
 
         TextField
@@ -247,7 +247,7 @@ import "./" as Esci
       Layout.columnSpan: 2
 
         Label {
-          text: qsTr("Other options")
+          text: qsTr("<b>Other options</b>")
         }
 
         CheckBox

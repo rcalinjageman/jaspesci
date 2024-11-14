@@ -182,7 +182,7 @@ Form
 
     Group
     {
-    title: qsTr("CI")
+    title: qsTr("<b>CI</b>")
     columns: 2
     Layout.columnSpan: 2
 
@@ -222,7 +222,7 @@ Form
 
     Group
     {
-    title: qsTr("Error distribution")
+    title: qsTr("<b>Error distribution</b>")
     columns: 2
     Layout.columnSpan: 2
 
@@ -246,7 +246,7 @@ Form
 
     Group
     {
-    title: qsTr("The raw data")
+    title: qsTr("<b>The raw data</b>")
     columns: 2
     Layout.columnSpan: 2
 

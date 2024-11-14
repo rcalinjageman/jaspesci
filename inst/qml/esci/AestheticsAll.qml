@@ -18,25 +18,25 @@ import "./" as Esci
       }
 
       Label {
-        text: "Reference"
+        text: "<u>Reference</u>"
       }
 
 
       Label {
-        text: "Comparison"
+        text: "<u>Comparison</u>"
       }
 
 
       Label {
-        text: "Difference"
+        text: "<u>Difference</u>"
       }
 
       Label {
-        text: "Unused"
+        text: "<u>Unused</u>"
       }
 
       Label {
-        text: "Summary"
+        text: "<b>Summary</b>"
       }
 
       Label {
@@ -218,7 +218,7 @@ import "./" as Esci
       }
 
       Label {
-        text: qsTr("CI")
+        text: qsTr("<b>CI</b>")
       }
 
       Label {
@@ -380,7 +380,7 @@ import "./" as Esci
       }
 
       Label {
-        text: qsTr("Error distribution")
+        text: qsTr("<b>Error distribution</b>")
       }
 
       Label {
@@ -473,7 +473,7 @@ import "./" as Esci
 
 
       Label {
-        text: "Raw data"
+        text: "<b>Raw data</b>"
       }
 
       Label {

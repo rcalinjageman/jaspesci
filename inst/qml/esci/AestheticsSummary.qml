@@ -6,7 +6,7 @@ import "./" as Esci
 
     Group
     {
-    title: qsTr("Summary")
+    title: qsTr("<b>Summary</b>")
     columns: 2
     Layout.columnSpan: 2
 

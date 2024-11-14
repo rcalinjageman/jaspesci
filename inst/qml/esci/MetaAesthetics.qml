@@ -16,21 +16,21 @@ import "./" as Esci
         }
 
         Label {
-          text: "<b>Reference</b>"
+          text: "<u>Reference</u>"
         }
 
 
         Label {
-          text: "<b>Comparison</b>"
+          text: "<u>Comparison</u>"
         }
 
 
         Label {
-          text: "<b>Difference</b>"
+          text: "<u>Difference</u>"
         }
 
         Label {
-          text: "<b>Unused</b>"
+          text: "<u>Unused</u>"
         }
 
         Label {
@@ -382,15 +382,15 @@ import "./" as Esci
         }
 
         Label {
-          text: "Outline"
+          text: "<u>Outline</u>"
         }
 
         Label {
-          text: "Fill"
+          text: "<u>Fill</u>"
         }
 
         Label {
-          text: "Transparency"
+          text: "<u>Transparency</u>"
         }
 
         Label {

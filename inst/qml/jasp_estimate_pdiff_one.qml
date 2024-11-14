@@ -189,7 +189,7 @@ Form
 
     Group
     {
-    title: qsTr("CI")
+    title: qsTr("<b>CI</b>")
     columns: 2
     Layout.columnSpan: 2
 

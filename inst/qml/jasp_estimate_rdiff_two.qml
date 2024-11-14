@@ -280,17 +280,17 @@ Form
       }
 
       Label {
-        text: qsTr("<b>Reference</b>")
+        text: qsTr("<u>Reference</u>")
       }
 
 
       Label {
-        text: qsTr("<b>Comparison</b>")
+        text: qsTr("<u>Comparison</u>")
       }
 
 
       Label {
-        text: qsTr("<b>Unused</b>")
+        text: qsTr("<u>Unused</u>")
       }
 
       Label {
@@ -611,7 +611,7 @@ Form
       columns: 4
 
       Label {
-        text: qsTr("CI")
+        text: qsTr("<b>CI</b>")
         Layout.columnSpan: 4
       }
 

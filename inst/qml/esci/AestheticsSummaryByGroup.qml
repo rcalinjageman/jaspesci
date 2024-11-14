@@ -15,21 +15,21 @@ import "./" as Esci
       }
 
       Label {
-        text: "Reference"
+        text: "<u>Reference</u>"
       }
 
 
       Label {
-        text: "Comparison"
+        text: "<u>Comparison</u>"
       }
 
 
       Label {
-        text: "Difference"
+        text: "<u>Difference</u>"
       }
 
       Label {
-        text: "Summary"
+        text: "<b>Summary</b>"
         Layout.columnSpan: 4
       }
 

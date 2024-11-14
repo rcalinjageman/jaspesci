@@ -229,7 +229,7 @@ Form
       Layout.columnSpan: 2
 
       Label {
-          text: qsTr("Raw data")
+          text: qsTr("<b>Raw data</b>")
       }
 
       Esci.ShapeSelect
@@ -292,16 +292,16 @@ Form
       }
 
       Label {
-          text: qsTr("Regression")
+          text: qsTr("<u>Regression</u>")
       }
 
       Label {
-          text: qsTr("Prediction")
+          text: qsTr("<u>Prediction</u>")
       }
 
 
       Label {
-          text: qsTr("Residual")
+          text: qsTr("<u>Residual</u>")
       }
 
       Label {
@@ -427,7 +427,7 @@ Form
       Layout.columnSpan: 2
 
       Label {
-          text: qsTr("Prediction from <i>X</i>")
+          text: qsTr("<b>Prediction from <i>X</i></b>")
       }
 
       IntegerField
@@ -463,16 +463,16 @@ Form
       }
 
       Label {
-          text: qsTr("Guidelines")
+          text: qsTr("<u>Guidelines</u>")
       }
 
       Label {
-          text: qsTr("PI")
+          text: qsTr("<u>PI</u>")
       }
 
 
       Label {
-          text: qsTr("SI")
+          text: qsTr("<u>SI</u>")
       }
 
       Label {
@@ -619,7 +619,7 @@ Form
 
     Group
     {
-    title: qsTr("CI")
+    title: qsTr("<b>CI</b>")
     columns: 2
     Layout.columnSpan: 2
 

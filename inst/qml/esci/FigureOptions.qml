@@ -6,7 +6,7 @@ import "./" as Esci
 
   Section
   {
-    title: qsTr("Figure Options")
+    title: qsTr("Figure options")
 
     property alias simple_labels_enabled: simple_contrast_labels.enabled
     property alias simple_labels_visible: simple_contrast_labels.visible
@@ -29,7 +29,7 @@ import "./" as Esci
       Layout.columnSpan: 2
 
       Label {
-        text: qsTr("Dimensions")
+        text: qsTr("<b>Dimensions</b>")
       }
 
       IntegerField
@@ -61,7 +61,7 @@ import "./" as Esci
 
 
         Label {
-          text: qsTr("<i>Y</i> axis")
+          text: qsTr("<b><i>Y</i> axis</b>")
         }
 
         TextField
@@ -145,7 +145,7 @@ import "./" as Esci
 
 
         Label {
-          text: qsTr("<i>X</i> axis")
+          text: qsTr("<b><i>X</i> axis</b>")
         }
 
         TextField
@@ -206,7 +206,7 @@ import "./" as Esci
       columns: 3
       Layout.columnSpan: 2
         Label {
-          text: qsTr("Difference axis")
+          text: qsTr("<b>Difference axis</b>")
         }
 
              DropDown
@@ -246,7 +246,7 @@ import "./" as Esci
       Layout.columnSpan: 2
 
         Label {
-          text: qsTr("Distributions")
+          text: qsTr("<b>Distributions</b>")
         }
 
         DoubleField
@@ -289,7 +289,7 @@ import "./" as Esci
 
 
       Label {
-        text: qsTr("Data")
+        text: qsTr("<b>Data</b>")
       }
 
       Esci.DataLayout

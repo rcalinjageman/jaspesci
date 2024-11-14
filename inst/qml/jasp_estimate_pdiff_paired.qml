@@ -228,7 +228,7 @@ Form
       columns: 4
 
       Label {
-        text: qsTr("CI")
+        text: qsTr("<b>CI</b>")
         Layout.columnSpan: 4
       }
 

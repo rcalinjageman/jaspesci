@@ -212,7 +212,7 @@ Form
 	   }
 
 
-      GridLayout {esc
+      GridLayout {
       id: show_chi_square_grid
       columns: 4
     	 	CheckBox
@@ -280,7 +280,7 @@ Form
       columns: 4
 
       Label {
-        text: qsTr("CI")
+        text: qsTr("<b>CI</b>")
         Layout.columnSpan: 4
       }
 
