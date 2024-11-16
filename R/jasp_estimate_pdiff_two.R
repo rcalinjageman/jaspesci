@@ -8,6 +8,8 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   if (from_raw) {
     ready <- (length(options$outcome_variable) > 0) & (options$grouping_variable != "")
   } else {
+    jasp_summary_dirty(options$summary_dirty, jaspResults)
+
     # Determine if summary data is ready
     ready <- !is.null(options$reference_cases) & !is.null(options$reference_not_cases) & !is.null(options$comparison_cases) & !is.null(options$comparison_not_cases)
     if (ready) {

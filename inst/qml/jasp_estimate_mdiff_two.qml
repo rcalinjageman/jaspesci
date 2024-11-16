@@ -127,18 +127,25 @@ Form
 
       Label {
         text: qsTr("Mean (<i>M</i>)")
+
       }
 
       DoubleField
       {
         name: "reference_mean"
         defaultValue: 10
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
       {
         name: "comparison_mean"
         defaultValue: 12
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
@@ -151,6 +158,9 @@ Form
         name: "reference_sd"
         defaultValue: 3
         min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
@@ -158,6 +168,9 @@ Form
         name: "comparison_sd"
         defaultValue: 3
         min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
@@ -170,6 +183,9 @@ Form
         name: "reference_n"
         defaultValue: 20
         min: 2
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       IntegerField
@@ -177,6 +193,9 @@ Form
         name: "comparison_n"
         defaultValue: 20
         min: 2
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
     }
@@ -201,6 +220,12 @@ Form
 
     }
 
+      CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
 
   }
 

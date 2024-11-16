@@ -25,6 +25,8 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     if (from_raw) {
       ready <- (options$grouping_variable_A != "") & (options$grouping_variable_B != "") & (options$outcome_variable != "")
     } else {
+      jasp_summary_dirty(options$summary_dirty, jaspResults)
+
       # need any checks for summary data?
       ready <- TRUE
       options$effect_size <- "mean_difference"

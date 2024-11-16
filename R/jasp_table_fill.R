@@ -51,3 +51,19 @@ jasp_numeric_fix <- function(options, field_name, default) {
 
   return(fixed)
 }
+
+
+jasp_summary_dirty <- function(summary_dirty, jaspResults) {
+
+  if (!summary_dirty) {
+    summary_replace <- createJaspHtml(
+      '<p style="background-color:#ffc2c2;">For summary data analysis, sample data has been provided.  Enter your own values.</p>',
+      title = "Summary data: Replace sample data with your own values."
+    )
+    summary_replace$dependOn("summary_dirty")
+    jaspResults[["summary_replace"]] <- summary_replace
+    jaspResults[["summary_replace"]]$position <- -5
+
+  }
+
+}

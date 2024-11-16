@@ -169,12 +169,18 @@ Form
         name: "A1B1_mean"
         defaultValue: 10
         label: qsTr("<i>M</i>")
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
       {
         name: "A2B1_mean"
         defaultValue: 10
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       TextField
@@ -190,6 +196,9 @@ Form
         defaultValue: 2.1
         label: qsTr("<i>s</i>")
         negativeValues: false
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
@@ -197,6 +206,9 @@ Form
         name: "A2B1_sd"
         defaultValue: 2.2
         negativeValues: false
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       Label {
@@ -210,6 +222,9 @@ Form
         name: "A1B1_n"
         defaultValue: 20
         min: 2
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       IntegerField
@@ -217,6 +232,9 @@ Form
         name: "A2B1_n"
         defaultValue: 20
         min: 2
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
@@ -229,12 +247,18 @@ Form
         name: "A1B2_mean"
         defaultValue: 15
         label: qsTr("<i>M</i>")
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
       {
         name: "A2B2_mean"
         defaultValue: 10
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       TextField
@@ -250,6 +274,9 @@ Form
         defaultValue: 2.3
         label: qsTr("<i>s</i>")
         negativeValues: false
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
@@ -257,6 +284,9 @@ Form
         name: "A2B2_sd"
         defaultValue: 2.4
         negativeValues: false
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       Label {
@@ -270,6 +300,9 @@ Form
         name: "A1B2_n"
         defaultValue: 20
         negativeValues: false
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       IntegerField
@@ -277,6 +310,9 @@ Form
         name: "A2B2_n"
         defaultValue: 20
         negativeValues: false
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
@@ -291,6 +327,13 @@ Form
         Layout.columnSpan: 2
     }
 
+
+      CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
 
   }  // fully between summary section
 

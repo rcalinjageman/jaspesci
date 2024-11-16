@@ -136,12 +136,18 @@ Form
       {
         name: "reference_mean"
         defaultValue: 10
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
       {
         name: "comparison_mean"
         defaultValue: 12
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
@@ -155,6 +161,9 @@ Form
         id: sd1
         defaultValue: 2.1
         min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
@@ -163,6 +172,9 @@ Form
         id: sd2
         defaultValue: 2.2
         min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       Label {
@@ -175,6 +187,9 @@ Form
         defaultValue: 20
         Layout.columnSpan: 2
         min: 2
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       RadioButtonGroup {
@@ -220,6 +235,9 @@ Form
           onFocusChanged: {
             sdiff_adjust()
           }
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
@@ -237,11 +255,20 @@ Form
           onFocusChanged: {
             r_adjust()
           }
-
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
 
     } // end first summary data grid
+
+          CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
 
   }
 

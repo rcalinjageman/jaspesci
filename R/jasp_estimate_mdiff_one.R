@@ -8,6 +8,9 @@ jasp_estimate_mdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
   if (from_raw) {
     ready <- (length(options$outcome_variable) > 0)
   } else {
+
+    jasp_summary_dirty(options$summary_dirty, jaspResults)
+
     # Determine if summary data is ready
     ready <- !is.null(options$n) & !is.null(options$sd) & !is.null(options$m)
     if (ready) ready <- ready & options$n > 0 & options$sd > 0

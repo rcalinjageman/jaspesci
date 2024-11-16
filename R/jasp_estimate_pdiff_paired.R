@@ -8,6 +8,9 @@ jasp_estimate_pdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   if (from_raw) {
     ready <- (options$reference_measure != "") & (options$comparison_measure != "")
   } else {
+    jasp_summary_dirty(options$summary_dirty, jaspResults)
+
+
     # Determine if summary data is ready
     ready <- !is.null(options$cases_consistent) & !is.null(options$cases_inconsistent) & !is.null(options$not_cases_consistent) & !is.null(options$not_cases_inconsistent)
     if (ready) {

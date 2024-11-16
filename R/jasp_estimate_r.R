@@ -8,6 +8,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
   if (from_raw) {
     ready <- (options$x != "") & (options$y != "")
   } else {
+    jasp_summary_dirty(options$summary_dirty, jaspResults)
+
     # Determine if summary data is ready
     ready <- !is.null(options$r) & !is.null(options$n)
     if (ready) {

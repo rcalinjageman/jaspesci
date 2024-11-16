@@ -11,6 +11,9 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   if (from_raw) {
     ready <- options$reference_measure != "" & options$comparison_measure != ""
   } else {
+
+    jasp_summary_dirty(options$summary_dirty, jaspResults)
+
     # Need any summary data checks?  Maybe not
     ready <- TRUE
     # Over-ride effect size if summary data is being analyzed

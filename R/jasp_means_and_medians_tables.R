@@ -101,7 +101,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
     combine = TRUE
   )
 
-  if (levels > 1) {
+  if (levels > 1 & ready) {
     overviewTable$addColumnInfo(
       name = "grouping_variable_level",
       title = options$grouping_variable,

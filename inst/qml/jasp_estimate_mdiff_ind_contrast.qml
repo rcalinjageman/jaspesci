@@ -72,9 +72,26 @@ Form
     	{
     		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
     		AvailableVariablesList { name: "allVariablesList" }
-    		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable(s)"); allowedColumns: ["scale"] }
-    		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); allowedColumns: ["nominal"]; singleVariable: true }
+    		AssignedVariablesList {
+    		  name: "outcome_variable";
+    		  title: qsTr("Outcome variable(s)");
+    		  allowedColumns: ["scale"];
+    		}
+    		AssignedVariablesList {
+    		  name: "grouping_variable";
+    		  title: qsTr("Grouping variable");
+    		  allowedColumns: ["nominal"];
+    		  singleVariable: trueOn;
+
+    		}
     	}
+
+    	CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
 
   }
 
@@ -113,6 +130,7 @@ Form
       }
 
     }
+
 
 
   }

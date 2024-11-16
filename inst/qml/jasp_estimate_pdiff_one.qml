@@ -108,6 +108,9 @@ Form
           label: qsTr("Cases")
           defaultValue: 20
           min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
         TextField
@@ -125,8 +128,18 @@ Form
           label: qsTr("Sample size")
           defaultValue: 80
           min: 0
+                  onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
       }  // 2 column grid
+
+            CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
     }  // end of group for summary
 
   }

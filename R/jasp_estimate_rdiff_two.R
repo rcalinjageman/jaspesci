@@ -8,6 +8,9 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   if (from_raw) {
     ready <- (options$x != "") & (options$y != "") & (options$grouping_variable != "")
   } else {
+    jasp_summary_dirty(options$summary_dirty, jaspResults)
+
+
     # Determine if summary data is ready
     ready <- !is.null(options$comparison_r) & !is.null(options$comparison_n) & !is.null(options$reference_r) & !is.null(options$reference_n)
     if (ready) {

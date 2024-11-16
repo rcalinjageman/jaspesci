@@ -134,6 +134,9 @@ Form
           label: ""
           defaultValue: 18
           min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
         IntegerField
@@ -143,6 +146,9 @@ Form
           label: ""
           defaultValue: 4
           min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
 
@@ -159,6 +165,9 @@ Form
           label: ""
           defaultValue: 12
           min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
         IntegerField
@@ -168,10 +177,20 @@ Form
           label: ""
           defaultValue: 5
           min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
 
       }  // 3 column grid
+
+                  CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
     }  // end of group for summary
 
   }

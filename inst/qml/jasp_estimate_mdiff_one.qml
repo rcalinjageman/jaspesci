@@ -37,6 +37,7 @@ Form
       }
   }
 
+
   RadioButtonGroup {
     columns: 2
     name: "switch"
@@ -91,6 +92,9 @@ Form
         name: "mean"
         label: qsTr("Mean (<i>M</i>)")
         defaultValue: 10.1
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       DoubleField
@@ -99,6 +103,9 @@ Form
         label: qsTr("Standard deviation (<i>s</i>)")
         defaultValue: 3
         min: 0
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       IntegerField
@@ -107,6 +114,9 @@ Form
         label: qsTr("Sample size (<i>N</i>)")
         defaultValue: 20
         min: 2
+        onEditingFinished : {
+          summary_dirty.checked = true
+        }
       }
 
       TextField
@@ -115,6 +125,14 @@ Form
         label: qsTr("Outcome variable name")
         placeholderText: "Outcome variable"
       }
+
+
+      CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
 
 
     }

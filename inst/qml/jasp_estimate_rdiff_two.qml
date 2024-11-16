@@ -129,6 +129,9 @@ Form
           min: 0
           max: 1
           enabled: from_summary.checked
+                  onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
         DoubleField {
@@ -138,6 +141,9 @@ Form
           min: 0
           max: 1
           enabled: from_summary.checked
+                  onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
 
@@ -151,6 +157,9 @@ Form
           defaultValue: 20
           min: 2
           enabled: from_summary.checked
+                  onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
 
@@ -160,6 +169,9 @@ Form
           defaultValue: 20
           min: 2
           enabled: from_summary.checked
+                  onEditingFinished : {
+          summary_dirty.checked = true
+        }
         }
 
       } // end of 3 column grid
@@ -197,6 +209,15 @@ Form
         }
 
       }  // 1 column grid
+
+
+                        CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
+
     }  // end of group for summary
 
   }
