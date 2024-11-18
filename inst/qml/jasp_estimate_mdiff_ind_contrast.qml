@@ -76,22 +76,17 @@ Form
     		  name: "outcome_variable";
     		  title: qsTr("Outcome variable(s)");
     		  allowedColumns: ["scale"];
+
     		}
     		AssignedVariablesList {
     		  name: "grouping_variable";
     		  title: qsTr("Grouping variable");
     		  allowedColumns: ["nominal"];
-    		  singleVariable: trueOn;
-
+    		  singleVariable: trueOn
     		}
     	}
 
-    	CheckBox
-	    {
-	      name: "summary_dirty";
-	      id: summary_dirty
-	      visible: false
-	    }
+
 
   }
 
@@ -105,10 +100,46 @@ Form
     VariablesForm {
       preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
       AvailableVariablesList { name: "allVariablesList_summary" }
-      AssignedVariablesList { name: "grouping_variable_levels"; title: qsTr("Grouping variable levels"); allowedColumns: ["nominal"]; singleVariable: true }
-      AssignedVariablesList { name: "means"; title: qsTr("Group means"); allowedColumns: ["scale"]; singleVariable: true }
-      AssignedVariablesList { name: "sds"; title: qsTr("Group standard deviations"); allowedColumns: ["scale"]; singleVariable: true }
-      AssignedVariablesList { name: "ns"; title: qsTr("Group samplpe sizes"); allowedColumns: ["scale"]; singleVariable: true }
+      AssignedVariablesList {
+        name: "grouping_variable_levels";
+        id: grouping_variable_levels;
+        title: qsTr("Grouping variable levels");
+        allowedColumns: ["nominal"];
+        singleVariable: true;
+    		  onCountChanged: {
+    		    if (grouping_variable_levels.count > 0) summary_dirty.checked = true
+          }
+      }
+      AssignedVariablesList {
+        name: "means";
+        id: means;
+        title: qsTr("Group means");
+        allowedColumns: ["scale"];
+        singleVariable: true;
+          onCountChanged: {
+    		    if (means.count > 0) summary_dirty.checked = true
+          }
+      }
+      AssignedVariablesList {
+        name: "sds";
+        id: sds;
+        title: qsTr("Group standard deviations");
+        allowedColumns: ["scale"];
+        singleVariable: true;
+          onCountChanged: {
+    		    if (sds.count > 0) summary_dirty.checked = true
+          }
+      }
+      AssignedVariablesList {
+        name: "ns";
+        id: ns;
+        title: qsTr("Group sample sizes");
+        allowedColumns: ["scale"];
+        singleVariable: true;
+          onCountChanged: {
+    		    if (ns.count > 0) summary_dirty.checked = true
+          }
+      }
     }
 
 
@@ -132,7 +163,13 @@ Form
     }
 
 
-
+    	CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      checked: false
+	      visible: false
+	    }
   }
 
   Group {

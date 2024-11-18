@@ -42,7 +42,7 @@ import "./" as Esci
       DoubleField
       {
         name: "null_value"
-        label: qsTr("Evaluate against <i>H</i><sub>0</sub> of: ")
+        label: qsTr("Evaluate against <i>H</i>₀ of: ")
         defaultValue: 0
         id: null_value
         negativeValues: true
@@ -79,7 +79,7 @@ import "./" as Esci
       }
 
       Label {
-        text: "at alpha = .05"
+        text: "at α = .05"
         id: alpha_label
         enabled: evaluate_hypotheses.checked
         visible: evaluate_hypotheses.checked

@@ -16,6 +16,8 @@ jasp_estimate_mdiff_ind_contrast <- function(jaspResults, dataset = NULL, option
     ready <- (length(options$outcome_variable) > 0) & (length(options$grouping_variable) > 0)
     # ready <- (length(options$outcome_variable) > 0) & (options$grouping_variable != "")
   } else {
+    # jasp_summary_dirty(options$summary_dirty, jaspResults)
+
     ready <- (options$means != "") & (options$sds != "") & (options$ns != "") & (options$grouping_variable_levels != "")
     # Over-ride effect size if summary data is being analyzed
     if (ready) options$effect_size <- "mean_difference"
