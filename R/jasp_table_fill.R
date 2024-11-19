@@ -46,6 +46,7 @@ jasp_numeric_fix <- function(options, field_name, default) {
   if (!is.null(options[[field_name]])) {
     if (!options[[field_name]] %in% c("auto", "Auto", "AUTO", "")) {
       try(fixed <- as.numeric(options[[field_name]]))
+      if (is.na(fixed)) fixed <- default
     }
   }
 

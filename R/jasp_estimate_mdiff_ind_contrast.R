@@ -363,13 +363,10 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
 
         args$difference_axis_units <- self$options$difference_axis_units
 
-        difference_axis_breaks <- NULL
-        if (!(options$difference_axis_breaks %in% c("auto", "Auto", "AUTO", ""))) {
-          try(difference_axis_breaks <- as.numeric(options$difference_axis_breaks))
-          if (is.na(difference_axis_breaks)) difference_axis_breaks <- NULL
-        }
+        args$difference_axis_breaks <- jasp_numeric_fix(options, "difference_axis_breaks", 5)
+        if (args$difference_axis_breaks < 2) args$difference_axis_breaks <- 2
+        if (args$difference_axis_breaks > 50) args$difference_axies_breaks <- 50
 
-        args$difference_axis_breaks <- difference_axis_breaks
         args$difference_axis_space <- 0.5
         args$simple_contrast_labels <- self$options$simple_contrast_labels
 
@@ -391,10 +388,6 @@ in {self$options$grouping_variable_levels}.  Rows with empty group labels have b
 
         args$ylim <- ylim
         args$ybreaks <- ybreaks
-        args$difference_axis_breaks <- self$options$difference_axis_breaks
-        args$difference_axis_units <- self$options$difference_axis_units
-        args$difference_axis_space <- 0.5
-        args$simple_contrast_labels <- self$options$simple_contrast_labels
 
         if (evaluate_h & !is.null(contrast)) {
           args$rope <- c(

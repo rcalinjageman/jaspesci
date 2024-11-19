@@ -241,10 +241,15 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   } # end of show_details for raw data
 
 
+  n_label <- "<i>N</i>"
+  if (options$effect_size %in% c("mean_difference", "median_difference")) {
+    n_label <- "<i>n</i>"
+  }
+
   if (!paired) {
     overviewTable$addColumnInfo(
       name = "n",
-      title = "<i>N</i>",
+      title = n_label,
       type = "integer"
     )
 
@@ -940,7 +945,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
         )
       } else {
         overviewTable$addFootnote(
-          "Variances are not assumed equal, and so the CI was calculated separately for each mean."
+          "Variances are not assumed equal, so the Welch method was used to calculate each CI on a difference."
         )
 
       }

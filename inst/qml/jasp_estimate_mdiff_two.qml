@@ -259,7 +259,7 @@ Form
     CheckBox {
 	    name: "assume_equal_variance";
 	    id: assume_equal_variance
-	    label: qsTr("Assume equal variance")
+	    label: qsTr("Assume equal variances")
 	    checked: true
 	    enabled: effect_size.currentValue == "mean_difference"
     }

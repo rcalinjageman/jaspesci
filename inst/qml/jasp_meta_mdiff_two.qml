@@ -193,7 +193,7 @@ Form
 	    name: "assume_equal_variance";
 	    id: assume_equal_variance
 	    checked: true;
-	    label: qsTr("Assume equal variance")
+	    label: qsTr("Assume equal variances")
 	  }
 
     DropDown {

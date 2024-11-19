@@ -218,6 +218,7 @@ Form
         defaultValue: 3
         min: 1
         max: 10
+        enabled: effect_size.currentValue == "mean"
       }
 
       Esci.ColorSelect
@@ -226,12 +227,14 @@ Form
         label: qsTr("Color")
         startValue: 'black'
         id: color_interval
+        enabled: effect_size.currentValue == "mean"
       }
 
       Esci.AlphaSelect
       {
         name: "alpha_interval"
         label: qsTr("Transparency")
+        enabled: effect_size.currentValue == "mean"
       }
 
 
@@ -250,12 +253,14 @@ Form
         label: qsTr("Fill")
         startValue: 'gray75'
         id: fill_error
+        enabled: effect_size.currentValue == "mean"
       }
 
       Esci.AlphaSelect
       {
         name: "alpha_error"
         label: qsTr("Transparency")
+        enabled: effect_size.currentValue == "mean"
       }
 
 

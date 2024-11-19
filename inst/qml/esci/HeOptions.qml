@@ -37,12 +37,18 @@ import "./" as Esci
 
     GridLayout {
       id: hgrid
-      columns: 3
+      columns: 5
+
+      Label {
+        text: qsTr("Evaluate against <i>H</i>₀ of: ")
+        id: intro_label
+        enabled: evaluate_hypotheses.checked
+        visible: evaluate_hypotheses.checked
+      }
 
       DoubleField
       {
         name: "null_value"
-        label: qsTr("Evaluate against <i>H</i>₀ of: ")
         defaultValue: 0
         id: null_value
         negativeValues: true
