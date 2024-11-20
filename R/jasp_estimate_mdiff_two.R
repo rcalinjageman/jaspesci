@@ -299,7 +299,7 @@ jasp_estimate_mdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         options,
         ready,
         estimate,
-        mylevels
+        if (ready) mylevels else NULL
       )
 
       jaspResults[["es_m_ratioTable"]]$position <- 40
@@ -550,7 +550,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
 
 
   try(shape_raw_difference <- self$options$shape_raw_difference, silent = TRUE)
-  try(shape_raw_difference <- self$options$color_raw_difference, silent = TRUE)
+  try(shape_color_difference <- self$options$color_raw_difference, silent = TRUE)
   try(fill_raw_difference <- self$options$fill_raw_difference, silent = TRUE)
   try(size_raw_difference <- as.integer(self$options$size_raw_difference), silent = TRUE)
   try(alpha_raw_difference <- as.numeric(self$options$alpha_raw_difference), silent = TRUE)
@@ -585,7 +585,7 @@ jasp_plot_mdiff_decorate <- function(myplot, options, has_contrast = TRUE) {
   try(alpha_error_unused <- as.numeric(self$options$alpha_error_unused), silent = TRUE)
 
 
-  # Aesthetics
+  #Aesthetics
   myplot <- myplot + ggplot2::scale_shape_manual(
     values = c(
       "Reference_raw" = shape_raw_reference,

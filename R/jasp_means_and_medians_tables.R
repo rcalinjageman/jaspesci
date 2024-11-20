@@ -348,7 +348,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
 
 
 # Prep a Cohen's d table
-jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_group = TRUE) {
+jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_group = TRUE, is_paired = FALSE) {
   # Handles
   has_estimate <- !is.null(estimate)
   if (has_estimate) has_estimate <- !is.null(estimate$es_smd_properties)
@@ -385,11 +385,6 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
 
   is_complex <- FALSE
   if (!is.null(options$design)) is_complex <- TRUE
-
-  is_paired <- FALSE
-  if (is.null(options$assume_equal_variance)) {
-    is_paired <- TRUE
-  }
 
 
   # Title
@@ -973,15 +968,17 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
 
 
 # Prep a mdiff table
-jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels = c("Comparison", "Reference")) {
+jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels = c("Comparison", "Reference"), is_paired = FALSE) {
+
+  if (is.null(levels)) levels <- c("Comparison", "Reference")
 
   is_mean <- FALSE
   if (options$effect_size == "mean_difference") is_mean <- TRUE
 
-  is_paired <- FALSE
-  if (is.null(options$assume_equal_variabce)) {
-    is_paired <- TRUE
-  }
+  # is_paired <- FALSE
+  # if (is.null(options$assume_equal_variance)) {
+  #   is_paired <- TRUE
+  # }
 
   overviewTable <- createJaspTable(
     title = if (is_mean) "Ratio of Means" else "Ratio of Medians"
@@ -1005,7 +1002,7 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels =
   }
 
 
-  effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+  effect_title <- paste(options$grouping_variable, "Effect", sep = "</BR>")
 
   overviewTable$addColumnInfo(
     name = "effect",
@@ -1013,21 +1010,33 @@ jasp_es_m_ratio_prep <- function(jaspResults, options, ready, estimate, levels =
     type = "string"
   )
 
+  c_title <- paste(
+    if (is_mean) "<i>M</i>" else "<i>Mdn</i>",
+    "<sub>", levels[2], "</sub>",
+    sep = ""
+  )
+
+  r_title <- paste(
+    if (is_mean) "<i>M</i>" else "<i>Mdn</i>",
+    "<sub>", levels[1], "</sub>",
+    sep = ""
+  )
+
   overviewTable$addColumnInfo(
     name = if (is_mean) "comparison_mean" else "comparison_median",
-    title = if (is_mean) "<i>M</i><sub>comparison</sub>" else "<i>Mdn</i><sub>comparison</sub>",
+    title = c_title,
     type = "number"
   )
 
   overviewTable$addColumnInfo(
     name = if (is_mean) "reference_mean" else "reference_median",
-    title = if (is_mean) "<i>M</i><sub>reference</sub>" else "<i>Mdn</i><sub>reference</sub>",
+    title = r_title,
     type = "number"
   )
 
   overviewTable$addColumnInfo(
     name = "effect_size",
-    title = if (is_mean) "<i>M</i>/<i>M</i>" else "<i>Mdn</i>/<i>Mdn</i>",
+    title = paste(c_title, r_title, sep = "/"),
     type = "number"
   )
 

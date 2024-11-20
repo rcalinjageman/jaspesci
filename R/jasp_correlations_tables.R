@@ -202,7 +202,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE, differen
   if (options$show_details) {
     overviewTable$addColumnInfo(
       name = "SE",
-      title = "<i>SE<sub>r</sub></i>",
+      title = if (paired) "<i>SE</i>" else "<i>SE<sub>r</sub></i>",
       type = "number"
     )
 
@@ -210,7 +210,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE, differen
 
   overviewTable$addColumnInfo(
     name = "n",
-    title = if (difference) "<i>N</i><sub>pairs</sub>" else "<i>n</i><sub>pairs</sub>",
+    title = if (difference | paired) "<i>N</i><sub>pairs</sub>" else "<i>n</i><sub>pairs</sub>",
     type = "integer"
   )
 

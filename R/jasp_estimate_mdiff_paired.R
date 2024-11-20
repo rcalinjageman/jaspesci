@@ -100,10 +100,12 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
     estimate$overview$moe <- (estimate$overview$mean_UL - estimate$overview$mean_LL)/2
 
     # Add calculation details
-    alpha <- 1 - self$options$conf_level/100
+    alpha <- 1 - self$options$conf_level
     estimate$es_mean_difference$t_multiplier <- stats::qt(1-alpha/2, estimate$es_mean_difference$df)
     estimate$es_mean_difference$n_component <- 1/sqrt(estimate$es_mean_difference$df+1)
     estimate$es_mean_difference$s_component <- estimate$es_mean_difference$moe / estimate$es_mean_difference$t_multiplier / estimate$es_mean_difference$n_component
+
+
 
     if(evaluate_h & is.null(jaspResults[["heTable"]])) {
       mytest <- jasp_test_mdiff(
@@ -206,10 +208,11 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   if (is_mean & is.null(jaspResults[["smdTable"]]) ) {
     jasp_smd_prep(
       jaspResults,
-      options,
-      ready,
-      if (ready) estimate else NULL,
-      one_group = FALSE
+      options = options,
+      ready = ready,
+      estimate = if (ready) estimate else NULL,
+      one_group = FALSE,
+      is_paired = TRUE
     )
 
 
@@ -228,12 +231,24 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   # Define and fill out the m_diff table (mean or median)
   if (options$show_ratio & from_raw & is.null(jaspResults[["es_m_ratioTable"]])) {
     if (isa(neg_errors, "logical")) {
+
+      if (ready) {
+        mylevels <- c(
+        unname(self$options$reference_measure),
+        unname(self$options$comparison_measure)
+        )
+      } else {
+        mylevels <- NULL
+      }
+
+
       jasp_es_m_ratio_prep(
         jaspResults,
-        options,
-        ready,
-        if (ready) estimate else NULL,
-        2
+        options = options,
+        ready = ready,
+        estimate = if (ready) estimate else NULL,
+        levels = if(ready) mylevels else NULL,
+        is_paired = TRUE
       )
 
       jaspResults[["es_m_ratioTable"]]$position <- 50
