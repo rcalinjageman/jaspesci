@@ -78,7 +78,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       args$n <- self$options$n
       args$comparison_mean <- options$comparison_mean
       args$comparison_sd <- self$options$comparison_sd
-      args$correlation <- jasp_numeric_fix(options, "r", 0)
+      args$correlation <- self$options$correlation
       args$comparison_measure_name <- jasp_text_fix(
         options,
         "comparison_measure_name",
@@ -192,7 +192,7 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
       to_fill
     )
 
-    if (ready) jaspResults[["es_m_differenceTable"]]$addFootnote(
+    if (ready & is_mean) jaspResults[["es_m_differenceTable"]]$addFootnote(
       paste(
         "<i>s</i><sub>diff</sub> = ",
         format(estimate$es_mean_difference$s_component[[3]], 2),
@@ -269,9 +269,11 @@ jasp_estimate_mdiff_paired <- function(jaspResults, dataset = NULL, options, ...
   if(evaluate_h & is.null(jaspResults[["heTable"]])) {
     jasp_he_prep(
       jaspResults,
-      options,
-      ready,
-      mytest
+      options = options,
+      read = ready,
+      mytest = mytest,
+      show_outcome_variable = FALSE,
+      paired = TRUE
     )
 
     jaspResults[["heTable"]]$position <- 60

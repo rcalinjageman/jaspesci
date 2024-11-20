@@ -541,7 +541,7 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
 
 
 # Prep a hypothesis evaluation table
-jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcome_variable = TRUE) {
+jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcome_variable = TRUE, paired = FALSE) {
   # Handles
 
   is_difference <- FALSE
@@ -896,7 +896,7 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   }
 
 
-  if (show_calculations & is_mean & assume_equal_variance) {
+  if (show_calculations & is_mean & (assume_equal_variance | paired))  {
     overviewTable$addColumnInfo(
       name = "t_multiplier",
       title = "<i>t</i>",

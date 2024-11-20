@@ -178,7 +178,7 @@ Form
       }
 
       Label {
-        text: qsTr("Sample size (<i>n</i>)")
+        text: qsTr("Sample size (<i>N</i>)")
       }
 
       IntegerField
