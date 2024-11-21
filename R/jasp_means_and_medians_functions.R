@@ -43,6 +43,53 @@ jasp_plot_depend_on <- function() {
 
   mydepends <- apply(expand.grid(mytypes, myobjs, mycontrast), 1, paste, collapse="_")
 
+  mydepends <- c(
+    jasp_mdiff_table_depends_on(),
+    "null_value",
+    "null_boundary",
+    "null_color",
+    "rope_units",
+    "evaluate_hypotheses",
+    "width",
+    "height",
+    "data_layout",
+    "data_spread",
+    "error_layout",
+    "error_scale",
+    "error_nudge",
+    "ylab",
+    "xlab",
+    "axis.text.y",
+    "axis.title.y",
+    "axis.text.x",
+    "axis.title.x",
+    "simple_contrast_labels",
+    "ymin",
+    "ymax",
+    "ybreaks",
+    "n.breaks",
+    "difference_axis_units",
+    "difference_axis_breaks",
+    mydepends,
+    "shape_summary",
+    "size_summary",
+    "color_summary",
+    "fill_summary",
+    "alpha_summary",
+    "linetype_summary",
+    "size_interval",
+    "color_interval",
+    "alpha_interval",
+    "fill_error",
+    "alpha_error",
+    "shape_raw",
+    "size_raw",
+    "color_raw",
+    "fill_raw",
+    "alpha_raw",
+    jasp_pdiff_table_depends_on()
+  )
+
   return(mydepends)
 }
 

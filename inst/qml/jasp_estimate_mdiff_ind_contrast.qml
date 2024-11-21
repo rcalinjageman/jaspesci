@@ -181,6 +181,7 @@ Form
         name: "reference_labels"
         id: reference_labels
         label: qsTr("Reference subset")
+        fieldWidth: 400
       }
 
      TextField
@@ -188,6 +189,7 @@ Form
         name: "comparison_labels"
         id: comparison_labels
         label: qsTr("Comparison subset")
+        fieldWidth: 400
       }
 
 

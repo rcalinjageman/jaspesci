@@ -243,8 +243,15 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
             effect_size = effect_size,
             rope = c(rope_upper * -1, rope_upper),
             rope_units = rope_units,
-            output_html = TRUE
+            output_html = FALSE
           )
+
+          test_results$interval_null$rope_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", test_results$interval_null$rope_compare)
+          test_results$point_null$CI_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", test_results$point_null$CI_compare)
+          test_results$point_null$null_decision <- gsub("H_0", "<i>H</i><sub>0</sub>", test_results$point_null$null_decision)
+          test_results$point_null$conclusion <- gsub("_diff", "<sub>diff</sub>", test_results$point_null$conclusion)
+          test_results$interval_null$conclusion <- gsub("_diff", "<sub>diff</sub>", test_results$interval_null$conclusion)
+
 
           estimate$point_null <- rbind(
             estimate$point_null,
@@ -320,6 +327,10 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
     jaspResults[["es_m_differenceTable"]]$position <- 10
 
     to_fill <- if (is_mean) "es_mean_difference" else "es_median_difference"
+
+    if (ready & is_mean) {
+        estimate$es_mean_difference$df <- as.numeric(estimate$es_mean_difference$df)
+    }
 
     if (ready) jasp_table_fill(
       jaspResults[["es_m_differenceTable"]],

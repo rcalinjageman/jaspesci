@@ -83,6 +83,8 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
     show_calculations <- options$show_calculations
   }
 
+  is_complex <- FALSE
+  if (!is.null(options$design)) is_complex <- TRUE
 
 
   # Title
@@ -253,7 +255,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
       type = "integer"
     )
 
-    if (from_raw) {
+    if (from_raw & !is_complex) {
       overviewTable$addColumnInfo(
         name = "missing",
         title = "Missing",
@@ -620,7 +622,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcom
         name = "outcome_variable_name",
         title = "Outcome variable",
         type = "string",
-        combine = FALSE
+        combine = is_complex
       )
 
     }
@@ -642,7 +644,7 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcom
 
   overviewTable$addColumnInfo(
     name = effect_column,
-    title = if (is_complex) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
+    title = if (is_complex) "Effect" else "Effect",   # paste(options$grouping_variable, "Effect", "</BR>"),
     type = "string",
     combine = FALSE
   )
@@ -888,11 +890,21 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
   }
 
   if (show_details & is_mean) {
-    overviewTable$addColumnInfo(
-      name = "df",
-      title = "<i>df</i>",
-      type = if (assume_equal_variance) "integer" else "number"
-    )
+    if (assume_equal_variance) {
+      overviewTable$addColumnInfo(
+        name = "df",
+        title = "<i>df</i>",
+        type = "integer"
+      )
+    } else {
+      overviewTable$addColumnInfo(
+        name = "df",
+        title = "<i>df</i>",
+        type = "number",
+        format = "dp:2"
+      )
+
+    }
   }
 
 
@@ -1191,13 +1203,6 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
   if (options$effect_size %in% c("median", "median_difference", "r")) {
 
     overviewTable$addColumnInfo(
-      name = "mean",
-      title = "<i>M</i>",
-      type = "number"
-    )
-
-
-    overviewTable$addColumnInfo(
       name = "median",
       title = "<i>Mdn</i>",
       type = "number"
@@ -1224,6 +1229,11 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       )
     }
 
+    overviewTable$addColumnInfo(
+      name = "mean",
+      title = "<i>M</i>",
+      type = "number"
+    )
 
   } # end of median, median difference
 
@@ -1271,13 +1281,13 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       type = "integer"
     )
 
-    if (from_raw) {
-      overviewTable$addColumnInfo(
-        name = "missing",
-        title = "Missing",
-        type = "integer"
-      )
-    }
+    # if (from_raw) {
+    #   overviewTable$addColumnInfo(
+    #     name = "missing",
+    #     title = "Missing",
+    #     type = "integer"
+    #   )
+    # }
 
 
   if (options$show_details & options$effect_size %in% c("mean", "mean_difference", "r")) {
@@ -1286,15 +1296,26 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
       mytype <- if (options$assume_equal_variance) "integer" else "number"
     }
 
-    overviewTable$addColumnInfo(
-      name = "df",
-      title = "<i>df</i>",
-      type = mytype
-    )
+    if (mytype == "integer") {
+      overviewTable$addColumnInfo(
+        name = "df",
+        title = "<i>df</i>",
+        type = "integer"
+      )
+
+    } else {
+      overviewTable$addColumnInfo(
+        name = "df",
+        title = "<i>df</i>",
+        type = "number"
+      )
+
+    }
+
 
   }
 
-  if (options$effect_size == "mean_difference") {
+  if (options$effect_size == "mean_difference" & !mixed) {
     if (options$assume_equal_variance) {
       overviewTable$addColumnInfo(
         name = "s_pooled",

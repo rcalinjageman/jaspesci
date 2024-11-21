@@ -446,7 +446,7 @@ Form
 
 
   Esci.FigureOptions {
-   simple_labels_enabled: true
+   simple_labels_enabled: fully_between.checked
    width_defaultValue: 700
    height_defaultValue: 400
    error_nudge_defaultValue: 0.5
