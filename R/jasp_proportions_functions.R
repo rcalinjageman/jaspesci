@@ -10,8 +10,14 @@ jasp_test_pdiff <- function(options, estimate) {
     mytest <- esci::test_pdiff(
       estimate,
       rope = c(rope_upper * -1, rope_upper),
-      output_html = TRUE
+      output_html = FALSE
     )
+
+    mytest$interval_null$rope_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$interval_null$rope_compare)
+    mytest$point_null$CI_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$CI_compare)
+    mytest$point_null$null_decision <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$null_decision)
+    mytest$point_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$point_null$conclusion)
+    mytest$interval_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$interval_null$conclusion)
 
 
     if (rope_upper > 0) {

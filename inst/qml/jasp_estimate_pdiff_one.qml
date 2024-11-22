@@ -67,7 +67,7 @@ Form
   	{
   		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
   		AvailableVariablesList { name: "allVariablesList" }
-  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); allowedColumns: ["nominal"] }
+  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); allowedColumns: ["nominal", "ordinal"] }
   	}
 
   }
@@ -96,21 +96,22 @@ Form
           name: "case_label"
           id: case_label
           label: ""
-          placeholderText: "Affected"
-          onFocusChanged: {
-            not_case_label_adjust()
+          defaultValue: "Affected"
+          onEditingFinished : {
+            summary_dirty.checked = true
           }
         }
 
         IntegerField
         {
           name: "cases"
-          label: qsTr("Cases")
+          label: ""
           defaultValue: 20
           min: 0
-        onEditingFinished : {
-          summary_dirty.checked = true
-        }
+          fieldWidth: 70
+          onEditingFinished : {
+            summary_dirty.checked = true
+          }
         }
 
         TextField
@@ -119,18 +120,19 @@ Form
           id: not_case_label
           enabled: false
           label: ""
-          placeholderText: "Not Affected"
+          value: "Not " + case_label.value
         }
 
         IntegerField
         {
           name: "not_cases"
-          label: qsTr("Sample size")
+          label: ""
           defaultValue: 80
           min: 0
-                  onEditingFinished : {
-          summary_dirty.checked = true
-        }
+          fieldWidth: 70
+          onEditingFinished : {
+            summary_dirty.checked = true
+          }
         }
       }  // 2 column grid
 
@@ -162,6 +164,7 @@ Form
 	    name: "count_NA";
 	    label: qsTr("Missing cases are counted")
 	    enabled: from_raw.checked
+	    visible: from_raw.checked
 	   }
 	}
 
