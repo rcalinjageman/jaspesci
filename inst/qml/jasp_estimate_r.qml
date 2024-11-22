@@ -85,7 +85,7 @@ Form
           name: "r"
           label: qsTr("Correlation (<i>r</i>)")
           defaultValue: 0.5
-          min: 0
+          min: -1
           max: 1
           enabled: from_summary.checked
         onEditingFinished : {
@@ -109,7 +109,7 @@ Form
         {
           name: "x_variable_name"
           id: x_variable_name
-          label: "X-variable name"
+          label: "<i>X</i>-variable name"
           placeholderText: "X variable"
           enabled: from_summary.checked
         }
@@ -119,7 +119,7 @@ Form
         {
           name: "y_variable_name"
           id: y_variable_name
-          label: "Y-variable name"
+          label: "<i>Y</i>-variable name"
           placeholderText: "Y variable"
           enabled: from_summary.checked
         }
@@ -486,7 +486,7 @@ Form
 
 
       Label {
-          text: qsTr("<u>SI</u>")
+          text: qsTr("<u>CI</u>")
       }
 
       Label {

@@ -18,6 +18,8 @@ jasp_mdiff_table_depends_on <- function() {
       "r",
       "x",
       "y",
+      "comparison_r",
+      "reference_r",
       "comparison_mean",
       "comparison_sd",
       "comparison_n",
@@ -28,6 +30,8 @@ jasp_mdiff_table_depends_on <- function() {
       "reference_level_name",
       "outcome_variable_name",
       "grouping_variable_name",
+      "y_variable_name",
+      "x_variable_name",
       "reference_measure",
       "comparison_measure",
       "reference_measure_name",
@@ -245,6 +249,9 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
 
   n_label <- "<i>N</i>"
   if (options$effect_size %in% c("mean_difference", "median_difference")) {
+    n_label <- "<i>n</i>"
+  }
+  if (options$effect_size %in% c("r") & levels > 1) {
     n_label <- "<i>n</i>"
   }
 
@@ -642,9 +649,18 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcom
   if (is_complex) effect_column <- "effects_complex"
   if (is_pdiff)  effect_column <- "effect_plus"
 
+  effect_title <- "Effect"
+
+  if (is_r) {
+    effect_title <- if (from_raw)
+      options$grouping_variable
+    else
+      jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
+  }
+
   overviewTable$addColumnInfo(
     name = effect_column,
-    title = if (is_complex) "Effect" else "Effect",   # paste(options$grouping_variable, "Effect", "</BR>"),
+    title = effect_title,
     type = "string",
     combine = FALSE
   )

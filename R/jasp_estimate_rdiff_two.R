@@ -58,8 +58,8 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       args$comparison_n <- options$comparison_n
       args$reference_r <- options$reference_r
       args$reference_n <- options$reference_n
-      args$x_variable_name <- jasp_text_fix(options, "x_variable_name", "X-variable")
-      args$y_variable_name <- jasp_text_fix(options, "y_variable_name", "Y-variable")
+      args$x_variable_name <- jasp_text_fix(options, "x_variable_name", "X variable")
+      args$y_variable_name <- jasp_text_fix(options, "y_variable_name", "Y variable")
       args$grouping_variable_name <- jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
       args$grouping_variable_levels <- c(
         jasp_text_fix(options, "reference_level_name", "Reference level"),
@@ -82,8 +82,15 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       mytest <- esci::test_rdiff(
         estimate,
         rope = c(options$null_value - options$null_boundary, options$null_value + options$null_boundary),
-        output_html = TRUE
+        output_html = FALSE
+
       )
+
+      mytest$interval_null$rope_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$interval_null$rope_compare)
+      mytest$point_null$CI_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$CI_compare)
+      mytest$point_null$null_decision <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$null_decision)
+      mytest$point_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$point_null$conclusion)
+      mytest$interval_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$interval_null$conclusion)
 
       mytest$to_fill <- if (options$null_boundary > 0) mytest$interval_null else mytest$point_null
     }
@@ -123,7 +130,8 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     jasp_es_r_prep(
       jaspResults = jaspResults,
       options = options,
-      ready = ready
+      ready = ready,
+      difference = TRUE
     )
 
     jaspResults[["es_r"]]$position <- 10
@@ -177,7 +185,7 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
   }
 
   # scatterplot
-  if (is.null(jaspResults[["scatterPlot"]])) {
+  if (is.null(jaspResults[["scatterPlot"]]) & from_raw) {
 
     scatterplot <- createJaspPlot(
       title = "Scatterplot",
@@ -239,6 +247,10 @@ jasp_estimate_rdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         jasp_numeric_fix(options, "ymax", 1)
       )
       args$ybreaks <- jasp_numeric_fix(options, "ybreaks", NULL)
+      args$difference_axis_breaks <- jasp_numeric_fix(options, "difference_axis_breaks", 5)
+      if (!is.null(args$difference_axis_breaks)) {
+        if (args$difference_axis_breaks < 2) args$difference_axis_breaks <- 2
+      }
 
       if (evaluate_h) {
         args$rope <- c(

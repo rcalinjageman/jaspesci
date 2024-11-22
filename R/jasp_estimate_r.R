@@ -52,8 +52,8 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
 
       args$r <- options$r
       args$n <- options$n
-      args$x_variable_name <- jasp_text_fix(options, "x_variable_name", "X-variable")
-      args$y_variable_name <- jasp_text_fix(options, "y_variable_name", "Y-variable")
+      args$x_variable_name <- jasp_text_fix(options, "x_variable_name", "X variable")
+      args$y_variable_name <- jasp_text_fix(options, "y_variable_name", "Y variable")
 
     }
 
@@ -89,8 +89,14 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       mytest <- esci::test_correlation(
         estimate,
         rope = c(options$null_value - options$null_boundary, options$null_value + options$null_boundary),
-        output_html = TRUE
+        output_html = FALSE
       )
+
+      mytest$interval_null$rope_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$interval_null$rope_compare)
+      mytest$point_null$CI_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$CI_compare)
+      mytest$point_null$null_decision <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$null_decision)
+      mytest$point_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$point_null$conclusion)
+      mytest$interval_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$interval_null$conclusion)
 
       mytest$to_fill <- if (options$null_boundary > 0) mytest$interval_null else mytest$point_null
     }
@@ -177,7 +183,7 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
   }
 
   # scatterplot
-  if (is.null(jaspResults[["scatterPlot"]])) {
+  if (is.null(jaspResults[["scatterPlot"]])  & from_raw) {
 
     scatterplot <- createJaspPlot(
       title = "Scatterplot",
@@ -192,14 +198,14 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
     if (ready) {
       args <- list()
       args$estimate <- estimate
-      args$show_line <- options$show_line
-      args$show_line_CI <- options$show_line_CI
-      args$show_PI <- options$show_PI
-      args$show_residuals <- options$show_residuals
+      args$show_line <- options$show_line & options$do_regression
+      args$show_line_CI <- options$show_line_CI & options$do_regression
+      args$show_PI <- options$show_PI & options$do_regression
+      args$show_residuals <- options$show_residuals & options$do_regression
       args$show_mean_lines <- options$show_mean_lines
       args$plot_as_z <- options$plot_as_z
       args$show_r <- options$show_r
-      args$predict_from_x <- jasp_numeric_fix(options, "predict_from_x", NULL)
+      if(options$do_regression)  args$predict_from_x <- jasp_numeric_fix(options, "predict_from_x", NULL)
 
 
       myplot <- do.call(
@@ -297,6 +303,9 @@ jasp_plot_correlation_decorate <- function(myplot, options, rdiff = FALSE) {
   )
 
   ybreaks <- jasp_numeric_fix(options, "ybreaks", NULL)
+  if (!is.null(ybreaks)) {
+    if (ybreaks < 2) ybreaks <- 2
+  }
 
   if (!rdiff) {
     myplot <- myplot + ggplot2::scale_y_continuous(
@@ -552,6 +561,9 @@ jasp_scatterplot_decorate <- function(myplot, options, r_value, rdiff = FALSE, s
   )
 
   xbreaks <- jasp_numeric_fix(options, "sp_xbreaks", NULL)
+  if (!is.null(xbreaks)) {
+    if (xbreaks < 2) xbreaks <- 2
+  }
 
   myplot <- myplot + ggplot2::scale_x_continuous(
     limits = xlim,
@@ -565,6 +577,9 @@ jasp_scatterplot_decorate <- function(myplot, options, r_value, rdiff = FALSE, s
   )
 
   ybreaks <- jasp_numeric_fix(options, "sp_ybreaks", NULL)
+  if (!is.null(ybreaks)) {
+    if (ybreaks < 2) ybreaks <- 2
+  }
 
   myplot <- myplot + ggplot2::scale_y_continuous(
     limits = ylim,
@@ -578,8 +593,8 @@ jasp_scatterplot_decorate <- function(myplot, options, r_value, rdiff = FALSE, s
     axis.title.y = ggtext::element_markdown(size = self$options$sp_axis.title.y),
     axis.text.x = ggtext::element_markdown(size = self$options$sp_axis.text.x),
     axis.title.x = ggtext::element_markdown(size = self$options$sp_axis.title.x),
-    legend.title = ggtext::element_markdown(),
-    legend.text = ggtext::element_markdown()
+    legend.title = ggtext::element_markdown(size = self$options$sp_axis.text.x),
+    legend.text = ggtext::element_markdown(size = self$options$sp_axis.text.x)
   )
 
 

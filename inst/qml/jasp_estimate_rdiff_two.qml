@@ -126,7 +126,7 @@ Form
           name: "reference_r"
           label: ""
           defaultValue: 0.5
-          min: 0
+          min: -1
           max: 1
           enabled: from_summary.checked
                   onEditingFinished : {
@@ -138,7 +138,7 @@ Form
           name: "comparison_r"
           label: ""
           defaultValue: 0.75
-          min: 0
+          min: -1
           max: 1
           enabled: from_summary.checked
                   onEditingFinished : {
@@ -185,7 +185,7 @@ Form
         {
           name: "x_variable_name"
           id: x_variable_name
-          label: "X-variable name"
+          label: "<i>X</i>-variable name"
           placeholderText: "X variable"
           enabled: from_summary.checked
         }
@@ -194,7 +194,7 @@ Form
         {
           name: "y_variable_name"
           id: y_variable_name
-          label: "Y-variable name"
+          label: "<i>Y</i>-variable name"
           placeholderText: "Y variable"
           enabled: from_summary.checked
         }

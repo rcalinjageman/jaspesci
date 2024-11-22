@@ -25,6 +25,7 @@ jasp_correlation_table_depends_on <- function() {
 jasp_scatterplot_depends_on <- function() {
   return(
     c(
+      jasp_correlation_table_depends_on(),
       "show_line",
       "show_line_CI",
       "show_PI",
@@ -33,6 +34,7 @@ jasp_scatterplot_depends_on <- function() {
       "plot_as_z",
       "show_r",
       "predict_from_x",
+      "do_regression",
       "x",
       "y",
       "grouping_variable",
@@ -128,17 +130,17 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE, differen
 
   gvn <- NULL
   if (!is.null(options$grouping_variable)) gvn <- options$grouping_variable
-  if (!from_raw & !is.null(options$grouping_variable_name)) gvn <- options$grouping_variable_name
+  if (!from_raw) gvn <- jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
 
   effect_title <- if (is.null(gvn))
     "Effect"
   else
-    paste(gvn, "Effect", "</BR>")
+    if (difference) gvn else paste(gvn, "Effect", "</BR>")
 
   if (paired) effect_title <- "Measures"
 
   table_title <- if (is.null(options$grouping_variable) & !paired)
-    "Linear correlation"
+    "Linear Correlation"
   else
     "Correlation Between Paired Measures"
 
@@ -150,14 +152,14 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE, differen
   if (!paired) {
     overviewTable$addColumnInfo(
       name = "x_variable_name",
-      title = "<i>X</i>-variable name",
+      title = "<i>X</i> variable",
       type = "string",
       combine = TRUE
     )
 
     overviewTable$addColumnInfo(
       name = "y_variable_name",
-      title = "<i>Y</i>-variable name",
+      title = "<i>Y</i> variable",
       type = "string",
       combine = TRUE
     )
@@ -210,7 +212,7 @@ jasp_es_r_prep <- function(jaspResults, options, ready, paired = FALSE, differen
 
   overviewTable$addColumnInfo(
     name = "n",
-    title = if (difference | paired) "<i>N</i><sub>pairs</sub>" else "<i>n</i><sub>pairs</sub>",
+    title = if (paired) "<i>N</i><sub>pairs</sub>" else "<i>n</i><sub>pairs</sub>",
     type = "integer"
   )
 
@@ -295,10 +297,12 @@ jasp_es_r_difference_prep <- function(jaspResults, options, ready) {
   # Handles
   from_raw <- options$switch == "from_raw"
 
+  effect_title <- "Effect"
+
   effect_title <- if (from_raw)
-    paste(options$grouping_variable, "Effect", "</BR>")
+    options$grouping_variable
   else
-    paste(options$grouping_variable_name, "Effect", "</BR>")
+    jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
 
   table_title <- "Difference in Correlation"
 
