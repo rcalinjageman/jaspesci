@@ -174,6 +174,7 @@ jasp_estimate_pdiff_one <- function(jaspResults, dataset = NULL, options, ...) {
         args$estimate <- estimate[[my_variable]]
         args$plot_possible <- options$plot_possible
 
+
         if (evaluate_h) {
           args$rope <- c(
             options$null_value - options$null_boundary,

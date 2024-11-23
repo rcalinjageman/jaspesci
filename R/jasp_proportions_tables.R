@@ -19,7 +19,15 @@ jasp_pdiff_table_depends_on <- function() {
       "grouping_variable_name",
       "grouping_variable_level1",
       "grouping_variable_level2",
-      "count_NA"
+      "count_NA",
+      "reference_measure",
+      "comparison_measure",
+      "comparison_measure_name",
+      "reference_measure_name",
+      "cases_consistent",
+      "cases_inconsistent",
+      "not_cases_inconsistent",
+      "not_cases_consistent"
     )
   )
 }
@@ -82,7 +90,7 @@ jasp_poverview_prep <- function(jaspResults, options, ready, estimate = NULL, le
 
   overviewTable$addColumnInfo(
     name = "n",
-    title = "<i>N</i>",
+    title = if (levels > 1) "<i>n</i>" else "<i>N</i>",
     type = "integer"
   )
 
@@ -162,7 +170,13 @@ jasp_es_proportion_difference_prep <- function(jaspResults, options, ready) {
   )
 
 
-  effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+  # effect_title <- if (ready) options$grouping_variable else "Effect"
+
+  effect_title <- paste(
+    if (!ready) "" else if (from_raw) options$grouping_variable else jasp_text_fix(options, "grouping_variable_name", "Grouping variable"),
+    "Effect",
+    "</BR>"
+  )
 
   overviewTable$addColumnInfo(
     name = "effect_plus",
@@ -251,7 +265,11 @@ jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, tab
   }
 
 
-  effect_title <- paste(options$grouping_variable, "Effect", "</BR>")
+  effect_title <- paste(
+    if (from_raw) options$grouping_variable else options$grouping_variable_name,
+    "Effect",
+    "</BR>"
+  )
 
   overviewTable$addColumnInfo(
     name = if (table_name != "es_phi") "effect_plus" else "effect",
@@ -324,6 +342,13 @@ jasp_es_proportion_prep <- function(jaspResults, options, ready, table_name, tab
 
 
 jamovi_contingency_table <- function(self, estimate, jaspResults) {
+  # Handles
+  from_raw <- FALSE
+  if (!is.null(self$options$switch)) {
+    from_raw <- self$options$switch == "from_raw"
+  }
+
+
   # Create a contingency table for Chi Square
 
   # Setup based on options for chi_table_option
@@ -351,7 +376,7 @@ jamovi_contingency_table <- function(self, estimate, jaspResults) {
   total_suffix <- "</b>"
 
   # Handle on the table and the observed and expected tables
-  tbl <- createJaspTable(title = "Chi-Square Contingency Table")
+  tbl <- createJaspTable(title = "Chi-Square Analysis")
 
   tbl$dependOn(
     c(
@@ -367,6 +392,14 @@ jamovi_contingency_table <- function(self, estimate, jaspResults) {
   cdims <- dim(observed)
   crows <- cdims[[1]]
   ccolumns <- cdims[[2]]
+
+  ovl_name <- if (from_raw) jasp_text_fix(self$options, "outcome_variable", "Outcome variable") else jasp_text_fix(self$options, "outcome_variable_name", "Outcome variable")
+
+  tbl$addColumnInfo(
+    name = "outcome_variable_level",
+    title = ovl_name,
+    type = "string"
+  )
 
 
   # First, create a column for each level of the grouping variable

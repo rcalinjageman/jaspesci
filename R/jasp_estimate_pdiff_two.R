@@ -60,6 +60,11 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         )
 
       }
+    } else {
+      mylevels <- c(
+        jasp_text_fix(options, "grouping_variable_level1", "Control"),
+        jasp_text_fix(options, "grouping_variable_level2", "Treated")
+      )
     }
   } else {
     mylevels <- 1
@@ -210,7 +215,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     self$options <- options
     jamovi_contingency_table(self, estimate, jaspResults)
 
-    jaspResults[["chi_square"]]$position <- 40
+    jaspResults[["chi_square"]]$position <- 50
 
   }
 
@@ -226,7 +231,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       effect_label = "&#981;"
     )
 
-    jaspResults[["es_phi"]]$position <- 50
+    jaspResults[["es_phi"]]$position <- 60
 
     if (ready) jasp_table_fill(
       jaspResults[["es_phi"]],
@@ -287,6 +292,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
         args$difference_axis_space <- 0.5
 
         args$difference_axis_breaks <- jasp_numeric_fix(options, "difference_axis_breaks", 5)
+        args$simple_contrast_labels <- options$simple_contrast_labels
 
         args$ylim <- c(
           jasp_numeric_fix(options, "ymin", NA),

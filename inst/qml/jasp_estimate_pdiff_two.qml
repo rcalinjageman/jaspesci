@@ -63,8 +63,8 @@ Form
   	{
   		preferredHeight: jaspTheme.smallDefaultVariablesFormHeight
   		AvailableVariablesList { name: "allVariablesList" }
-  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); allowedColumns: ["nominal"] }
-  		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); allowedColumns: ["nominal"]; singleVariable: true }
+  		AssignedVariablesList { name: "outcome_variable"; title: qsTr("Outcome variable"); allowedColumns: ["nominal", "ordinal"] }
+  		AssignedVariablesList { name: "grouping_variable"; title: qsTr("Grouping variable"); allowedColumns: ["nominal", "ordinal"]; singleVariable: true }
   	}
 
   }
@@ -276,8 +276,8 @@ Form
 
 
   Esci.FigureOptions {
-    simple_labels_enabled: false
-    simple_labels_visible: false
+    simple_labels_enabled: true
+    simple_labels_visible: true
     difference_axis_grid_visible: true
     difference_axis_units_visible: false
     data_grid_visible: false

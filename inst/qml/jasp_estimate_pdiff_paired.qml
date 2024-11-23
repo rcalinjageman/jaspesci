@@ -107,23 +107,22 @@ Form
           name: "case_label"
           id: case_label
           label: ""
-          placeholderText: "Sick"
+          defaultValue: "Sick"
           enabled: from_summary.checked
         }
-
 
         TextField
         {
           name: "not_case_label"
           id: not_case_label
           label: ""
-          placeholderText: "Well"
+          defaultValue: "Well"
           enabled: from_summary.checked
         }
 
         Label {
           id: case_label_again
-          text: "Sick"
+          text: case_label.value
           enabled: false
         }
 
@@ -154,7 +153,7 @@ Form
 
         Label {
           id: not_case_label_again
-          text: "Well"
+          text: not_case_label.value
           enabled: false
         }
 

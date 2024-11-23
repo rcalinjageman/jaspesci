@@ -28,7 +28,7 @@ import "./" as Esci
       {
         name: "height"
         label: qsTr("Height")
-        defaultValue: 400
+        defaultValue: 750
         min: 100
         max: 3000
       }
