@@ -171,15 +171,6 @@ Form
         id: fill_highlighted
       }
 
-      Label {
-        text: qsTr("Markers")
-      }
-
-      Esci.SizeSelect
-      {
-        label: qsTr("Size")
-        name: "marker_size"
-      }
 
 
     } // end describe_aesthetics_grid

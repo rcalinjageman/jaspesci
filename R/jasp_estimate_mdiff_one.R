@@ -273,11 +273,19 @@ jasp_plot_magnitude_decorate <- function(myplot, options) {
     if (is.na(ybreaks)) ybreaks <- NULL
   }
 
+  pargs <- list()
+  pargs$n.breaks <- ybreaks
+  if (all(is.na(limits))) {
 
-  myplot <- myplot + ggplot2::scale_y_continuous(
-    limits = limits,
-    n.breaks = ybreaks
-  )
+  } else {
+    pargs$limits <- limits
+  }
+
+  myplot <- myplot + do.call(ggplot2::scale_y_continuous, pargs)
+  # (
+  #   limits = limits,
+  #   n.breaks = ybreaks
+  # )
 
 
   # Aesthetics -------------------
