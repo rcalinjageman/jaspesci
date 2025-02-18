@@ -366,7 +366,7 @@ jamovi_contingency_table <- function(self, estimate, jaspResults) {
     "both" = TRUE
   )
 
-  buffer <- if (print_observed & print_expected) "<hr>" else NULL
+  buffer <- if (print_observed & print_expected) " " else NULL
 
   observed_prefix <- if (print_observed) NULL else NULL
   observed_suffix <- if (print_observed) NULL else NULL

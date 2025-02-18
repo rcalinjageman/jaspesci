@@ -283,7 +283,7 @@ Form
 	  CheckBox {
 	    name: "show_ratio";
 	    id: show_ratio
-	    label: qsTr("Ratio between groups (appropriate only for true ratio scales")
+	    label: qsTr("Ratio between groups (appropriate only for true ratio scales)")
 	    enabled: from_raw.checked
     }
 	}

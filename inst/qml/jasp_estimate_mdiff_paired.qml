@@ -211,13 +211,9 @@ Form
         RadioButton {
           value: "enter_sdiff";
           id: enter_sdiff
+          label: qsTr("Enter standard deviation of difference scores (<i>s</i><sub>diff</sub>)")
           onClicked: {
             r_adjust()
-          }
-          Label {
-            textFormat: Text.RichText
-            text: qsTr("Enter standard deviation of difference scores (<i>s</i><sub>diff</sub>)")
-            enabled: edter_sdiff.clicked
           }
         }
       }

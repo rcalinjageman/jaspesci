@@ -231,7 +231,7 @@ jasp_estimate_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
       effect_label = "&#981;"
     )
 
-    jaspResults[["es_phi"]]$position <- 60
+    jaspResults[["es_phi"]]$position <- 40
 
     if (ready) jasp_table_fill(
       jaspResults[["es_phi"]],

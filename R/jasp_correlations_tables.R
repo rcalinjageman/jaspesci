@@ -246,7 +246,7 @@ jasp_regression_prep <- function(jaspResults, options, ready) {
 
   overviewTable <- createJaspTable(title = "Regression")
 
-  overviewTable$dependOn(jasp_correlation_table_depends_on())
+  overviewTable$dependOn(c(jasp_correlation_table_depends_on(), "do_regression"))
 
   overviewTable$addColumnInfo(
     name = "component",
@@ -300,9 +300,9 @@ jasp_es_r_difference_prep <- function(jaspResults, options, ready) {
   effect_title <- "Effect"
 
   effect_title <- if (from_raw)
-    options$grouping_variable
+    paste(options$grouping_variable, "Effect", "<BR>")
   else
-    jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
+    paste(jasp_text_fix(options, "grouping_variable_name", "Grouping variable"), "Effect", "<BR>")
 
   table_title <- "Difference in Correlation"
 
@@ -312,14 +312,14 @@ jasp_es_r_difference_prep <- function(jaspResults, options, ready) {
 
   overviewTable$addColumnInfo(
     name = "x_variable_name",
-    title = "<i>X</i>-variable name",
+    title = "<i>X</i>-variable",
     type = "string",
     combine = TRUE
   )
 
   overviewTable$addColumnInfo(
     name = "y_variable_name",
-    title = "<i>Y</i>-variable name",
+    title = "<i>Y</i>-variable",
     type = "string",
     combine = TRUE
   )

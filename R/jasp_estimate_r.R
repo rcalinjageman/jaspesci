@@ -96,7 +96,9 @@ jasp_estimate_r <- function(jaspResults, dataset = NULL, options, ...) {
       mytest$point_null$CI_compare <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$CI_compare)
       mytest$point_null$null_decision <- gsub("H_0", "<i>H</i><sub>0</sub>", mytest$point_null$null_decision)
       mytest$point_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$point_null$conclusion)
+      mytest$point_null$conclusion <- gsub("Ͱ", "ρ", mytest$point_null$conclusion)
       mytest$interval_null$conclusion <- gsub("_diff", "<sub>diff</sub>", mytest$interval_null$conclusion)
+      mytest$interval_null$conclusion <- gsub("Ͱ", "ρ", mytest$interval_null$conclusion)
 
       mytest$to_fill <- if (options$null_boundary > 0) mytest$interval_null else mytest$point_null
     }

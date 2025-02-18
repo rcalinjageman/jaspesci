@@ -26,6 +26,8 @@ jasp_mdiff_table_depends_on <- function() {
       "reference_mean",
       "reference_sd",
       "reference_n",
+      "correlation",
+      "sdiff",
       "comparison_level_name",
       "reference_level_name",
       "outcome_variable_name",
@@ -110,7 +112,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   if (levels > 1 & ready) {
     overviewTable$addColumnInfo(
       name = "grouping_variable_level",
-      title = options$grouping_variable,
+      title = if (from_raw) options$grouping_variable else jasp_text_fix(options, "grouping_variable_name", "Grouping variable"),
       type = "string",
       combine = TRUE
     )
@@ -273,7 +275,7 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
   }
 
 
-  if (options$show_details & options$effect_size %in% c("mean", "mean_difference", "r")) {
+  if (options$show_details & options$effect_size %in% c("mean", "mean_difference")) {
     mytype <- "integer"
     if (!is.null(options$assume_equal_variance)) {
       mytype <- if (options$assume_equal_variance) "integer" else "number"
@@ -283,6 +285,16 @@ jasp_overview_prep <- function(jaspResults, options, ready, estimate = NULL, lev
       name = "df",
       title = "<i>df</i>",
       type = mytype
+    )
+
+  }
+
+  if (options$show_details & options$effect_size %in% c("r")) {
+    overviewTable$addColumnInfo(
+      name = "df",
+      title = "<i>df</i>",
+      type = "integer",
+      format = "dp:0"
     )
 
   }
@@ -430,9 +442,26 @@ jasp_smd_prep <- function(jaspResults, options, ready, estimate = NULL, one_grou
     )
   }
 
+  effect_label <- "Effect"
+  if (!is_complex & ! one_group) {
+    if (from_raw) {
+      effect_label <- paste(options$grouping_variable, "Effect", "</BR>")
+    } else {
+      effect_label <- paste(
+        jasp_text_fix(
+          options,
+          "grouping_variable_name",
+          "Grouping variable"
+        ),
+        "Effect",
+        "<BR>"
+      )
+    }
+  }
+
   overviewTable$addColumnInfo(
     name = if (is_complex) "effects_complex" else "effect",
-    title = if (is_complex | one_group) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
+    title = effect_label,    #      if (is_complex | one_group) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
     type = "string"
   )
 
@@ -651,12 +680,12 @@ jasp_he_prep <- function(jaspResults, options, ready, mytest = NULL, show_outcom
 
   effect_title <- "Effect"
 
-  if (is_r) {
-    effect_title <- if (from_raw)
-      options$grouping_variable
-    else
-      jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
-  }
+  # if (is_r) {
+  #   effect_title <- if (from_raw)
+  #     options$grouping_variable
+  #   else
+  #     jasp_text_fix(options, "grouping_variable_name", "Grouping variable")
+  # }
 
   overviewTable$addColumnInfo(
     name = effect_column,
@@ -862,9 +891,26 @@ jasp_es_m_difference_prep <- function(jaspResults, options, ready, estimate = NU
     )
   }
 
+  effect_label <- "Effect"
+  if (!is_complex & !is_paired) {
+    if (from_raw) {
+      effect_label <- paste(options$grouping_variable, "Effect", "</BR>")
+    } else {
+      effect_label <- paste(
+        jasp_text_fix(
+          options,
+          "grouping_variable_name",
+          "Grouping variable"
+        ),
+        "Effect",
+        "<BR>"
+      )
+    }
+  }
+
   overviewTable$addColumnInfo(
     name = if (is_complex) "effects_complex" else "effect",
-    title = if (is_complex) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
+    title = effect_label, # if (is_complex) "Effect" else paste(options$grouping_variable, "Effect", "</BR>"),
     type = "string"
   )
 
@@ -1293,7 +1339,7 @@ jasp_overview_complex_prep <- function(jaspResults, options, ready, estimate = N
 
     overviewTable$addColumnInfo(
       name = "n",
-      title = "<i>N</i>",
+      title = "<i>n</i>",
       type = "integer"
     )
 

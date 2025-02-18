@@ -313,8 +313,8 @@ jasp_plot_proportion_decorate <- function(myplot, options) {
     myplot$layers[["null_line"]]$aes_params$colour <- self$options$null_color
     if ((self$options$null_boundary != 0)) {
         try(myplot$layers[["null_interval"]]$aes_params$fill <- self$options$null_color)
-        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summary)/divider+1)
-        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- as.numeric(self$options$alpha_summary))
+        try(myplot$layers[["ta_CI"]]$aes_params$size <- as.numeric(self$options$size_summary)/divider+3)
+        try(myplot$layers[["ta_CI"]]$aes_params$alpha <- 1 - as.numeric(self$options$alpha_summary))
         try(myplot$layers[["ta_CI"]]$aes_params$colour <- self$options$color_summary)
         try(myplot$layers[["ta_CI"]]$aes_params$linetype <- self$options$linetype_summary)
     }
