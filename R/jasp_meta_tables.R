@@ -66,6 +66,7 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
   }
 
   e_title <- if (has_estimate) estimate$properties$effect_size_name_html else "Effect size"
+  e_title <- gsub("Mean", "<i>M</i>", e_title)
 
   overviewTable$addColumnInfo(
     name = "effect_size",
@@ -228,7 +229,7 @@ jasp_meta_raw_data_prep <- function(jaspResults, options, ready, estimate = NULL
   }  # end show details for pdiff
 
 
-  if (options$show_details & from_raw & reported_effect_size != "mean difference" & effect_size == "mean") {
+  if (options$show_details & from_raw & reported_effect_size != "mean_difference" & effect_size == "mean") {
           overviewTable$addColumnInfo(
             name = "mean",
             title = "<i>M</i>",

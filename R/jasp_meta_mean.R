@@ -108,6 +108,12 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
           " - <i>M</i><sub>Reference</sub>",
           sep = ""
         )
+        estimate$properties$effect_size_name_ggplot <- paste(
+          estimate$properties$effect_size_name_ggplot,
+          " - <i>M</i><sub>Reference</sub>",
+          sep = ""
+        )
+
       } else {
       }
     }
@@ -222,7 +228,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
       # Apply aesthetics to the plot
       xlab_replace <- paste(
-        estimate$properties$effect_size_name_ggplot,
+        if (has_reference) "<i>M</i> - <i>M</i><sub>Reference</sub>" else estimate$properties$effect_size_name_ggplot,
         ": ",
         estimate$es_meta$effect_label[[1]],
         sep = ""
@@ -284,7 +290,6 @@ jasp_forest_plot_decorate <- function(myplot, options, xlab_replace = "My Effect
   # make compatible with jamovi code
   self <- list()
   self$options <- options
-
 
   myplot <- myplot + ggplot2::scale_size_continuous(
     range = c(
@@ -418,6 +423,7 @@ jasp_forest_plot_decorate <- function(myplot, options, xlab_replace = "My Effect
     try(xbreaks <- as.numeric(options$xbreaks))
     if (is.na(xbreaks)) xbreaks <- NULL
   }
+
 
   if (!(options$xlab %in% c("auto", "Auto", "AUTO", ""))) {
     xlab_replace <- options$xlab

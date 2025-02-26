@@ -4,6 +4,8 @@ jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL) {
   self <- list()
   self$options <- options
 
+  estimate$es_heterogeneity[estimate$es_heterogeneity$moderator_level != "Overall" & estimate$es_heterogeneity$measure == "Diamond Ratio", c("LL", "UL")] <- NA
+
   has_aev <- !is.null(options$assume_equal_variance)
   has_switch <- !is.null(options$switch)
   if (has_switch) {
