@@ -81,10 +81,10 @@ Form
       GridLayout {
       id: sgrid
       columns: 3
+      rowSpacing: 1
+      columnSpacing: 1
 
-        Label {
-          text: " "
-        }
+        Item {}
 
 
         TextField {
@@ -92,6 +92,7 @@ Form
           Layout.columnSpan: 2
           label: ""
           placeholderText: "Grouping variable"
+          fieldWidth: 2*jaspTheme.textFieldWidth
         }
 
 
@@ -129,6 +130,7 @@ Form
           label: ""
           defaultValue: 20
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -141,6 +143,7 @@ Form
           label: ""
           defaultValue: 40
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -161,6 +164,7 @@ Form
           label: ""
           defaultValue: 80
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -173,6 +177,7 @@ Form
           label: ""
           defaultValue: 60
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
