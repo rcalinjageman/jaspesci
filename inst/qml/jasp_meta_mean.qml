@@ -33,6 +33,8 @@ Form
     } else {
       means.label = "Cohen's <i>d</i>, unbiased"
     }
+    means = null
+
   }
 
 
@@ -66,6 +68,7 @@ Form
       	  height: 40
       		AvailableVariablesList {
       		  name: "allVariablesList"
+      		  id: allVariablesList
       		}
       		AssignedVariablesList {
       		  name: "means";
@@ -76,6 +79,7 @@ Form
       		}
       		AssignedVariablesList {
       		  name: "sds";
+      		  id: sds;
       		  title: qsTr("Standard deviations");
       		  allowedColumns: ["scale"];
       		  singleVariable: true
@@ -84,12 +88,14 @@ Form
       		}
       		AssignedVariablesList {
       		  name: "ns";
+      		  id: ns
       		  title: qsTr("Sample sizes");
       		  allowedColumns: ["scale"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "labels";
+      		  id: mylabels
       		  title: qsTr("Study labels (optional");
       		  allowedColumns: ["nominal"];
       		  singleVariable: true

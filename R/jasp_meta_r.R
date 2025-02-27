@@ -83,13 +83,14 @@ jasp_meta_r <- function(jaspResults, dataset = NULL, options, ...) {
     args$random_effects <- self$options$random_effects %in% c("random_effects", "compare")
 
     estimate <- try(do.call(what = call, args = args))
+    if(is(estimate, "try-error")) stop(estimate[1])
 
     # Seems to be some encoding issue with presenting factors in JASP
     estimate$raw_data$label <- as.character(estimate$raw_data$label)
     if (has_moderator) estimate$raw_data$moderator <- as.character(estimate$raw_data$moderator)
 
     # Fix notes, also need to move to within esci
-    estimate <- jasp_meta_notes(options, estimate)
+    estimate <- jasp_meta_notes(options, estimate, NULL, jaspResults)
 
 
 
@@ -123,7 +124,8 @@ jasp_meta_r <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options = options,
       ready = ready,
-      estimate = estimate
+      estimate = estimate,
+      effect_size = "r"
     )
     if (ready) jasp_table_fill(
       jaspResults[["es_metaTable"]],
@@ -162,7 +164,8 @@ jasp_meta_r <- function(jaspResults, dataset = NULL, options, ...) {
       jaspResults,
       options = options,
       ready = ready,
-      estimate = estimate
+      estimate = estimate,
+      effect_size = "r"
     )
     if (ready) jasp_table_fill(
       jaspResults[["es_meta_differenceTable"]],

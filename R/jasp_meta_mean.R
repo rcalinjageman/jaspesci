@@ -100,6 +100,8 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
 
     estimate <- try(do.call(what = call, args = args))
 
+    if(is(estimate, "try-error")) stop(estimate[1])
+
     # properties cleanup - need to move this into esci
     if (!is.null(args$reference_mean) & from_raw) {
       if (options$reported_effect_size == "mean_difference") {
@@ -123,8 +125,7 @@ jasp_meta_mean <- function(jaspResults, dataset = NULL, options, ...) {
     if (has_moderator) estimate$raw_data$moderator <- as.character(estimate$raw_data$moderator)
 
     # Fix notes, also need to move to within esci
-    estimate <- jasp_meta_notes(options, estimate, args$reference_mean)
-
+    estimate <- jasp_meta_notes(options, estimate, args$reference_mean, jaspResults)
 
 
   } else {

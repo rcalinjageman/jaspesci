@@ -81,6 +81,7 @@ jasp_meta_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     # jaspResults[["debugtext"]] <- debugtext
 
     estimate <- try(do.call(what = call, args = args))
+    if(is(estimate, "try-error")) stop(estimate[1])
 
     # add pref and pcomp to raw data, should be moved to esci
     estimate$raw_data$reference_P <- estimate$raw_data$reference_cases / estimate$raw_data$reference_N
@@ -92,7 +93,7 @@ jasp_meta_pdiff_two <- function(jaspResults, dataset = NULL, options, ...) {
     if (has_moderator) estimate$raw_data$moderator <- as.character(estimate$raw_data$moderator)
 
     # Fix notes, also need to move to within esci
-    estimate <- jasp_meta_notes(options, estimate)
+    estimate <- jasp_meta_notes(options, estimate, NULL, jaspResults)
 
 
 

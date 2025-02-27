@@ -1,10 +1,14 @@
-jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL) {
+jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL, jaspResults = NULL) {
 
   # Handles
   self <- list()
   self$options <- options
 
   estimate$es_heterogeneity[estimate$es_heterogeneity$moderator_level != "Overall" & estimate$es_heterogeneity$measure == "Diamond Ratio", c("LL", "UL")] <- NA
+
+  estimate$es_heterogeneity$measure_html <- jasp_heterogeneity_to_html(
+    estimate$es_heterogeneity$measure
+  )
 
   has_aev <- !is.null(options$assume_equal_variance)
   has_switch <- !is.null(options$switch)
@@ -81,6 +85,15 @@ jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL) {
     }
   }
 
+  if (smd_reported & is.null(reference_mean) & !is.null(options$means)) {
+    ref_note <- paste(
+      "Effect sizes are relative to a reference value of ",
+      0,
+      ".<br>",
+      sep = ""
+    )
+  }
+
 
   meta_note <- paste(
     ref_note,
@@ -111,7 +124,40 @@ jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL) {
     message_html = raw_note
   )
 
+  if (!is.null(estimate$warnings)) {
+    lerror_text <- createJaspHtml(
+      paste(
+        estimate$warnings,
+        sep = "<BR>"
+      ),
+      title = "Warning!"
+    )
+    # To do: why does depenOn throw an error?
+    lerror_text$dependOn(jasp_meta_table_depends_on())
+    jaspResults[["estimate_warnings"]] <- lerror_text
+    jaspResults[["estimate_warnings"]]$position <- -5
+
+  }
+
   return(estimate)
+
+}
+
+
+jasp_heterogeneity_to_html <- function(measures) {
+  for (x in 1:length(measures)) {
+    measures[[x]] <- switch(
+      measures[[x]],
+      'tau^2' = "<i>𝜏</i><sup>2</sup>",
+      'tau' = "<i>𝜏</i>",
+      'I^2(%)'  = "<i>I</i><sup>2</sup>(%)",
+      'H^2' = "<i>H</i><sup>2</sup>",
+      "Diamond Ratio" = "Diamond Ratio",
+      "heterogneity"
+    )
+  }
+
+  return(measures)
 
 }
 
