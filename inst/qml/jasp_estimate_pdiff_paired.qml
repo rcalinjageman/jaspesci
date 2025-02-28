@@ -81,10 +81,10 @@ Form
       GridLayout {
       id: sgrid
       columns: 3
+      rowSpacing: 1
+      columnSpacing: 1
 
-        Label {
-          text: " "
-        }
+        Item {}
 
         TextField {
           name: "comparison_measure_name"
@@ -92,6 +92,7 @@ Form
           label: ""
           placeholderText: "Post-test"
           enabled: from_summary.checked
+          fieldWidth: 2*jaspTheme.textFieldWidth
         }
 
 
@@ -133,6 +134,7 @@ Form
           label: ""
           defaultValue: 18
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -145,6 +147,7 @@ Form
           label: ""
           defaultValue: 4
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -164,6 +167,7 @@ Form
           label: ""
           defaultValue: 12
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -176,6 +180,7 @@ Form
           label: ""
           defaultValue: 5
           min: 0
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
