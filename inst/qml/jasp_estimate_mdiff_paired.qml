@@ -98,10 +98,10 @@ Form
     GridLayout {
       id: summary_grid
       columns: 3
+      rowSpacing: 1
+      columnSpacing: 1
 
-      Label {
-        text: ""
-      }
+      Item {}
 
       Label {
         text: "Reference group"
@@ -136,6 +136,7 @@ Form
       {
         name: "reference_mean"
         defaultValue: 10
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -145,6 +146,7 @@ Form
       {
         name: "comparison_mean"
         defaultValue: 12
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -161,6 +163,7 @@ Form
         id: sd1
         defaultValue: 2.1
         min: 0
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -172,6 +175,7 @@ Form
         id: sd2
         defaultValue: 2.2
         min: 0
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -187,10 +191,19 @@ Form
         defaultValue: 20
         Layout.columnSpan: 2
         min: 2
+        fieldWidth: jaspTheme.textFieldWidth * 2
         onEditingFinished : {
           summary_dirty.checked = true
         }
       }
+
+      CheckBox
+	    {
+	      name: "summary_dirty";
+	      id: summary_dirty
+	      visible: false
+	    }
+
 
       RadioButtonGroup {
         Layout.columnSpan: 3
@@ -232,6 +245,7 @@ Form
         min: -1
         max: 1
         defaultValue: 0.7
+        fieldWidth: jaspTheme.textFieldWidth
           onFocusChanged: {
             sdiff_adjust()
           }
@@ -253,6 +267,7 @@ Form
         enabled: enter_sdiff.checked
         Layout.columnSpan: 2
         defaultValue: 1.67
+        fieldWidth: jaspTheme.textFieldWidth
           onFocusChanged: {
             r_adjust()
           }
@@ -264,12 +279,7 @@ Form
 
     } // end first summary data grid
 
-          CheckBox
-	    {
-	      name: "summary_dirty";
-	      id: summary_dirty
-	      visible: false
-	    }
+
 
   }
 

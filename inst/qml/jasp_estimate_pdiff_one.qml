@@ -80,16 +80,22 @@ Form
 
     Group {
 
-      TextField
-      {
-        name: "outcome_variable_name"
-        label: qsTr("Outcome variable name")
-        placeholderText: "Outcome variable"
-      }
+
 
       GridLayout {
       id: sgrid
       columns: 2
+      rowSpacing: 1
+      columnSpacing: 1
+
+        Item {}
+
+        TextField
+        {
+          name: "outcome_variable_name"
+          placeholderText: "Outcome variable"
+        }
+
 
         TextField
         {
@@ -108,7 +114,7 @@ Form
           label: ""
           defaultValue: 20
           min: 0
-          fieldWidth: 70
+          fieldWidth: jaspTheme.textFieldWidth
           onEditingFinished : {
             summary_dirty.checked = true
           }
@@ -129,7 +135,7 @@ Form
           label: ""
           defaultValue: 80
           min: 0
-          fieldWidth: 70
+          fieldWidth: jaspTheme.textFieldWidth
           onEditingFinished : {
             summary_dirty.checked = true
           }

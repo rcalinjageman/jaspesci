@@ -85,44 +85,64 @@ Form
     visible: from_summary.checked
     expanded: from_summary.checked
 
-    Group {
+    GridLayout {
+      id: summary_grid
+      columns: 2
+      rowSpacing: 1
+      columnSpacing: 1
+
+
+      Label {
+        text: qsTr("Mean (<i>M</i>)")
+      }
 
       DoubleField
       {
         name: "mean"
-        label: qsTr("Mean (<i>M</i>)")
         defaultValue: 10.1
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
+      }
+
+      Label {
+        text: qsTr("Standard deviation (<i>s</i>)")
       }
 
       DoubleField
       {
         name: "sd"
-        label: qsTr("Standard deviation (<i>s</i>)")
         defaultValue: 3
         min: 0
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
+      }
+
+      Label {
+        text: qsTr("Sample size (<i>N</i>)")
       }
 
       IntegerField
       {
         name: "n"
-        label: qsTr("Sample size (<i>N</i>)")
         defaultValue: 20
         min: 2
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
       }
 
+      Label {
+        text: qsTr("Outcome variable name")
+      }
+
       TextField
       {
         name: "outcome_variable_name"
-        label: qsTr("Outcome variable name")
         placeholderText: "Outcome variable"
       }
 

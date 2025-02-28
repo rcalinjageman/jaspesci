@@ -95,10 +95,10 @@ Form
     GridLayout {
       id: summary_grid
       columns: 3
+      rowSpacing: 1
+      columnSpacing: 1
 
-      Label {
-        text: ""
-      }
+      Item {}
 
       Label {
         text: "Reference group"
@@ -109,9 +109,8 @@ Form
       }
 
 
-      Label {
-        text: qsTr("Name")
-      }
+      Item {}
+
 
       TextField
       {
@@ -127,6 +126,7 @@ Form
 
       Label {
         text: qsTr("Mean (<i>M</i>)")
+        width: 900
 
       }
 
@@ -134,6 +134,7 @@ Form
       {
         name: "reference_mean"
         defaultValue: 10
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -143,6 +144,7 @@ Form
       {
         name: "comparison_mean"
         defaultValue: 12
+        fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -151,12 +153,14 @@ Form
 
       Label {
         text: qsTr("Standard deviation (<i>s</i>)")
+        width: 400
       }
 
       DoubleField
       {
         name: "reference_sd"
         defaultValue: 3
+        fieldWidth: jaspTheme.textFieldWidth
         min: 0
         onEditingFinished : {
           summary_dirty.checked = true
@@ -167,6 +171,7 @@ Form
       {
         name: "comparison_sd"
         defaultValue: 3
+        fieldWidth: jaspTheme.textFieldWidth
         min: 0
         onEditingFinished : {
           summary_dirty.checked = true
@@ -176,12 +181,14 @@ Form
 
       Label {
         text: qsTr("Sample size (<i>n</i>)")
+        width: 400
       }
 
       IntegerField
       {
         name: "reference_n"
         defaultValue: 20
+        fieldWidth: jaspTheme.textFieldWidth
         min: 2
         onEditingFinished : {
           summary_dirty.checked = true
@@ -192,6 +199,7 @@ Form
       {
         name: "comparison_n"
         defaultValue: 20
+        fieldWidth: jaspTheme.textFieldWidth
         min: 2
         onEditingFinished : {
           summary_dirty.checked = true
