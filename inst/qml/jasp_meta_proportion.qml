@@ -48,14 +48,14 @@ Form
       		}
       		AssignedVariablesList {
       		  name: "labels";
-      		  title: qsTr("Study labels (optional");
+      		  title: qsTr("Study labels (optional)");
       		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "moderator";
       		  id: moderator;
-      		  title: qsTr("Moderator (optional");
+      		  title: qsTr("Moderator (optional)");
       		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}

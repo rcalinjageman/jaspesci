@@ -18,6 +18,11 @@ jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL, jas
     from_raw <- FALSE
   }
 
+  is_rd <- FALSE
+  if (!is.null(options$reported_effect_size)) {
+    if (options$reported_effect_size == "RD") is_rd <- TRUE
+  }
+
 
   # Update column headings if reference mean was used
   ref_note <- NULL
@@ -106,6 +111,7 @@ jasp_meta_notes <- function(options, estimate = NULL, reference_mean = NULL, jas
   raw_note <- paste(
     ref_note,
     aev_note,
+    if (is_rd) "<i>P</i><sub>diff</sub> is calculated as <i>P</i><sub>comparison</sub> - <i>P</i><sub>reference</sub>" else NULL,
     " "
   )
 

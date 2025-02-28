@@ -61,14 +61,14 @@ Form
       		}
       		AssignedVariablesList {
       		  name: "labels";
-      		  title: qsTr("Study labels (optional");
+      		  title: qsTr("Study labels (optional)");
       		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
       		AssignedVariablesList {
       		  name: "moderator";
       		  id: moderator;
-      		  title: qsTr("Moderator (optional");
+      		  title: qsTr("Moderator (optional)");
       		  allowedColumns: ["nominal"];
       		  singleVariable: true
       		}
@@ -99,8 +99,8 @@ Form
           [
             { label: "Risk difference (<i>P</i><sub>diff</sub>)", value: "RD"},
             { label: "Log risk ratio (ln(<i>RR</i>))", value: "RR"},
-            { label: "Log odds ratio (ln(<i>OR</i>))", value: "AS"},
-            { label: "Arcsine-square-root-transformed risk difference (1/2 * Cohen's H)", value: "AS"},
+            { label: "Log odds ratio (ln(<i>OR</i>))", value: "OR"},
+            { label: "Arcsine-square-root-transformed risk difference (1/2 * Cohen's <i>h</i>)", value: "AS"},
             { label: "Log odds ratio, Peto's method (ln(<i>OR</i>)<sub>Peto</sub>)", value: "PETO"}
           ]
         id: reported_effect_size

@@ -134,7 +134,7 @@ import "./" as Esci
       CheckBox {
   	    name: "mark_zero";
   	    label: qsTr("Mark zero")
-  	    checked: true
+  	    checked: false
   	}
 
   	      Label {
