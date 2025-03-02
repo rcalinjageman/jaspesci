@@ -21,51 +21,79 @@ import "./" as Esci
 
     GridLayout {
       id: sp_dimensions_grid
-      columns: 3
+      columns: 5
       Layout.columnSpan: 2
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
+
 
       Label {
         text: qsTr("<b>Dimensions</b>")
+      }
+
+
+      Label {
+        text: qsTr("Width")
       }
 
       IntegerField
       {
         name: "sp_plot_width"
         id: sp_plot_width
-        label: qsTr("Width")
         defaultValue: 650
         min: 100
         max: 3000
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
+      }
+
+      Label {
+        text: qsTr("Height")
       }
 
     IntegerField
       {
         name: "sp_plot_height"
         id: sp_plot_height
-        label: qsTr("Height")
         defaultValue: 650
         min: 100
         max: 3000
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
     }  // end dimensions grid
 
+
+
     GridLayout {
       id: histogram_grid
-      columns: 3
+      columns: 5
       Layout.columnSpan: 2
       visible: false
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
 
         Label {
           text: qsTr("<b>Histogram</b>")
         }
 
+        Label {
+          text: qsTr("No. bins")
+        }
+
         IntegerField
         {
           name: "histogram_bins"
-          label: qsTr("No. bins")
           defaultValue: 12
           min: 2
           max: 80
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
+        }
+
+        Label {
+          text: qsTr(" ")
+        }
+
+        Label {
+          text: qsTr(" ")
         }
 
 
@@ -74,79 +102,105 @@ import "./" as Esci
 
     GridLayout {
       id: sp_yaxis_grid
-      columns: 3
+      columns: 5
       Layout.columnSpan: 2
-
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
 
         Label {
           text: qsTr("<b><i>Y</i> axis</b>")
         }
 
+        Label {
+          text: qsTr("Label")
+        }
+
         TextField
         {
           name: "sp_ylab"
-          label: qsTr("Label")
           placeholderText: "auto"
+          fieldWidth: jaspTheme.textFieldWidth * 0.7 * 2
+          Layout.columnSpan: 3
         }
+
 
         Label {
           text: " "
         }
 
         Label {
-          text: " "
+          text: qsTr("Tick Font Size")
         }
 
         IntegerField
         {
           name: "sp_axis.text.y"
-          label: qsTr("Tick Font Size")
           defaultValue: 14
           min: 2
           max: 80
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
+        }
+
+        Label {
+          text:  qsTr("Label Font Size")
         }
 
       IntegerField
         {
           name: "sp_axis.title.y"
-          label: qsTr("Label Font Size")
           defaultValue: 15
           min: 2
           max: 80
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
         }
 
         Label {
           text: " "
+        }
+
+        Label {
+          text: qsTr("Min")
         }
 
       TextField
         {
           name: "sp_ymin"
           id: ymin
-          label: qsTr("Min")
           placeholderText: "auto"
-          fieldWidth: 60
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
+        }
+
+        Label {
+          text: qsTr("Max")
         }
 
       TextField
         {
           name: "sp_ymax"
           id: ymax
-          label: qsTr("Max")
           placeholderText: "auto"
-          fieldWidth: 60
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
         }
 
         Label {
           text: " "
         }
 
+
+        Label {
+          text: qsTr("Num. tick marks")
+        }
+
+
         TextField
         {
           name: "sp_ybreaks"
-          label: qsTr("Num. tick marks")
           placeholderText: "auto"
-          fieldWidth: 60
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
+        }
+
+        Label {
+          text: " "
         }
 
         Label {
@@ -158,19 +212,27 @@ import "./" as Esci
 
       GridLayout {
       id: sp_xaxiss_grid
-      columns: 3
+      columns: 5
       Layout.columnSpan: 2
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
 
 
         Label {
           text: qsTr("<b><i>X</i> axis</b>")
         }
 
+
+        Label {
+          text: qsTr("Label")
+        }
+
         TextField
         {
           name: "sp_xlab"
-          label: qsTr("Label")
           placeholderText: "auto"
+          fieldWidth: jaspTheme.textFieldWidth * 0.7 * 2
+          Layout.columnSpan: 3
         }
 
         Label {
@@ -178,65 +240,83 @@ import "./" as Esci
         }
 
         Label {
-          text: " "
+          text: qsTr("Tick Font Size")
         }
 
         IntegerField
         {
           name: "sp_axis.text.x"
-          label: qsTr("Tick Font Size")
           defaultValue: 14
           min: 2
           max: 80
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
         }
+
+        Label {
+          text: qsTr("Label Font Size")
+        }
+
 
       IntegerField
         {
           name: "sp_axis.title.x"
-          label: qsTr("Label Font Size")
           defaultValue: 15
           min: 2
           max: 80
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
         }
 
         Label {
           text: " "
+        }
+
+        Label {
+          text:  qsTr("Min")
         }
 
       TextField
         {
           name: "sp_xmin"
           id: xmin
-          label: qsTr("Min")
           placeholderText: "auto"
-          fieldWidth: 60
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
+        }
+
+        Label {
+          text:  qsTr("Max")
         }
 
       TextField
         {
           name: "sp_xmax"
           id: xmax
-          label: qsTr("Max")
           placeholderText: "auto"
-          fieldWidth: 60
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
         }
 
         Label {
           text: " "
         }
+
+        Label {
+          text:  qsTr("Num. tick marks")
+        }
+
 
         TextField
         {
           name: "sp_xbreaks"
-          label: qsTr("Num. tick marks")
           placeholderText: "auto"
-          fieldWidth: 60
+          fieldWidth: jaspTheme.textFieldWidth * 0.7
         }
 
         Label {
           text: " "
         }
 
+        Label {
+          text: " "
+        }
 
       } // xaxis grid
 

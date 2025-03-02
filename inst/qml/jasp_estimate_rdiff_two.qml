@@ -82,6 +82,8 @@ Form
       GridLayout {
       id: sgrid
       columns: 3
+      rowSpacing: 1
+      columnSpacing: 1
 
         Label {
           text: qsTr("")
@@ -106,6 +108,7 @@ Form
           label: ""
           placeholderText: "Reference level"
           enabled: from_summary.checked
+          fieldWidth: jaspTheme.textFieldWidth
         }
 
 
@@ -116,6 +119,7 @@ Form
           label: ""
           placeholderText: "Comparison level"
           enabled: from_summary.checked
+          fieldWidth: jaspTheme.textFieldWidth
         }
 
         Label {
@@ -128,9 +132,11 @@ Form
           defaultValue: 0.5
           min: -1
           max: 1
+          fieldWidth: jaspTheme.textFieldWidth
           enabled: from_summary.checked
                   onEditingFinished : {
           summary_dirty.checked = true
+
         }
         }
 
@@ -140,9 +146,11 @@ Form
           defaultValue: 0.75
           min: -1
           max: 1
+          fieldWidth: jaspTheme.textFieldWidth
           enabled: from_summary.checked
                   onEditingFinished : {
           summary_dirty.checked = true
+
         }
         }
 
@@ -156,6 +164,7 @@ Form
           label: ""
           defaultValue: 20
           min: 2
+          fieldWidth: jaspTheme.textFieldWidth
           enabled: from_summary.checked
                   onEditingFinished : {
           summary_dirty.checked = true
@@ -168,47 +177,59 @@ Form
           label: ""
           defaultValue: 20
           min: 2
+          fieldWidth: jaspTheme.textFieldWidth
           enabled: from_summary.checked
                   onEditingFinished : {
           summary_dirty.checked = true
         }
         }
 
-      } // end of 3 column grid
 
 
-      GridLayout {
-      id: slabelgrid
-      columns: 1
+        Label {
+          text: qsTr("<i>X</i>-variable name")
+        }
 
         TextField
         {
           name: "x_variable_name"
           id: x_variable_name
-          label: "<i>X</i>-variable name"
           placeholderText: "X variable"
           enabled: from_summary.checked
+           Layout.columnSpan: 2
+           fieldWidth: jaspTheme.textFieldWidth * 2
+        }
+
+        Label {
+          text: qsTr("<i>Y</i>-variable name")
         }
 
         TextField
         {
           name: "y_variable_name"
           id: y_variable_name
-          label: "<i>Y</i>-variable name"
           placeholderText: "Y variable"
           enabled: from_summary.checked
+           Layout.columnSpan: 2
+           fieldWidth: jaspTheme.textFieldWidth * 2
         }
+
+        Label {
+          text: qsTr("Grouping variable name")
+        }
+
 
         TextField
         {
           name: "grouping_variable_name"
           id: grouping_variable_name
-          label: "Grouping variable name"
           placeholderText: "Grouping variable"
           enabled: from_summary.checked
+           Layout.columnSpan: 2
+           fieldWidth: jaspTheme.textFieldWidth * 2
         }
+      } // end of 3 column grid
 
-      }  // 1 column grid
 
 
                         CheckBox

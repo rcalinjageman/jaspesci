@@ -9,7 +9,7 @@ import "./" as Esci
 
      GridLayout {
       id: fgrid
-      columns: 3
+      columns: 5
       rowSpacing:    jaspTheme.rowGroupSpacing
       columnSpacing: jaspTheme.columnGroupSpacing
 
@@ -20,60 +20,81 @@ import "./" as Esci
         text: qsTr("<b>Dimensions</b>")
       }
 
-    IntegerField
-      {
-        name: "width"
-        label: qsTr("Width")
-        defaultValue: 600
-        min: 100
-        max: 3000
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+     Label {
+        text: qsTr("Width")
       }
 
     IntegerField
       {
+        name: "width"
+        defaultValue: 600
+        min: 100
+        max: 3000
+        fieldWidth: fgrid.adjustedFieldWidth
+      }
+
+     Label {
+        text: qsTr("Height")
+      }
+
+
+    IntegerField
+      {
         name: "height"
-        label: qsTr("Height")
         defaultValue: 750
         min: 100
         max: 3000
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
       }
 
      Label {
         text: qsTr("<b><i>Y</i> axis</b>")
       }
 
+     Label {
+        text: qsTr("Diamond height")
+      }
+
       DoubleField
       {
         name: "meta_diamond_height"
-        label: qsTr("Diamond height")
         defaultValue: 0.25
         min: 0
         max: 5
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
       }
+
+     Label {
+        text: qsTr("Include CIs")
+      }
+
 
   	  CheckBox {
   	    name: "report_CIs";
-  	    label: qsTr("Include CIs")
   	  }
 
   	  Label {
         text: " "
       }
 
+  	  Label {
+        text: qsTr("Tick Font Size")
+      }
+
   	   IntegerField
       {
         name: "axis.text.y"
-        label: qsTr("Tick Font Size")
         defaultValue: 14
         min: 2
         max: 80
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
       }
 
       Label {
+        text: " "
+      }
+
+  	  Label {
         text: " "
       }
 
@@ -82,124 +103,158 @@ import "./" as Esci
         text: qsTr("<b><i>X</i> axis</b>")
       }
 
+  	  Label {
+        text: qsTr("Label")
+      }
+
       TextField {
         name: "xlab"
-        label: qsTr("Label")
         placeholderText: "auto"
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth * 2
+        Layout.columnSpan: 3
       }
+
 
       Label {
         text: " "
       }
 
-      Label {
-        text: " "
+  	  Label {
+        text: qsTr("Tick Font Size")
       }
-
 
       IntegerField {
         name: "axis.text.x"
-        label: qsTr("Tick Font Size")
         defaultValue: 14
         min: 2
         max: 80
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
     }
+
+  	  Label {
+        text: qsTr("Label Font Size")
+      }
+
 
     IntegerField {
         name: "axis.title.x"
-        label: qsTr("Label Font Size")
         defaultValue: 15
         min: 2
         max: 80
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
     }
 
      Label {
         text: " "
       }
 
+     Label {
+        text: qsTr("Min")
+      }
 
     TextField {
         name: "xmin"
-        label: qsTr("Min")
         placeholderText: "auto"
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
     }
+
+     Label {
+        text: qsTr("Max")
+      }
+
 
     TextField {
         name: "xmax"
-        label: qsTr("Max")
         placeholderText: "auto"
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
     }
 
      Label {
         text: " "
       }
 
+     Label {
+        text: qsTr("Num. tick marks")
+      }
+
+
       TextField {
         name: "xbreaks"
-        label: qsTr("Num. tick marks")
         placeholderText: "auto"
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
+      }
+
+     Label {
+        text: qsTr("Mark zero")
       }
 
       CheckBox {
   	    name: "mark_zero";
-  	    label: qsTr("Mark zero")
   	    checked: false
   	}
 
-  	      Label {
+  	 Label {
         text: qsTr("<b>Difference axis</b>")
       }
 
+  	 Label {
+        text: qsTr("Label")
+      }
 
       TextField {
         name: "dlab"
-        label: qsTr("Label")
         placeholderText: "auto"
         enabled: moderator.count > 0
+        fieldWidth: fgrid.adjustedFieldWidth * 2
+        Layout.columnSpan: 3
       }
 
-           Label {
+     Label {
         text: " "
       }
 
-           Label {
-        text: " "
+     Label {
+        text: qsTr("Min")
       }
-
 
     TextField {
         name: "dmin"
-        label: qsTr("Min")
         placeholderText: "auto"
         enabled: moderator.count > 0
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
+      }
+
+     Label {
+        text: qsTr("Max")
       }
 
       TextField {
         name: "dmax"
-        label: qsTr("Max")
         placeholderText: "auto"
         enabled: moderator.count > 0
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
       }
 
       Label {
         text: " "
       }
 
+     Label {
+        text: qsTr("Num. tick marks")
+      }
+
+
        TextField {
         name: "dbreaks"
-        label: qsTr("Num. tick marks")
         placeholderText: "auto"
         enabled: moderator.count > 0
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
       }
+
+      Label {
+        text: " "
+      }
+
 
             Label {
         text: " "
@@ -209,22 +264,29 @@ import "./" as Esci
         text: qsTr("<b>Sample-size scaling</b>")
       }
 
+      Label {
+        text: qsTr("Minimum")
+      }
+
+
        DoubleField {
         name: "size_base"
-        label: qsTr("Minimum")
         defaultValue: 2
         min: 0.25
         max: 8
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
+      }
+
+      Label {
+        text: qsTr("Multiplier")
       }
 
       DoubleField {
         name: "size_multiplier"
-        label: qsTr("Multiplier")
         defaultValue: 3
         min: 1
         max: 5
-        fieldWidth: dimensions_grid.adjustedFieldWidth
+        fieldWidth: fgrid.adjustedFieldWidth
       }
 
 

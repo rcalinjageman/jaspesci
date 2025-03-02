@@ -79,47 +79,76 @@ Form
 
       GridLayout {
       id: sgrid
-      columns: 1
+      columns: 3
+      rowSpacing: 1
+      columnSpacing: 1
+
+
+      Label {
+        text: qsTr("Correlation (<i>r</i>)")
+      }
 
         DoubleField {
           name: "r"
-          label: qsTr("Correlation (<i>r</i>)")
           defaultValue: 0.5
           min: -1
           max: 1
           enabled: from_summary.checked
+          fieldWidth: jaspTheme.textFieldWidth
         onEditingFinished : {
           summary_dirty.checked = true
         }
         }
 
+      Label {
+        text: qsTr(" ")
+      }
+
+      Label {
+        text: qsTr("Sample size (<i>N</i>)")
+      }
 
         DoubleField {
           name: "n"
-          label: qsTr("Sample size (<i>N</i>)")
           defaultValue: 20
           min: 2
+          fieldWidth: jaspTheme.textFieldWidth
           enabled: from_summary.checked
                   onEditingFinished : {
           summary_dirty.checked = true
+          }
         }
-        }
+
+      Label {
+        text: qsTr(" ")
+      }
+
+
+      Label {
+        text: qsTr("<i>X</i>-variable name")
+      }
 
         TextField
         {
           name: "x_variable_name"
           id: x_variable_name
-          label: "<i>X</i>-variable name"
+          fieldWidth: jaspTheme.textFieldWidth * 2
+          Layout.columnSpan: 2
           placeholderText: "X variable"
           enabled: from_summary.checked
         }
 
 
+      Label {
+        text: qsTr("<i>Y</i>-variable name")
+      }
+
         TextField
         {
           name: "y_variable_name"
           id: y_variable_name
-          label: "<i>Y</i>-variable name"
+          fieldWidth: jaspTheme.textFieldWidth * 2
+          Layout.columnSpan: 2
           placeholderText: "Y variable"
           enabled: from_summary.checked
         }

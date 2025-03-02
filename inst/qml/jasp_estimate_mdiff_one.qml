@@ -218,122 +218,138 @@ Form
     }
 
 
-    Group
+    GridLayout
     {
-    title: qsTr("<b>CI</b>")
-    columns: 2
-    Layout.columnSpan: 2
+    columns: 5
+    rowSpacing:    jaspTheme.rowGroupSpacing
+    columnSpacing: jaspTheme.columnGroupSpacing
+
+      Label { text: qsTr("<b>CI</b>") }
+
+      Label { text:  qsTr("Style") }
 
       Esci.LineTypeSelect
       {
-        label: qsTr("Style")
         name: "linetype_summary"
         id: linetype_summary
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text:  qsTr("Thickness") }
 
       IntegerField
       {
         name: "size_interval"
-        label: qsTr("Thickness")
         defaultValue: 3
         min: 1
         max: 10
         enabled: effect_size.currentValue == "mean"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: "" }
+
+      Label { text: qsTr("Color") }
 
       Esci.ColorSelect
       {
         name: "color_interval"
-        label: qsTr("Color")
         startValue: 'black'
         id: color_interval
         enabled: effect_size.currentValue == "mean"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: qsTr("Transparency") }
 
       Esci.AlphaSelect
       {
         name: "alpha_interval"
-        label: qsTr("Transparency")
         enabled: effect_size.currentValue == "mean"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
 
 
-    }
+      Label { text: qsTr("<b>Error distribution</b>") }
 
-
-    Group
-    {
-    title: qsTr("<b>Error distribution</b>")
-    columns: 2
-    Layout.columnSpan: 2
+      Label { text: qsTr("Fill") }
 
       Esci.ColorSelect
       {
         name: "fill_error"
-        label: qsTr("Fill")
         startValue: 'gray75'
         id: fill_error
         enabled: effect_size.currentValue == "mean"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: qsTr("Transparency") }
 
       Esci.AlphaSelect
       {
         name: "alpha_error"
-        label: qsTr("Transparency")
         enabled: effect_size.currentValue == "mean"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
 
 
-    }
+      Label { text: qsTr("<b>The raw data</b>") }
 
-
-    Group
-    {
-    title: qsTr("<b>The raw data</b>")
-    columns: 2
-    Layout.columnSpan: 2
+      Label { text: qsTr("Shape") }
 
       Esci.ShapeSelect
       {
-        label: qsTr("Shape")
         name: "shape_raw"
         id: shape_raw
         enabled: from_raw.checked
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: qsTr("Size") }
 
       Esci.SizeSelect
       {
-        label: qsTr("Size")
         name: "size_raw"
         defaultValue: 2
         enabled: from_raw.checked
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: qsTr(" ") }
+
+      Label { text: qsTr("Outline") }
 
       Esci.ColorSelect
       {
         name: "color_raw"
-        label: qsTr("Outline")
         startValue: '#008DF9'
         id: color_raw
         enabled: from_raw.checked
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: qsTr("Fill") }
 
       Esci.ColorSelect
       {
         name: "fill_raw"
-        label: qsTr("Fill")
         startValue: 'NA'
         id: fill_raw
         enabled: from_raw.checked
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+
+      Label { text: qsTr(" ") }
+
+      Label { text: qsTr("Transparency") }
 
       Esci.AlphaSelect
       {
         name: "alpha_raw"
         enabled: from_raw.checked
-        label: qsTr("Transparency")
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
-
 
     }
 

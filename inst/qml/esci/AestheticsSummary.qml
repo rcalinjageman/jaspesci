@@ -4,33 +4,45 @@ import JASP
 import JASP.Controls
 import "./" as Esci
 
-    Group
+    GridLayout
     {
-    title: qsTr("<b>Summary</b>")
-    columns: 2
+    columns: 5
     Layout.columnSpan: 2
+    rowSpacing:    jaspTheme.rowGroupSpacing
+    columnSpacing: jaspTheme.columnGroupSpacing
+
+    Label { text: qsTr("<b>Summary</b>") }
+
+    Label { text: qsTr("Shape") }
 
       Esci.ShapeSelect
       {
-        label: qsTr("Shape")
         name: "shape_summary"
         id: shape_summary
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+    Label { text: qsTr("Size") }
 
       Esci.SizeSelect
       {
-        label: qsTr("Size")
         name: "size_summary"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+    Label { text: qsTr(" ") }
+
+    Label { text: qsTr("Outline") }
 
       Esci.ColorSelect
       {
         name: "color_summary"
-        label: qsTr("Outline")
         startValue: '#008DF9'
         id: color_summary
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
 
+    Label { text: qsTr("Fill") }
 
       Esci.ColorSelect
       {
@@ -38,14 +50,23 @@ import "./" as Esci
         label: qsTr("Fill")
         startValue: '#008DF9'
         id: fill_summary
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+    Label { text: qsTr(" ") }
+
+    Label { text: qsTr("Transparency") }
 
 
       Esci.AlphaSelect
       {
-        label: qsTr("Transparency")
         name: "alpha_summary"
+        fieldWidth: jaspTheme.textFieldWidth * 0.7
       }
+
+      Label { text: qsTr(" ") }
+
+      Label { text: qsTr(" ") }
 
 
     }

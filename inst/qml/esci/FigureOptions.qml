@@ -68,11 +68,10 @@ import "./" as Esci
       {
           name: "ylab"
           placeholderText: "auto"
-		  fieldWidth: dimensions_grid.adjustedFieldWidth
+		      fieldWidth: dimensions_grid.adjustedFieldWidth * 2
+          Layout.columnSpan: 3
       }
 
-      Label { text: "" }
-      Label { text: "" }
       // end: y-axis 1
 
       // y-axis row 2
@@ -143,11 +142,9 @@ import "./" as Esci
       {
           name: "xlab"
           placeholderText: "auto"
-		  fieldWidth: dimensions_grid.adjustedFieldWidth
-      }
+		      fieldWidth: dimensions_grid.adjustedFieldWidth * 2
+          Layout.columnSpan: 3      }
 
-      Label { text: "" }
-      Label { text: "" }
       // end: x-axis row 1
 
       // x-axis row 2
