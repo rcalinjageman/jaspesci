@@ -508,7 +508,7 @@ jasp_estimate_mdiff_2x2 <- function(jaspResults, dataset = NULL, options, ...) {
          }
 
          myplot$scales$scales[[2]]$labels <- mylabs
-         myplot <- myplot + ggplot2::guides(x = legendry:::guide_axis_nested(delim = " - "))
+         myplot <- myplot + ggplot2::guides(x = legendry::guide_axis_nested(key = " - "))
 
         jaspResults[[this_plot]]$plotObject <- myplot
 
