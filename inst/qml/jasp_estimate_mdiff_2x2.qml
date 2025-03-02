@@ -115,8 +115,8 @@ Form
     GridLayout {
       id: summary_grid
       columns: 3
-      rowSpacing:    jaspTheme.rowGroupSpacing
-      columnSpacing: jaspTheme.columnGroupSpacing
+      rowSpacing: 1
+      columnSpacing: 1
 
       Label {
         text: ""
@@ -127,10 +127,14 @@ Form
         name: "A_label"
         placeholderText: qsTr("Variable A")
         Layout.columnSpan: 2
+        fieldWidth: 2*jaspTheme.textFieldWidth
       }
 
-      Label {
-        text: ""
+      TextField
+      {
+        name: "B_label"
+        placeholderText: qsTr("Variable B")
+        Layout.columnSpan: 1
       }
 
       TextField
@@ -148,21 +152,8 @@ Form
 
       TextField
       {
-        name: "B_label"
-        placeholderText: qsTr("Variable B")
-        Layout.columnSpan: 1
-      }
-
-      Label {
-        text: ""
-      }
-
-      Label {
-        text: ""
-      }
-
-      Label {
-        text: ""
+        name: "B1_label"
+        placeholderText: qsTr("B1 level")
       }
 
 
@@ -171,6 +162,7 @@ Form
         name: "A1B1_mean"
         defaultValue: 10
         label: qsTr("<i>M</i>")
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -180,17 +172,15 @@ Form
       {
         name: "A2B1_mean"
         defaultValue: 10
+        label: qsTr("<i>M</i>")
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
       }
 
-      TextField
-      {
-        name: "B1_label"
-        placeholderText: qsTr("B1 level")
-      }
 
+      Item {}
 
       DoubleField
       {
@@ -198,6 +188,7 @@ Form
         defaultValue: 2.1
         label: qsTr("<i>s</i>")
         negativeValues: false
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -206,16 +197,16 @@ Form
       DoubleField
       {
         name: "A2B1_sd"
+        label: qsTr("<i>s</i>")
         defaultValue: 2.2
         negativeValues: false
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
       }
 
-      Label {
-        text: ""
-      }
+      Item {}
 
 
       IntegerField
@@ -224,6 +215,7 @@ Form
         name: "A1B1_n"
         defaultValue: 20
         min: 2
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -232,16 +224,20 @@ Form
       IntegerField
       {
         name: "A2B1_n"
+        label: qsTr("<i>n</i>")
         defaultValue: 20
         min: 2
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
       }
 
 
-      Label {
-        text: ""
+      TextField
+      {
+        name: "B2_label"
+        placeholderText: qsTr("B2 level")
       }
 
       DoubleField
@@ -249,6 +245,7 @@ Form
         name: "A1B2_mean"
         defaultValue: 15
         label: qsTr("<i>M</i>")
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -258,17 +255,17 @@ Form
       {
         name: "A2B2_mean"
         defaultValue: 10
+        label: qsTr("<i>M</i>")
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
       }
 
-      TextField
-      {
-        name: "B2_label"
-        placeholderText: qsTr("B2 level")
-      }
 
+      Label {
+        text: ""
+      }
 
       DoubleField
       {
@@ -276,6 +273,7 @@ Form
         defaultValue: 2.3
         label: qsTr("<i>s</i>")
         negativeValues: false
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -284,8 +282,10 @@ Form
       DoubleField
       {
         name: "A2B2_sd"
+        label: qsTr("<i>s</i>")
         defaultValue: 2.4
         negativeValues: false
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -302,6 +302,7 @@ Form
         name: "A1B2_n"
         defaultValue: 20
         negativeValues: false
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
@@ -310,8 +311,10 @@ Form
       IntegerField
       {
         name: "A2B2_n"
+        label: qsTr("<i>n</i>")
         defaultValue: 20
         negativeValues: false
+        fieldWidth: jaspTheme.textFieldWidth * .9
         onEditingFinished : {
           summary_dirty.checked = true
         }
