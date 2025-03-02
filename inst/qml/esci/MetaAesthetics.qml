@@ -9,6 +9,8 @@ import "./" as Esci
       GridLayout {
         id: grid
         columns: 5
+        rowSpacing:    jaspTheme.rowGroupSpacing
+        columnSpacing: jaspTheme.columnGroupSpacing
 
 
         Label {

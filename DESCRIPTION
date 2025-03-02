@@ -13,7 +13,8 @@ Imports:
   jaspBase,
   jaspGraphs,
   esci,
-  glue
+  glue,
+  legendry (>= 0.2)
 Suggests:
   testthat
 Remotes:

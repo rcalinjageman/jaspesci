@@ -10,6 +10,11 @@ import "./" as Esci
      GridLayout {
       id: fgrid
       columns: 3
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
+
+      // 0.7 is obtained via trial and error
+      property double adjustedFieldWidth: 0.7 * jaspTheme.textFieldWidth
 
      Label {
         text: qsTr("<b>Dimensions</b>")
@@ -22,6 +27,7 @@ import "./" as Esci
         defaultValue: 600
         min: 100
         max: 3000
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
     IntegerField
@@ -31,6 +37,7 @@ import "./" as Esci
         defaultValue: 750
         min: 100
         max: 3000
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
      Label {
@@ -44,6 +51,7 @@ import "./" as Esci
         defaultValue: 0.25
         min: 0
         max: 5
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
   	  CheckBox {
@@ -62,6 +70,7 @@ import "./" as Esci
         defaultValue: 14
         min: 2
         max: 80
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
       Label {
@@ -77,6 +86,7 @@ import "./" as Esci
         name: "xlab"
         label: qsTr("Label")
         placeholderText: "auto"
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
       Label {
@@ -94,6 +104,7 @@ import "./" as Esci
         defaultValue: 14
         min: 2
         max: 80
+        fieldWidth: dimensions_grid.adjustedFieldWidth
     }
 
     IntegerField {
@@ -102,6 +113,7 @@ import "./" as Esci
         defaultValue: 15
         min: 2
         max: 80
+        fieldWidth: dimensions_grid.adjustedFieldWidth
     }
 
      Label {
@@ -113,12 +125,14 @@ import "./" as Esci
         name: "xmin"
         label: qsTr("Min")
         placeholderText: "auto"
+        fieldWidth: dimensions_grid.adjustedFieldWidth
     }
 
     TextField {
         name: "xmax"
         label: qsTr("Max")
         placeholderText: "auto"
+        fieldWidth: dimensions_grid.adjustedFieldWidth
     }
 
      Label {
@@ -129,6 +143,7 @@ import "./" as Esci
         name: "xbreaks"
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
       CheckBox {
@@ -163,6 +178,7 @@ import "./" as Esci
         label: qsTr("Min")
         placeholderText: "auto"
         enabled: moderator.count > 0
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
       TextField {
@@ -170,6 +186,7 @@ import "./" as Esci
         label: qsTr("Max")
         placeholderText: "auto"
         enabled: moderator.count > 0
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
       Label {
@@ -181,6 +198,7 @@ import "./" as Esci
         label: qsTr("Num. tick marks")
         placeholderText: "auto"
         enabled: moderator.count > 0
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
             Label {
@@ -197,6 +215,7 @@ import "./" as Esci
         defaultValue: 2
         min: 0.25
         max: 8
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
       DoubleField {
@@ -205,6 +224,7 @@ import "./" as Esci
         defaultValue: 3
         min: 1
         max: 5
+        fieldWidth: dimensions_grid.adjustedFieldWidth
       }
 
 

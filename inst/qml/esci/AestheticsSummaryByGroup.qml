@@ -8,6 +8,8 @@ import "./" as Esci
     GridLayout {
       id: aesthetics_summary_by_group
       columns: 4
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
 
 
       Label {

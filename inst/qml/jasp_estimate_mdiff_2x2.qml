@@ -115,6 +115,8 @@ Form
     GridLayout {
       id: summary_grid
       columns: 3
+      rowSpacing:    jaspTheme.rowGroupSpacing
+      columnSpacing: jaspTheme.columnGroupSpacing
 
       Label {
         text: ""
